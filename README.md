@@ -1,3 +1,3 @@
 # fin-track-flask
 
-Flask web-app to track your finances.
+Web-app to track your finances using Flask and SQLitegit clone https://github.com/heroku/python-getting-started.git
