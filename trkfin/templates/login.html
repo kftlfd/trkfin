@@ -6,17 +6,6 @@
 {% endblock %}
 
 
-{% block message %}
-    {% if msg %}
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            alert("{{ msg }}");
-        });
-    </script>
-    {% endif %}
-{% endblock %}
-
-
 {% block main %}
 
     <h3>Log-in</h3>
@@ -38,7 +27,7 @@
         <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
         
         <p>{{ form.submit() }}</p>
-        
+
     </form>
 
 {% endblock %}
