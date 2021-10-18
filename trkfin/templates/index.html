@@ -1,8 +1,21 @@
 {% extends "layout.html" %}
 
+
 {% block title %}
     Home
 {% endblock %}
+
+
+{% block message %}
+    {% if msg %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            alert("{{ msg }}");
+        });
+    </script>
+    {% endif %}
+{% endblock %}
+
 
 {% block main %}
 
@@ -10,11 +23,5 @@
     <p>
         {{ res }}
     </p>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // alert("{% if res %}{{ res }}{% else %}hi{% endif %}");
-        });
-    </script>
 
 {% endblock %}

@@ -1,4 +1,5 @@
 from trkfin import app
+
 from flask import redirect, render_template, request, session
 from flask_session import Session
 from sqlalchemy import create_engine
