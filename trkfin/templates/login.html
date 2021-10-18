@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+
+{% block title %}
+    Log-In
+{% endblock %}
+
+
+{% block message %}
+    {% if msg %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            alert("{{ msg }}");
+        });
+    </script>
+    {% endif %}
+{% endblock %}
+
+
+{% block main %}
+
+    <h3>Log-in</h3>
+
+    <form action="" method="POST" novalidate>
+
+        {{ form.hidden_tag() }}
+        
+        <p>
+            {{ form.username.label }}<br>
+            {{ form.username(size=32) }}
+        </p>
+        
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(size=32) }}
+        </p>
+        
+        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+        
+        <p>{{ form.submit() }}</p>
+        
+    </form>
+
+{% endblock %}
