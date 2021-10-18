@@ -29,7 +29,7 @@
         <nav class="navbar navbar-expand-md navbar-light bg-light border">
             
             <!-- Navbar brand -->
-            <a class="navbar-brand" href="/">TrkFin</a>
+            <a class="navbar-brand" href="{{ ulr_for("index") }}">TrkFin</a>
             
             <!-- Navbar toggler -->
             <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-target="#navbar" data-toggle="collapse" type="button">
@@ -43,24 +43,21 @@
                 
                     <!-- left -->
                     <ul class="navbar-nav mr-auto mt-2">
-                        <li class="nav-item"><a class="nav-link" href="/quote">Quote</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/buy">Buy</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/sell">Sell</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/history">History</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ ulr_for("") }}">Link</a></li>
                     </ul>
                 
                     <!-- right -->
                     <ul class="navbar-nav ml-auto mt-2">
-                        <li class="nav-item"><a class="nav-link" href="/account">Account</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ ulr_for("account") }}">Account</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ ulr_for("logout") }}">Log Out</a></li>
                     </ul>
                 
                 {% else %}
                 
                     <!-- right -->
                     <ul class="navbar-nav ml-auto mt-2">
-                        <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/login">Log In</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ ulr_for("register") }}">Register</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ ulr_for("login") }}">Log In</a></li>
                     </ul>
                 
                 {% endif %}
