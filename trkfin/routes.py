@@ -1,11 +1,11 @@
 from flask import flash, redirect, render_template, request, session
 from flask_session import Session
-from sqlalchemy import create_engine
+# from sqlalchemy import create_engine
 from trkfin import app
 from trkfin.forms import LoginForm
 
-engine = create_engine('sqlite:///trkfin.db')
-db = engine.connect()
+# engine = create_engine('sqlite:///trkfin.db')
+# db = engine.connect()
 
 
 @app.route("/")
