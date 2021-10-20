@@ -2,46 +2,46 @@
 
 
 {% block title %}
-    Log-In
+	Log-In
 {% endblock %}
 
 
 {% block main %}
 
-    <h3>Log-in</h3>
+	<h3>Log-in</h3>
 
-    <form action="" method="POST" novalidate>
+	<form action="" method="POST" novalidate>
 
-        {{ form.hidden_tag() }}
+		{{ form.hidden_tag() }}
         
-        <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=32) }}
-            {% for error in form.username.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
+		<p>
+			{{ form.username.label }}<br>
+			{{ form.username(size=32) }}
+			{% for error in form.username.errors %}
+				<span style="color: red;">[{{ error }}]</span>
+			{% endfor %}
+		</p>
 
-        <p>
-            {{ form.email.label }}<br>
-            {{ form.email(size=32) }}
-            {% for error in form.username.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
+		<p>
+			{{ form.email.label }}<br>
+			{{ form.email(size=32) }}
+			{% for error in form.email.errors %}
+				<span style="color: red;">[{{ error }}]</span>
+			{% endfor %}
+		</p>
+		
+		<p>
+			{{ form.password.label }}<br>
+			{{ form.password(size=32) }}
+			{% for error in form.password.errors %}
+				<span style="color: red;">[{{ error }}]</span>
+			{% endfor %}
+		</p>
         
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=32) }}
-            {% for error in form.password.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        
-        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-        
-        <p>{{ form.submit() }}</p>
+		<p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+		
+		<p>{{ form.submit() }}</p>
 
-    </form>
+	</form>
 
 {% endblock %}
