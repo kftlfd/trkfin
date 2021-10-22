@@ -31,7 +31,7 @@
 				{% if current_user.is_authenticated %}					
 					<!-- left -->
 					<ul class="navbar-nav mr-auto mt-2">
-						<li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Link</a></li>
+						<li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
 					</ul>					
 					<!-- right -->
 					<ul class="navbar-nav ml-auto mt-2">
@@ -50,10 +50,9 @@
 		</nav>
 
 		{% if get_flashed_messages() %}
-		<!-- alert -->
+		<!-- flash messages -->
 			<header>
 				<div class="alert alert-primary border text-center" role="alert">
-					<!-- {{ get_flashed_messages() | join(" ") }} -->
 					{% with messages = get_flashed_messages() %}                    
 						<ul>
 							{% for message in messages %}
