@@ -4,6 +4,7 @@ from wtforms.validators import ValidationError, DataRequired, Optional, EqualTo
 
 from trkfin.models import Users
 
+
 class LoginForm(FlaskForm):
 
     username = StringField('Username', validators=[DataRequired()])

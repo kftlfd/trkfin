@@ -13,7 +13,7 @@ def index():
 
     if current_user.is_authenticated:
         msg = "logged-in!"
-        return render_template("index.html")
+        return render_template("index.html", msg=msg)
 
     return render_template("index.html")
 
@@ -26,19 +26,14 @@ def register():
 
     form = RegistrationForm()
 
+    # if received a valid form
     if form.validate_on_submit():
-        
-        # flash form data -- TEMP
-        flash("user: {}; email: {}; passw: {}; confirm: {}".format(
-            form.username.data, form.email.data, form.password.data, form.confirm.data
-        ))
 
         # remember registration info
-        new_user = Users(form.username.data)
-        new_user.email = form.email.data
+        new_user = Users(username=form.username.data, email=form.email.data)
         new_user.set_password(form.password.data)
 
-        # insert into db        
+        # insert write new user to db        
         db.session.add(new_user)
         db.session.commit()
 
@@ -57,28 +52,23 @@ def login():
 
     form = LoginForm()
 
+    # if received a valid form
     if form.validate_on_submit():
-
-        # flash form data
-        flash("form:: user: {}; email: {}; passw: {}; remember: {}".format(
-            form.username.data, form.email.data, form.password.data, form.remember_me.data
-        ))
 
         # check if user is in db
         user = Users.query.filter_by(username=form.username.data).first()        
-        
         if user is None:
             flash('username not found')
             return redirect(url_for('login'))
         
+        # check password
         if not user.check_password(form.password.data):
             flash('wrong password')
             return redirect((url_for('login')))
 
-        # success        
+        # log user in
         login_user(user, remember=form.remember_me.data)
-        flash('logged in: id ' + str(user.id))
-        flash(f"{current_user}")
+        flash('Logged in')
 
         # redirect to next page
         next_page = request.args.get('next')
