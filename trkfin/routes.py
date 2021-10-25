@@ -85,7 +85,13 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/account')
+@app.route('/u/<username>')
 @login_required
-def account():
+def account(username):
+    
+    if username is not current_user.username:
+        return redirect('/u/' + current_user.username)
+
+    user = Users.query.filter_by(username=username).first_or_404()
+
     return render_template('account.html')
