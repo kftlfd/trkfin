@@ -4,21 +4,26 @@ from werkzeug.urls import url_parse
 
 from trkfin import app, db
 from trkfin.models import Users
-from trkfin.forms import LoginForm, RegistrationForm
+from trkfin.forms import LoginForm, RegistrationForm, FormSpending, FormIncome, FormTransfer
 
 
-@app.route("/")
-@app.route("/index")
-def index():
-
-    if current_user.is_authenticated:
-        msg = "logged-in!"
-        return render_template("index.html", msg=msg)
+@app.route("/", methods=['GET', 'POST'])
+@app.route("/index", methods=['GET', 'POST'])
+def index():    
 
     if not current_user.is_authenticated:
         return redirect(url_for('welcome'))
 
-    return render_template("index.html")
+    f_sp = FormSpending()
+    f_inc = FormIncome()
+    f_tr = FormTransfer()
+    forms = {"sp": f_sp, "inc": f_inc, "tr": f_tr}
+
+    if f_sp.validate_on_submit():
+        
+        flash('valid')
+
+    return render_template("index.html", forms=forms)
 
 
 @app.route("/welcome")

@@ -9,6 +9,53 @@
 {% block main %}
 
 	<h3>Hello</h3>
-  <h4>{{ msg }}</h4>
+  
+  <hr>
+
+  <div>
+    <form action="" method="POST" novalidate>
+      {{ forms.sp.hidden_tag() }}
+
+      {{ forms.sp.source.label(class_="form-label") }}
+      {{ forms.sp.source(class_="form-control") }}
+      {% for error in forms.sp.source.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}<br>
+      
+      {{ forms.sp.amount.label(class_="form-label") }}
+      {{ forms.sp.amount(class_="form-control") }}
+      {% for error in forms.sp.amount.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}<br>
+
+      {{ forms.sp.description.label(class_="form-label") }}
+      {{ forms.sp.description(class_="form-control") }}
+      {% for error in forms.sp.description.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}<br>
+
+      {{ forms.sp.submit(class_="btn btn-primary") }}
+    </form>
+  </div>
+
+  <hr>
+
+  <div>
+    <form action="" method="POST">
+      {{ forms.inc.description.label(class_="form-label") }}
+      {{ forms.inc.description(class_="form-control") }}
+      {{ forms.inc.submit(class_="btn btn-primary") }}
+    </form>
+  </div>
+
+  <hr>
+
+  <div>
+    <form action="" method="POST">
+      {{ forms.tr.description.label(class_="form-label") }}
+      {{ forms.tr.description(class_="form-control") }}
+      {{ forms.tr.submit(class_="btn btn-primary") }}
+    </form>
+  </div>
 
 {% endblock %}
