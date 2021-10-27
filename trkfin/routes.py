@@ -7,9 +7,16 @@ from trkfin.models import Users
 from trkfin.forms import LoginForm, RegistrationForm, FormSpending, FormIncome, FormTransfer
 
 
-@app.route("/", methods=['GET', 'POST'])
-@app.route("/index", methods=['GET', 'POST'])
-def index():    
+@app.route("/")
+def index():
+    if not current_user.is_authenticated:
+        return redirect(url_for('welcome'))
+    else:
+        return redirect(url_for('home'))
+
+
+@app.route("/home", methods=['GET', 'POST'])
+def home():    
 
     if not current_user.is_authenticated:
         return redirect(url_for('welcome'))
