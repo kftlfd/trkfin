@@ -15,7 +15,15 @@ def index():
         msg = "logged-in!"
         return render_template("index.html", msg=msg)
 
+    if not current_user.is_authenticated:
+        return redirect(url_for('welcome'))
+
     return render_template("index.html")
+
+
+@app.route("/welcome")
+def welcome():
+    return render_template("welcome.html")
 
 
 @app.route("/register", methods=['GET', 'POST'])
