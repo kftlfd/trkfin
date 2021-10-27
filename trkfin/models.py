@@ -31,22 +31,26 @@ def load_user(id):
 
 class UserStuff(db.Model):
 
+    id = db.Column(db.Integer, primary_key=True)
     # user_id
     # category
     # amount
+    name = "UserStuff"
 
     def __repr__(self):
-        return "stuff"
+        return name
 
 
 class UsersHistory(db.Model):
 
+    id = db.Column(db.Integer, primary_key=True)
     # timestamp
     # user_id
     # type of transaction
     # from category
     # to category
     # amount
+    name = "UserHistory"
 
     def __repr__(self):
-        return "history"
+        return name
