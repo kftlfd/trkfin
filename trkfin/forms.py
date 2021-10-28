@@ -14,68 +14,80 @@ tdSources = {
 class LoginForm(FlaskForm):
 
     username = StringField('Username', validators=[DataRequired()])
+
     email = StringField('E-Mail', validators=[Optional()])
+    
     password = PasswordField('Password', validators=[DataRequired()])
+    
     remember_me = BooleanField('Remember Me')
+    
     submit = SubmitField('Sign In')
 
 
 class RegistrationForm(FlaskForm):
     
     username = StringField('Username', validators=[DataRequired()])
+    
     email = StringField('E-Mail', validators=[Optional()])
+    
     password = PasswordField('Password', validators=[DataRequired()])
+    
     confirm = PasswordField('Repeat password', validators=[DataRequired(), EqualTo('password', message="must match")])
+    
     submit = SubmitField('Sign Up')
 
     def validate_username(self, username):
         user = Users.query.filter_by(username=username.data).first()
         if user is not None:
-            raise ValidationError('Please use a different username.')
+            raise ValidationError('Username is not available.')
 
 
 class FormSpending(FlaskForm):
 
-    ts = ""
-    action = "spending"
-    
+    sp_ts = "timestamp"    
+
     srcs = []
     for key, value in tdSources.items():
         srcs.append(key)
-    source_sp = SelectField("Source", validators=[DataRequired()], choices=srcs)
+    sp_source = SelectField("Source", validators=[DataRequired()], choices=srcs)
 
-    amount_sp = DecimalField('Amount', validators=[DataRequired()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})
+    sp_amount = DecimalField('Amount', validators=[DataRequired()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})
     
-    description_sp = StringField('Description', validators=[Optional()], render_kw={'placeholder': 'description'})
+    sp_description = StringField('Description', validators=[Optional()], render_kw={'placeholder': 'description'})
     
-    submit_sp = SubmitField('Submit', id='submit-spending')
-
-    def __repr__(self):
-        return f'<SP | {self.ts} | {self.action} | {self.source_sp} | {self.amount_sp} | {self.description_sp}>'
+    sp_submit = SubmitField('Submit') #, id='submit-spending'
 
 
 class FormIncome(FlaskForm):
 
-    ts = ""
-    action = "income"
+    inc_ts = "timestamp"
     
     srcs = []
     for key, value in tdSources.items():
         srcs.append(key)
-    destination_inc = SelectField("Destination", validators=[DataRequired()], choices=srcs)
+    inc_destination = SelectField("Destination", validators=[DataRequired()], choices=srcs)
 
-    amount_inc = DecimalField('Amount', validators=[DataRequired()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})
+    inc_amount = DecimalField('Amount', validators=[DataRequired()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})
     
-    description_inc = StringField('Description', validators=[Optional()], id="descr_inc", render_kw={'placeholder': 'description'})
+    inc_description = StringField('Description', validators=[Optional()], render_kw={'placeholder': 'description'})
 
-    submit_inc = SubmitField('Submit', id='submit-income')
+    inc_submit = SubmitField('Submit') #, id='submit-income'
 
 
 class FormTransfer(FlaskForm):
 
-    ts = ""
-    action = "transfer"
-    # from
-    # to
-    description = StringField('Description', validators=[Optional()], id="descr_tr")
-    submit = SubmitField('Submit')
+    tr_ts = "timestamp"
+    
+    srcs = []
+    for key, value in tdSources.items():
+        srcs.append(key)
+
+    tr_source = SelectField("From", validators=[DataRequired()], choices=srcs)
+
+    tr_destination = SelectField("To", validators=[DataRequired()], choices=srcs)
+
+    tr_amount = DecimalField('Amount', validators=[DataRequired()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})
+
+    tr_description = StringField('Description', validators=[Optional()], render_kw={'placeholder': 'description'})
+    
+    tr_submit = SubmitField('Submit')

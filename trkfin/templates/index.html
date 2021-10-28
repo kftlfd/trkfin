@@ -12,29 +12,26 @@
   
   <hr>
   <h4>Spendings</h4>
-  <div>
+  <div class='form-group-row'>
     <form name="spending" id="f_spend" action="" method="POST">
       {{ forms.sp.hidden_tag() }}
-
-      {{ forms.sp.source_sp.label(class_="form-label") }}
-      {{ forms.sp.source_sp(class_="form-control") }}
-      {% for error in forms.sp.source_sp.errors %}
-        <span style="color: red;">[{{ error }}]</span>
-      {% endfor %}<br>
       
-      {{ forms.sp.amount_sp.label(class_="form-label") }}
-      {{ forms.sp.amount_sp(class_="form-control") }}
-      {% for error in forms.sp.amount_sp.errors %}
+      {{ forms.sp.sp_source(class_="form-control") }}
+      {% for error in forms.sp.sp_source.errors %}
         <span style="color: red;">[{{ error }}]</span>
       {% endfor %}<br>
 
-      {{ forms.sp.description_sp.label(class_="form-label") }}
-      {{ forms.sp.description_sp(class_="form-control") }}
-      {% for error in forms.sp.description_sp.errors %}
+      {{ forms.sp.sp_amount(class_="form-control") }}
+      {% for error in forms.sp.sp_amount.errors %}
         <span style="color: red;">[{{ error }}]</span>
       {% endfor %}<br>
 
-      {{ forms.sp.submit_sp(class_="btn btn-primary") }}
+      {{ forms.sp.sp_description(class_="form-control") }}
+      {% for error in forms.sp.sp_description.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}<br>
+
+      {{ forms.sp.sp_submit(class_="btn btn-primary") }}
     </form>
   </div>
 
@@ -44,16 +41,13 @@
     <form name="income" id="f_income" action="" method="POST">
       {{ forms.sp.hidden_tag() }}
 
-      {{ forms.inc.destination_inc.label() }}
-      {{ forms.inc.destination_inc() }}
+      {{ forms.inc.inc_destination() }}
 
-      {{ forms.inc.amount_inc.label() }}
-      {{ forms.inc.amount_inc() }}
+      {{ forms.inc.inc_amount() }}
 
-      {{ forms.inc.description_inc.label() }}      
-      {{ forms.inc.description_inc() }}
+      {{ forms.inc.inc_description() }}
 
-      {{ forms.inc.submit_inc() }}
+      {{ forms.inc.inc_submit() }}
     </form>
   </div>
 
@@ -61,9 +55,17 @@
   <h4>Transfer</h4>
   <div>
     <form name="transfer" action="" method="POST">
-      {{ forms.tr.description.label() }}
-      {{ forms.tr.description() }}
-      {{ forms.tr.submit() }}
+      {{ forms.sp.hidden_tag() }}
+      
+      From {{ forms.tr.tr_source() }}
+
+      To {{ forms.tr.tr_destination() }}
+
+      {{ forms.tr.tr_amount() }}
+      
+      {{ forms.tr.tr_description() }}
+      
+      {{ forms.tr.tr_submit() }}
     </form>
   </div>
 

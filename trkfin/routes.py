@@ -36,12 +36,12 @@ def home():
     forms = {"sp": f_sp, "inc": f_inc, "tr": f_tr}
 
     # received spendings form
-    if f_sp.submit_sp.data and f_sp.validate():
-        tdSources[f_sp.source_sp.data] += f_sp.amount_sp.data
+    if f_sp.sp_submit.data and f_sp.validate():
+        tdSources[f_sp.sp_source.data] += f_sp.sp_amount.data
     
     # received income form
-    if f_inc.submit_inc.data and f_inc.validate():
-        tdSources[f_inc.destination_inc.data] += f_inc.amount_inc.data
+    if f_inc.inc_submit.data and f_inc.validate():
+        tdSources[f_inc.inc_destination.data] += f_inc.inc_amount.data
 
     # received transer form
 
