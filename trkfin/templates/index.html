@@ -13,48 +13,57 @@
   <hr>
   <h4>Spendings</h4>
   <div>
-    <form action="" method="POST" novalidate>
+    <form name="spending" id="f_spend" action="" method="POST">
       {{ forms.sp.hidden_tag() }}
 
-      {{ forms.sp.source.label(class_="form-label") }}
-      {{ forms.sp.source(class_="form-control") }}
-      {% for error in forms.sp.source.errors %}
+      {{ forms.sp.source_sp.label(class_="form-label") }}
+      {{ forms.sp.source_sp(class_="form-control") }}
+      {% for error in forms.sp.source_sp.errors %}
         <span style="color: red;">[{{ error }}]</span>
       {% endfor %}<br>
       
-      {{ forms.sp.amount.label(class_="form-label") }}
-      {{ forms.sp.amount(class_="form-control") }}
-      {% for error in forms.sp.amount.errors %}
+      {{ forms.sp.amount_sp.label(class_="form-label") }}
+      {{ forms.sp.amount_sp(class_="form-control") }}
+      {% for error in forms.sp.amount_sp.errors %}
         <span style="color: red;">[{{ error }}]</span>
       {% endfor %}<br>
 
-      {{ forms.sp.description.label(class_="form-label") }}
-      {{ forms.sp.description(class_="form-control") }}
-      {% for error in forms.sp.description.errors %}
+      {{ forms.sp.description_sp.label(class_="form-label") }}
+      {{ forms.sp.description_sp(class_="form-control") }}
+      {% for error in forms.sp.description_sp.errors %}
         <span style="color: red;">[{{ error }}]</span>
       {% endfor %}<br>
 
-      {{ forms.sp.submit(class_="btn btn-primary") }}
+      {{ forms.sp.submit_sp(class_="btn btn-primary") }}
     </form>
   </div>
 
   <hr>
   <h4>Income</h4>
   <div>
-    <form action="" method="POST">
-      {{ forms.inc.description.label(class_="form-label") }}
-      {{ forms.inc.description(class_="form-control") }}
-      {{ forms.inc.submit(class_="btn btn-primary") }}
+    <form name="income" id="f_income" action="" method="POST">
+      {{ forms.sp.hidden_tag() }}
+
+      {{ forms.inc.destination_inc.label() }}
+      {{ forms.inc.destination_inc() }}
+
+      {{ forms.inc.amount_inc.label() }}
+      {{ forms.inc.amount_inc() }}
+
+      {{ forms.inc.description_inc.label() }}      
+      {{ forms.inc.description_inc() }}
+
+      {{ forms.inc.submit_inc() }}
     </form>
   </div>
 
   <hr>
   <h4>Transfer</h4>
   <div>
-    <form action="" method="POST">
-      {{ forms.tr.description.label(class_="form-label") }}
-      {{ forms.tr.description(class_="form-control") }}
-      {{ forms.tr.submit(class_="btn btn-primary") }}
+    <form name="transfer" action="" method="POST">
+      {{ forms.tr.description.label() }}
+      {{ forms.tr.description() }}
+      {{ forms.tr.submit() }}
     </form>
   </div>
 

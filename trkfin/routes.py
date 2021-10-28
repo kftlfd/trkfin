@@ -7,6 +7,14 @@ from trkfin.models import Users
 from trkfin.forms import LoginForm, RegistrationForm, FormSpending, FormIncome, FormTransfer
 
 
+tdSources = {
+    'cash': 0,
+    'card': 0,
+}
+
+
+
+
 @app.route("/")
 def index():
     if not current_user.is_authenticated:
@@ -21,14 +29,21 @@ def home():
     if not current_user.is_authenticated:
         return redirect(url_for('welcome'))
 
+    # prepare form objects
     f_sp = FormSpending()
     f_inc = FormIncome()
     f_tr = FormTransfer()
     forms = {"sp": f_sp, "inc": f_inc, "tr": f_tr}
 
-    if f_sp.validate_on_submit():
-        
-        flash('valid')
+    # received spendings form
+    if f_sp.submit_sp.data and f_sp.validate():
+        tdSources[f_sp.source_sp.data] += f_sp.amount_sp.data
+    
+    # received income form
+    if f_inc.submit_inc.data and f_inc.validate():
+        tdSources[f_inc.destination_inc.data] += f_inc.amount_inc.data
+
+    # received transer form
 
     return render_template("index.html", forms=forms)
 
@@ -44,6 +59,7 @@ def register():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
 
+    # create form object
     form = RegistrationForm()
 
     # if received a valid form
@@ -70,6 +86,7 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
 
+    # create form object
     form = LoginForm()
 
     # if received a valid form
@@ -114,4 +131,4 @@ def account(username):
 
     user = Users.query.filter_by(username=username).first_or_404()
 
-    return render_template('account.html')
+    return render_template('account.html', user=user)
