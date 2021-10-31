@@ -3,16 +3,8 @@ from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 
 from trkfin import app, db
-from trkfin.models import Users
+from trkfin.models import Users, Wallets
 from trkfin.forms import LoginForm, RegistrationForm, FormSpending, FormIncome, FormTransfer
-
-
-tdSources = {
-    'cash': 0,
-    'card': 0,
-}
-
-
 
 
 @app.route("/")
@@ -35,17 +27,36 @@ def home():
     f_tr = FormTransfer()
     forms = {"sp": f_sp, "inc": f_inc, "tr": f_tr}
 
+    # load wallets
+    srcs = []
+    for w in Wallets.query.filter_by(user_id=current_user.id).all():
+        srcs.append(w.wallet)
+    f_sp.sp_source.choices = srcs
+    f_inc.inc_destination.choices = srcs
+    f_tr.tr_source.choices = srcs
+    f_tr.tr_destination.choices = srcs
+
     # received spendings form
     if f_sp.sp_submit.data and f_sp.validate():
-        tdSources[f_sp.sp_source.data] += f_sp.sp_amount.data
+        w = Wallets.query.filter_by(user_id=current_user.id, wallet=f_sp.sp_source.data).first()
+        w.holds -= float(f_sp.sp_amount.data)
+        db.session.commit()
     
     # received income form
     if f_inc.inc_submit.data and f_inc.validate():
-        tdSources[f_inc.inc_destination.data] += f_inc.inc_amount.data
+        w = Wallets.query.filter_by(user_id=current_user.id, wallet=f_inc.inc_destination.data).first()
+        w.holds += float(f_inc.inc_amount.data)
+        db.session.commit()
 
     # received transer form
+    # TODO
 
-    return render_template("index.html", forms=forms)
+    info = [
+        Users.user(current_user.id),
+        Wallets.wallets(current_user.id)
+    ]
+
+    return render_template("index.html", forms=forms, info=info)
 
 
 @app.route("/welcome")
@@ -65,16 +76,22 @@ def register():
     # if received a valid form
     if form.validate_on_submit():
 
-        # remember registration info
+        # record user to db
         new_user = Users(username=form.username.data, email=form.email.data)
         new_user.set_password(form.password.data)
-
-        # insert write new user to db        
         db.session.add(new_user)
         db.session.commit()
 
+        # create default wallet for user
+        new_wallet = Wallets(user_id=new_user.id, wallet='cash', holds=42.15)
+        db.session.add(new_wallet)
+        db.session.commit()
+
         # success
-        flash('Successfully registered')
+        flash(f'{new_user}')
+        flash(f'{new_wallet}')
+        flash('Successfully registered')       
+        
         return redirect(url_for('login'))
 
     return render_template("register.html", form=form)
