@@ -51,3 +51,9 @@ class FormTransfer(FlaskForm):
     tr_amount = DecimalField('Amount', validators=[DataRequired()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})
     tr_description = StringField('Description', validators=[Optional()], render_kw={'placeholder': 'description'})    
     tr_submit = SubmitField('Submit')
+
+class AddWallet(FlaskForm):
+    aw_ts = "timestamp"
+    name = StringField('Name', validators=[Optional()], render_kw={'placeholder': 'Name, e.g.: "Cash"'})
+    type = StringField('Type', validators=[Optional()], render_kw={'placeholder': 'Type, e.g.: "On hand", "Savings"'})
+    submit = SubmitField('Add')

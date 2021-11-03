@@ -10,4 +10,33 @@
 
 	<p>Hello, <b>{{ current_user.username }}</b></p>
 
+  <br>
+  <div>
+    <h3>Add new wallet</h3>
+
+    <form action="" method="POST" class="form-row align-items-center">
+      {{ form.hidden_tag() }}
+
+      {{ form.type.label() }}
+      {{ form.type() }}
+
+      {{ form.name.label() }}
+      {{ form.name }}
+
+      {{ form.submit() }}
+    </form>
+  </div>
+
+  <br>
+  <div>
+    <h3>Wallets</h3>
+    <p>{{ wallets }}</p>
+    <dl>
+      {% for w in wallets %}
+      <dt>{{ w.type }}</dt>
+      <dd>{{ w.name }}: {{ w.amount }}</dd>
+      {% endfor %}
+    </dl>
+  </div>
+
 {% endblock %}

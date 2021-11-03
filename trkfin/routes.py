@@ -4,7 +4,7 @@ from werkzeug.urls import url_parse
 
 from trkfin import app, db
 from trkfin.models import Users, Wallets
-from trkfin.forms import LoginForm, RegistrationForm, FormSpending, FormIncome, FormTransfer
+from trkfin.forms import LoginForm, RegistrationForm, FormSpending, FormIncome, FormTransfer, AddWallet
 
 
 @app.route("/")
@@ -30,7 +30,7 @@ def home():
     # load wallets
     srcs = []
     for w in Wallets.query.filter_by(user_id=current_user.id).all():
-        srcs.append(w.wallet)
+        srcs.append(w.name)
     f_sp.sp_source.choices = srcs
     f_inc.inc_destination.choices = srcs
     f_tr.tr_source.choices = srcs
@@ -38,14 +38,14 @@ def home():
 
     # received spendings form
     if f_sp.sp_submit.data and f_sp.validate():
-        w = Wallets.query.filter_by(user_id=current_user.id, wallet=f_sp.sp_source.data).first()
-        w.holds -= float(f_sp.sp_amount.data)
+        w = Wallets.query.filter_by(user_id=current_user.id, name=f_sp.sp_source.data).first()
+        w.amount -= float(f_sp.sp_amount.data)
         db.session.commit()
     
     # received income form
     if f_inc.inc_submit.data and f_inc.validate():
-        w = Wallets.query.filter_by(user_id=current_user.id, wallet=f_inc.inc_destination.data).first()
-        w.holds += float(f_inc.inc_amount.data)
+        w = Wallets.query.filter_by(user_id=current_user.id, name=f_inc.inc_destination.data).first()
+        w.amount += float(f_inc.inc_amount.data)
         db.session.commit()
 
     # received transer form
@@ -83,7 +83,7 @@ def register():
         db.session.commit()
 
         # create default wallet for user
-        new_wallet = Wallets(user_id=new_user.id, wallet='cash', holds=42.15)
+        new_wallet = Wallets(user_id=new_user.id, type='Wallet', name='Cash', amount=42.15)
         db.session.add(new_wallet)
         db.session.commit()
 
@@ -139,7 +139,7 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/u/<username>')
+@app.route('/u/<username>', methods=['GET', 'POST'])
 @login_required
 def account(username):
     
@@ -147,5 +147,18 @@ def account(username):
         return redirect('/u/' + current_user.username)
 
     user = Users.query.filter_by(username=username).first_or_404()
+    wallets = Wallets.query.filter_by(user_id=current_user.id).order_by(Wallets.type).all()
 
-    return render_template('account.html', user=user)
+    form = AddWallet()
+
+    if form.validate_on_submit():
+        new_wallet = Wallets(user_id=current_user.id)
+        new_wallet.name = form.name.data
+        new_wallet.type = form.type.data
+        new_wallet.amount = 0
+
+        db.session.add(new_wallet)
+        db.session.commit()      
+
+    return render_template('account.html', user=user, wallets=wallets, form=form)
+    

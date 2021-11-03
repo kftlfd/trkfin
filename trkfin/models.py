@@ -32,12 +32,13 @@ def load_user(id):
 
 class Wallets(db.Model):
     wid = db.Column(db.Integer, primary_key=True, nullable=False)
-    user_id = db.Column(db.Integer, index=True)
-    wallet = db.Column(db.String(20))
-    holds = db.Column(db.Float)
+    user_id = db.Column(db.Integer, index=True, nullable=False)
+    type = db.Column(db.String(20), nullable=False)
+    name = db.Column(db.String(20), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
-        return f'< wallets | uid:{self.user_id} | wallet:{self.wallet} | holds:{self.holds} >'
+        return f'< wallet | uid:{self.user_id} | type:{self.type} | name:{self.name} | amount:{self.amount} >'
 
     def wallet_count(self, uid):
         return len(Wallets.query.filter_by(user_id=uid).all())
