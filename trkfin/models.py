@@ -31,10 +31,11 @@ def load_user(id):
 
 
 class Wallets(db.Model):
-    wid = db.Column(db.Integer, primary_key=True, nullable=False)
+    wallet_id = db.Column(db.Integer, primary_key=True, nullable=False)
     user_id = db.Column(db.Integer, index=True, nullable=False)
     type = db.Column(db.String(20), nullable=False)
     name = db.Column(db.String(20), nullable=False)
+    # currency = db.Column(db.String(8), nullable=False)
     amount = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
