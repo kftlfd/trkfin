@@ -14,7 +14,7 @@ db = SQLAlchemy(app)
 login = LoginManager(app)
 login.login_view = 'login'
 
-from trkfin import routes, models
+from trkfin import routes, models, errors
 
 # logging
 if not os.path.exists('logs'):
