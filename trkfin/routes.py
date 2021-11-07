@@ -88,9 +88,7 @@ def register():
         db.session.commit()
 
         # success
-        flash(f'{new_user}')
-        flash(f'{new_wallet}')
-        flash('Successfully registered')       
+        flash('Registered')       
         
         return redirect(url_for('login'))
 
@@ -147,7 +145,7 @@ def account(username):
         return redirect('/u/' + current_user.username)
 
     user = Users.query.filter_by(username=username).first_or_404()
-    wallets = Wallets.query.filter_by(user_id=current_user.id).order_by(Wallets.type).all()
+    wallets = Wallets.wallets(current_user.id)
 
     form = AddWallet()
 
