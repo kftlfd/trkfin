@@ -3,7 +3,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 
 from trkfin import app, db
-from trkfin.models import Users, Wallets
+from trkfin.models import Users, Wallets, History
 from trkfin.forms import LoginForm, RegistrationForm, FormSpending, FormIncome, FormTransfer, AddWallet
 
 
@@ -38,9 +38,13 @@ def home():
 
     # received spendings form
     if f_sp.sp_submit.data and f_sp.validate():
-        w = Wallets.query.filter_by(user_id=current_user.id, name=f_sp.sp_source.data).first()
+        w = Wallets.query.filter_by(user_id=current_user.id, wallet_id=f_sp.sp_source.data).first()
         w.amount -= float(f_sp.sp_amount.data)
         db.session.commit()
+        sp_record = History()
+        sp_record.user_id = current_user.id
+        sp_record.action = 'spending'
+        sp_record.source_id = None
     
     # received income form
     if f_inc.inc_submit.data and f_inc.validate():
@@ -82,15 +86,18 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        # create default wallet for user
-        new_wallet = Wallets(user_id=new_user.id, type='Wallet', name='Cash', amount=42.15)
-        db.session.add(new_wallet)
+        # history entry        
+        user = Users.query.filter_by(username=new_user.username).first()
+        record = History()
+        record.user_id = user.id
+        record.action = 'Created account'
+        db.session.add(record)
         db.session.commit()
 
-        # success
+        # success; log user in
         flash('Registered')       
-        
-        return redirect(url_for('login'))
+        login_user(user)
+        return redirect(url_for('index'))
 
     return render_template("register.html", form=form)
 
@@ -146,17 +153,28 @@ def account(username):
 
     user = Users.query.filter_by(username=username).first_or_404()
     wallets = Wallets.wallets(current_user.id)
+    history = History.user_history(current_user.id)
 
     form = AddWallet()
+    srcs = []
+    for w in Wallets.query.filter_by(user_id=current_user.id).all():
+        srcs.append(w.type)
+    form.type.choices = srcs
 
     if form.validate_on_submit():
         new_wallet = Wallets(user_id=current_user.id)
         new_wallet.name = form.name.data
-        new_wallet.type = form.type.data
+        if form.type.data is not None:
+            new_wallet.type = form.type.data
+        else:
+            new_wallet.type = form.type_new.data
+        new_wallet.currency = None
         new_wallet.amount = 0
 
         db.session.add(new_wallet)
-        db.session.commit()      
+        db.session.commit()  
 
-    return render_template('account.html', user=user, wallets=wallets, form=form)
+        return redirect(url_for('account', username=current_user.username))    
+
+    return render_template('account.html', user=user, wallets=wallets, history=history, form=form)
     

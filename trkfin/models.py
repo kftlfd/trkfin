@@ -70,3 +70,6 @@ class History(db.Model):
 
     def __repr__(self):
         return f'< history >'
+
+    def user_history(uid):
+        return History.query.filter_by(user_id=uid).order_by(History.id.desc()).all()

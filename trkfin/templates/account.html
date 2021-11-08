@@ -20,8 +20,14 @@
       {{ form.type.label() }}
       {{ form.type() }}
 
+      {{ form.type_new.label() }}
+      {{ form.type_new() }}
+
       {{ form.name.label() }}
       {{ form.name }}
+
+      {{ form.currency.label() }}
+      {{ form.currency }}
 
       {{ form.submit() }}
     </form>
@@ -37,6 +43,19 @@
       <dd>{{ w.name }}: {{ w.amount }}</dd>
       {% endfor %}
     </dl>
+  </div>
+
+  <br>
+  <div>
+    <h3>History</h3>
+    <table class="table">
+      {% for row in history %}
+      <tr>
+        <td>{{ row.timestamp }}</td>
+        <td>{{ row.action }}</td>
+      </tr>
+      {% endfor %}
+    </table>
   </div>
 
 {% endblock %}
