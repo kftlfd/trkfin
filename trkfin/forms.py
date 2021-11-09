@@ -54,6 +54,8 @@ class FormTransfer(FlaskForm):
 
 class AddWallet(FlaskForm):
     aw_ts = "timestamp"
-    name = StringField('Name', validators=[Optional()], render_kw={'placeholder': 'Name, e.g.: "Cash"'})
-    type = StringField('Type', validators=[Optional()], render_kw={'placeholder': 'Type, e.g.: "On hand", "Savings"'})
+    name = StringField('Name', validators=[Optional()], render_kw={'placeholder': 'Name'})
+    type = SelectField('Type', validators=[Optional()], render_kw={'placeholder': 'Type'})
+    type_new = StringField('Type', validators=[Optional()], render_kw={'placeholder': 'Type'})
+    currency = StringField('Currency', validators=[Optional()], render_kw={'placeholder': 'Currency'})
     submit = SubmitField('Add')
