@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+	| Home
+{% endblock %}
+
+
+{% block main %}
+
+  <div class="container">
+    <h3>Hello</h3>  
+    <hr>
+    <br>
+  </div>
+
+
+  <div class="container">
+
+    <h4>Spending</h4>
+    
+    <form name="spending" id="f_spend" action="" method="POST">      
+      
+      <div class="row justify-content-center">
+      
+        {{ forms.sp.hidden_tag() }}  
+        
+        <div class="col-sm">
+
+          <div class="row">
+      
+            <div class="col-auto">          
+              {{ forms.sp.sp_source(class_="form-control") }}
+              {% for error in forms.sp.sp_source.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+              {% endfor %}
+            </div>
+            
+            <div class="col">
+              {{ forms.sp.sp_amount(class_="form-control") }}
+              {% for error in forms.sp.sp_amount.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+              {% endfor %}
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="col-sm">
+          
+          <div class="row">
+          
+            <div class="col">
+              {{ forms.sp.sp_description(class_="form-control") }}
+              {% for error in forms.sp.sp_description.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+              {% endfor %}
+            </div>
+          
+            <div class="col-auto">
+              {{ forms.sp.sp_submit(class_="btn btn-primary") }}
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    
+    </form>
+
+    <hr>
+    <br>
+  
+  </div>
+
+  
+  <div>
+    <h4>Income</h4>
+  
+    <form name="income" id="f_income" action="" method="POST">
+      {{ forms.sp.hidden_tag() }}
+
+      {{ forms.inc.inc_destination() }}
+
+      {{ forms.inc.inc_amount() }}
+
+      {{ forms.inc.inc_description() }}
+
+      {{ forms.inc.inc_submit() }}
+    </form>
+
+    <hr>
+    <br>
+  </div>
+
+    
+  <div>
+    <h4>Transfer</h4>
+
+    <form name="transfer" action="" method="POST">
+      {{ forms.sp.hidden_tag() }}
+      
+      From {{ forms.tr.tr_source() }}
+
+      To {{ forms.tr.tr_destination() }}
+
+      {{ forms.tr.tr_amount() }}
+      
+      {{ forms.tr.tr_description() }}
+      
+      {{ forms.tr.tr_submit() }}
+    </form>
+
+    <hr><hr>
+    <h3>Info</h3>
+    <div>
+      {{ info }}
+    </div>
+  </div>
+
+{% endblock %}

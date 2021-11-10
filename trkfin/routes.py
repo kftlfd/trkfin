@@ -62,7 +62,7 @@ def home():
         Wallets.wallets(current_user.id)
     ]
 
-    return render_template("index.html", forms=forms, info=info)
+    return render_template("home.html", forms=forms, info=info)
 
 
 @app.route("/welcome")
@@ -99,7 +99,7 @@ def register():
         # success; log user in
         flash('Registered')       
         login_user(user)
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
 
     return render_template("register.html", form=form)
 
@@ -134,7 +134,7 @@ def login():
         # redirect to next page
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('index')
+            next_page = url_for('home')
         return redirect(next_page)
     
     return render_template('login.html', form=form)
