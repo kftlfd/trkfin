@@ -15,64 +15,11 @@
   </div>
 
 
-  <div class="container">
-
+  <div>
     <h4>Spending</h4>
-    
-    <form name="spending" id="f_spend" action="" method="POST">      
-      
-      <div class="row justify-content-center">
-      
-        {{ forms.sp.hidden_tag() }}  
-        
-        <div class="col-sm">
-
-          <div class="row">
-      
-            <div class="col-auto">          
-              {{ forms.sp.sp_source(class_="form-control") }}
-              {% for error in forms.sp.sp_source.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-              {% endfor %}
-            </div>
-            
-            <div class="col">
-              {{ forms.sp.sp_amount(class_="form-control") }}
-              {% for error in forms.sp.sp_amount.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-              {% endfor %}
-            </div>
-
-          </div>
-
-        </div>
-
-        <div class="col-sm">
-          
-          <div class="row">
-          
-            <div class="col">
-              {{ forms.sp.sp_description(class_="form-control") }}
-              {% for error in forms.sp.sp_description.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-              {% endfor %}
-            </div>
-          
-            <div class="col-auto">
-              {{ forms.sp.sp_submit(class_="btn btn-primary") }}
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-    
-    </form>
-
+    {% include "forms/spending.html" %}
     <hr>
     <br>
-  
   </div>
 
   

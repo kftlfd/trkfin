@@ -1,0 +1,54 @@
+<form name="spending" id="f_spend" action="" method="POST"> 
+  
+  {{ forms.sp.hidden_tag() }}
+
+  <div class="container">
+
+    <div class="row justify-content-center">
+      
+      <div class="col-sm">
+
+        <div class="row">
+    
+          <div class="col-auto">          
+            {{ forms.sp.sp_source(class_="form-control") }}
+            {% for error in forms.sp.sp_source.errors %}
+              <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          
+          <div class="col">
+            {{ forms.sp.sp_amount(class_="form-control") }}
+            {% for error in forms.sp.sp_amount.errors %}
+              <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="col-sm">
+        
+        <div class="row">
+        
+          <div class="col">
+            {{ forms.sp.sp_description(class_="form-control") }}
+            {% for error in forms.sp.sp_description.errors %}
+              <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+          </div>
+        
+          <div class="col-auto">
+            {{ forms.sp.sp_submit(class_="btn btn-primary") }}
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+  
+</form>
