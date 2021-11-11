@@ -41,7 +41,7 @@ class FormIncome(FlaskForm):
     inc_destination = SelectField("Destination", validators=[DataRequired()])
     inc_amount = DecimalField('Amount', validators=[DataRequired()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})    
     inc_description = StringField('Description', validators=[Optional()], render_kw={'placeholder': 'description'})
-    inc_submit = SubmitField('Submit') #, id='submit-income'
+    inc_submit = SubmitField('>') #, id='submit-income'
 
 
 class FormTransfer(FlaskForm):
@@ -50,7 +50,7 @@ class FormTransfer(FlaskForm):
     tr_destination = SelectField("To", validators=[DataRequired()])
     tr_amount = DecimalField('Amount', validators=[DataRequired()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})
     tr_description = StringField('Description', validators=[Optional()], render_kw={'placeholder': 'description'})    
-    tr_submit = SubmitField('Submit')
+    tr_submit = SubmitField('>')
 
 class AddWallet(FlaskForm):
     aw_ts = "timestamp"

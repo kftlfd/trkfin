@@ -1,0 +1,17 @@
+<form action="" method="POST" class="form-row align-items-center">
+  {{ form.hidden_tag() }}
+
+  {{ form.type.label() }}
+  {{ form.type() }}
+
+  {{ form.type_new.label() }}
+  {{ form.type_new() }}
+
+  {{ form.name.label() }}
+  {{ form.name }}
+
+  {{ form.currency.label() }}
+  {{ form.currency }}
+
+  {{ form.submit() }}
+</form>

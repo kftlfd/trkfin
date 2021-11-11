@@ -1,0 +1,27 @@
+<form name="income" id="f_income" action="" method="POST">  
+  {{ forms.inc.hidden_tag() }}
+  <div class="container">    
+    <div class="row justify-content-center">    
+      <div class="col-sm">
+        <div class="row">
+          <div class="col-auto">
+            {{ forms.inc.inc_destination(class_="form-control") }}
+          </div>
+          <div class="col">
+            {{ forms.inc.inc_amount(class_="form-control") }}
+          </div>
+        </div>
+      </div>    
+      <div class="col-sm">
+        <div class="row">
+          <div class="col">
+            {{ forms.inc.inc_description(class_="form-control") }}
+          </div>          
+          <div class="col-auto">
+            {{ forms.inc.inc_submit(class_="btn btn-primary") }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

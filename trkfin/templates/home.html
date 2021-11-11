@@ -8,13 +8,6 @@
 
 {% block main %}
 
-  <div class="container">
-    <h3>Hello</h3>  
-    <hr>
-    <br>
-  </div>
-
-
   <div>
     <h4>Spending</h4>
     {% include "forms/spending.html" %}
@@ -25,19 +18,7 @@
   
   <div>
     <h4>Income</h4>
-  
-    <form name="income" id="f_income" action="" method="POST">
-      {{ forms.sp.hidden_tag() }}
-
-      {{ forms.inc.inc_destination() }}
-
-      {{ forms.inc.inc_amount() }}
-
-      {{ forms.inc.inc_description() }}
-
-      {{ forms.inc.inc_submit() }}
-    </form>
-
+    {% include "forms/income.html" %}
     <hr>
     <br>
   </div>
@@ -45,25 +26,16 @@
     
   <div>
     <h4>Transfer</h4>
+    {% include "forms/transfer.html" %}
+    <hr>
+    <br>
+  </div>
 
-    <form name="transfer" action="" method="POST">
-      {{ forms.sp.hidden_tag() }}
-      
-      From {{ forms.tr.tr_source() }}
 
-      To {{ forms.tr.tr_destination() }}
-
-      {{ forms.tr.tr_amount() }}
-      
-      {{ forms.tr.tr_description() }}
-      
-      {{ forms.tr.tr_submit() }}
-    </form>
-
-    <hr><hr>
-    <h3>Info</h3>
+  <div>
+    <h4>Info</h4>
     <div>
-      {{ info }}
+    {{ info }}
     </div>
   </div>
 
