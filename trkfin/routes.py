@@ -30,9 +30,7 @@ def home():
     forms = {"sp": f_sp, "inc": f_inc, "tr": f_tr}
 
     # load wallets
-    srcs = []
-    for w in Wallets.query.filter_by(user_id=current_user.id).all():
-        srcs.append(w.name)
+    srcs = [(w.wallet_id, w.name) for w in Wallets.query.filter_by(user_id=current_user.id).order_by('name')]
     f_sp.sp_source.choices = srcs
     f_inc.inc_destination.choices = srcs
     f_tr.tr_source.choices = srcs
@@ -40,13 +38,29 @@ def home():
 
     # received spendings form
     if f_sp.sp_submit.data and f_sp.validate():
-        w = Wallets.query.filter_by(user_id=current_user.id, wallet_id=f_sp.sp_source.data).first()
+
+        w = Wallets.query.get(f_sp.sp_source.data)
         w.amount -= float(f_sp.sp_amount.data)
-        db.session.commit()
+        
+        
         sp_record = History()
         sp_record.user_id = current_user.id
+        ts = f_sp.sp_timestamp.data
+        sp_record.ts_year = ts[0:4]
+        sp_record.ts_month = ts[5:7]
+        sp_record.ts_day = ts[8:10]
+        sp_record.ts_hour = ts[11:13]
+        sp_record.ts_minute = ts[14:16]
+        sp_record.ts_second = ts[17:19]
+        sp_record.ts_ms = ts[20:]
         sp_record.action = 'spending'
-        sp_record.source_id = None
+        sp_record.source_id = f_sp.sp_source.data
+        sp_record.amount = f_sp.sp_amount.data
+        sp_record.description = f_sp.sp_description.data
+        db.session.add(sp_record)
+
+        db.session.commit()
+        
     
     # received income form
     if f_inc.inc_submit.data and f_inc.validate():

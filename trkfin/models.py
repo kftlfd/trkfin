@@ -32,9 +32,9 @@ def load_user(id):
 
 class Wallets(db.Model):
     wallet_id = db.Column(db.Integer, primary_key=True, nullable=False)
-    user_id = db.Column(db.Integer, index=True, nullable=False)
-    name = db.Column(db.String(20), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     type = db.Column(db.String(20), nullable=False)
+    name = db.Column(db.String(20), nullable=False)
     currency = db.Column(db.String(8))
     amount = db.Column(db.Float, nullable=False)
 
@@ -49,8 +49,9 @@ class Wallets(db.Model):
         })
         # f'< wallet | uid:{self.user_id} | type:{self.type} | name:{self.name} | amount:{self.amount} >'
 
-    def wallet_count(uid):
-        return len(Wallets.query.filter_by(user_id=uid).all())
+    def count(uid):
+        return Wallets.query.filter((user_id==uid).count())
+        # len(Wallets.query.filter_by(user_id=uid).all())
 
     def wallets(uid):
         return Wallets.query.filter_by(user_id=uid).order_by('type').all()
@@ -58,18 +59,33 @@ class Wallets(db.Model):
 
 class History(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    user_id = db.Column(db.Integer, index=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    
+    ts_utc = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)    
+    ts_year = db.Column(db.Integer)
+    ts_month = db.Column(db.Integer)
+    ts_day = db.Column(db.Integer)
+    ts_hour = db.Column(db.Integer)
+    ts_minute = db.Column(db.Integer)
+    ts_second = db.Column(db.Integer)
+    ts_ms = db.Column(db.Integer)
+    
     action = db.Column(db.String(20))
-    source = db.Column(db.String(20))
-    source_id = db.Column(db.Integer)
-    destination = db.Column(db.String(20))
-    destination_id = db.Column(db.Integer)
-    description = db.Column(db.String(120))
+    source_id = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))
+    destination_id = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))
     amount = db.Column(db.Float)
+    description = db.Column(db.String(120))
 
     def __repr__(self):
-        return f'< history >'
+        return str({
+            'user': self.user_id,
+            'ts_uts': self.ts_utc,
+            'action': self.action,
+            'from': self.source_id,
+            'to': self.destination_id,
+            'amount': self.amount,
+            'description': self.description
+        })
 
     def user_history(uid):
         return History.query.filter_by(user_id=uid).order_by(History.id.desc()).all()

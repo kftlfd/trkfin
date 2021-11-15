@@ -32,5 +32,35 @@
         </div>
       </div>
     </div>
-  </div>  
+  </div>
 </form>
+<script>
+  function lz(n) {
+    // add leading zeros
+    if (n <= 9) {
+      return "0" + n;
+    }
+    return n;
+  }
+  function lzms(n) {
+    // add leading zeros to miliseconds
+    if (n <= 9) {
+      return "00" + n;
+    }
+    else if (n <= 99) {
+      return "0" + n;
+    }
+    return n;
+  }  
+  document.forms['spending'].addEventListener('submit', function() {
+    // input timestamp
+    let date = new Date()
+    document.forms['spending'].sp_timestamp.value = date.getFullYear() + "-" + 
+                                                    lz(date.getMonth() + 1) + "-" + 
+                                                    lz(date.getDate()) + "_" +
+                                                    lz(date.getHours()) + "-" + 
+                                                    lz(date.getMinutes()) + "-" + 
+                                                    lz(date.getSeconds()) + "_" +
+                                                    lzms(date.getMilliseconds());    
+  });
+</script>

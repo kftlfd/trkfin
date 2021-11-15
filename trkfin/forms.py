@@ -1,6 +1,6 @@
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, SelectField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, SelectField, HiddenField
 from wtforms.validators import ValidationError, DataRequired, Optional, EqualTo
 from wtforms.widgets.html5 import NumberInput
 
@@ -29,7 +29,7 @@ class RegistrationForm(FlaskForm):
 
 
 class FormSpending(FlaskForm):
-    sp_ts = "timestamp"        
+    sp_timestamp = HiddenField('Timestamp')
     sp_source = SelectField("Source", validators=[DataRequired()])
     sp_amount = DecimalField('Amount', validators=[DataRequired()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})    
     sp_description = StringField('Description', validators=[Optional()], render_kw={'placeholder': 'description'})    
