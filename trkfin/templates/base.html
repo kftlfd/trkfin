@@ -13,7 +13,7 @@
 			<header>
 				<div class="alert alert-primary border text-center" role="alert">
 					{% with messages = get_flashed_messages() %}                    
-						<ul style="list-style-type: none;">
+						<ul>
 							{% for message in messages %}
 							<li>{{ message }}</li>
 							{% endfor %}
@@ -24,7 +24,7 @@
 		{% endif %}
 
 		<!-- main body -->
-		<main style="max-width: 800px; margin: auto;">
+		<main>
 			{% block main %}{% endblock %}
 		</main>
 

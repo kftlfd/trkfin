@@ -1,7 +1,16 @@
+main {
+    max-width: 800px;
+    margin: auto;
+}
+
 h3 {
     color: grey;
 }
 
 h3, h4 {
     text-align: center;
+}
+
+header ul {
+    list-style-type: none;
 }
