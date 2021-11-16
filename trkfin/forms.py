@@ -1,18 +1,10 @@
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, SelectField, HiddenField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, SelectField, HiddenField, RadioField
 from wtforms.validators import ValidationError, DataRequired, Optional, EqualTo
 from wtforms.widgets.html5 import NumberInput
 
 from trkfin.models import Users, Wallets
-
-
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('E-Mail', validators=[Optional()])    
-    password = PasswordField('Password', validators=[DataRequired()])    
-    remember_me = BooleanField('Remember Me')    
-    submit = SubmitField('Sign In')
 
 
 class RegistrationForm(FlaskForm):    
@@ -28,34 +20,28 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Username is not available.')
 
 
-class FormSpending(FlaskForm):
-    sp_timestamp = HiddenField('Timestamp')
-    sp_source = SelectField("Source", validators=[DataRequired()])
-    sp_amount = DecimalField('Amount', validators=[DataRequired()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})    
-    sp_description = StringField('Description', validators=[Optional()], render_kw={'placeholder': 'description'})    
-    sp_submit = SubmitField('>') #, id='submit-spending'
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('E-Mail', validators=[Optional()])    
+    password = PasswordField('Password', validators=[DataRequired()])    
+    remember_me = BooleanField('Remember Me')    
+    submit = SubmitField('Sign In')
 
-
-class FormIncome(FlaskForm):
-    inc_ts = "timestamp"        
-    inc_destination = SelectField("Destination", validators=[DataRequired()])
-    inc_amount = DecimalField('Amount', validators=[DataRequired()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})    
-    inc_description = StringField('Description', validators=[Optional()], render_kw={'placeholder': 'description'})
-    inc_submit = SubmitField('>') #, id='submit-income'
-
-
-class FormTransfer(FlaskForm):
-    tr_ts = "timestamp"
-    tr_source = SelectField("From", validators=[DataRequired()])
-    tr_destination = SelectField("To", validators=[DataRequired()])
-    tr_amount = DecimalField('Amount', validators=[DataRequired()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})
-    tr_description = StringField('Description', validators=[Optional()], render_kw={'placeholder': 'description'})    
-    tr_submit = SubmitField('>')
 
 class AddWallet(FlaskForm):
-    aw_ts = "timestamp"
+    timestamp = HiddenField('timestamp')
     name = StringField('Name', validators=[Optional()], render_kw={'placeholder': 'Name'})
     type = SelectField('Type', validators=[Optional()], render_kw={'placeholder': 'Type'})
     type_new = StringField('Type', validators=[Optional()], render_kw={'placeholder': 'Type'})
     currency = StringField('Currency', validators=[Optional()], render_kw={'placeholder': 'Currency'})
     submit = SubmitField('Add')
+
+
+class MainForm(FlaskForm):
+    timestamp = HiddenField('timestamp')
+    action = RadioField(choices=['spending', 'income', 'transfer'], default='spending')
+    source = SelectField("From", validators=[DataRequired()]) 
+    destination = SelectField("To", validators=[DataRequired()])
+    amount = DecimalField('amount', validators=[DataRequired()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})
+    description = StringField('description', validators=[Optional()], render_kw={'placeholder': 'description'})
+    submit = SubmitField('>')
