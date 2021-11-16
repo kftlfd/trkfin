@@ -71,8 +71,8 @@ class History(db.Model):
     ts_ms = db.Column(db.Integer)
     
     action = db.Column(db.String(20))
-    source_id = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))
-    destination_id = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))
+    source = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))
+    destination = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))
     amount = db.Column(db.Float)
     description = db.Column(db.String(120))
 
@@ -80,9 +80,11 @@ class History(db.Model):
         return str({
             'user': self.user_id,
             'ts_uts': self.ts_utc,
+            'ts_local': str(self.ts_year) + '-' + str(self.ts_month) + '-' + str(self.ts_day) + '_' + \
+                str(self.ts_hour) + '-' + str(self.ts_minute) + '-' + str(self.ts_second) + '_' + str(self.ts_ms),
             'action': self.action,
-            'from': self.source_id,
-            'to': self.destination_id,
+            'from': self.source,
+            'to': self.destination,
             'amount': self.amount,
             'description': self.description
         })
