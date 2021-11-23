@@ -6,7 +6,7 @@ from os import remove
 
 from trkfin import app, db
 from trkfin.models import Users, Wallets, History
-from trkfin.forms import LoginForm, RegistrationForm, FormSpending, FormIncome, FormTransfer, AddWallet
+from trkfin.forms import LoginForm, RegistrationForm, AddWallet, MainForm
 
 
 @app.route("/")
@@ -24,59 +24,52 @@ def home():
         return redirect(url_for('welcome'))
 
     # prepare form objects
-    f_sp = FormSpending()
-    f_inc = FormIncome()
-    f_tr = FormTransfer()
-    forms = {"sp": f_sp, "inc": f_inc, "tr": f_tr}
+    mf = MainForm()
 
     # load wallets
     srcs = [(w.wallet_id, w.name) for w in Wallets.query.filter_by(user_id=current_user.id).order_by('name')]
-    f_sp.sp_source.choices = srcs
-    f_inc.inc_destination.choices = srcs
-    f_tr.tr_source.choices = srcs
-    f_tr.tr_destination.choices = srcs
+    mf.source.choices = srcs
+    mf.destination.choices = srcs
 
-    # received spendings form
-    if f_sp.sp_submit.data and f_sp.validate():
+    # received main form
+    if mf.submit.data and mf.validate():
 
-        w = Wallets.query.get(f_sp.sp_source.data)
-        w.amount -= float(f_sp.sp_amount.data)
+        if mf.action.data == 'spending':
+            mf.amount.data = float(mf.amount.data) * (-1.0)
+
+        w = Wallets.query.get(mf.source.data)
+        w.amount += float(mf.amount.data)
         
+        record = History()
+        record.user_id = current_user.id
+        ts = mf.timestamp.data
+        record.ts_year = ts[0:4]
+        record.ts_month = ts[5:7]
+        record.ts_day = ts[8:10]
+        record.ts_hour = ts[11:13]
+        record.ts_minute = ts[14:16]
+        record.ts_second = ts[17:19]
+        record.ts_ms = ts[20:]
+        record.action = mf.action.data
+        record.source = mf.source.data
+        record.destination = mf.destination.data
+        record.amount = mf.amount.data
+        record.description = mf.description.data
         
-        sp_record = History()
-        sp_record.user_id = current_user.id
-        ts = f_sp.sp_timestamp.data
-        sp_record.ts_year = ts[0:4]
-        sp_record.ts_month = ts[5:7]
-        sp_record.ts_day = ts[8:10]
-        sp_record.ts_hour = ts[11:13]
-        sp_record.ts_minute = ts[14:16]
-        sp_record.ts_second = ts[17:19]
-        sp_record.ts_ms = ts[20:]
-        sp_record.action = 'spending'
-        sp_record.source_id = f_sp.sp_source.data
-        sp_record.amount = f_sp.sp_amount.data
-        sp_record.description = f_sp.sp_description.data
-        db.session.add(sp_record)
-
+        db.session.add(record)
         db.session.commit()
+        flash(record)
         
-    
-    # received income form
-    if f_inc.inc_submit.data and f_inc.validate():
-        w = Wallets.query.filter_by(user_id=current_user.id, name=f_inc.inc_destination.data).first()
-        w.amount += float(f_inc.inc_amount.data)
-        db.session.commit()
 
-    # received transer form
-    # TODO
+    info = {}
+    if current_user.is_authenticated:
+        info['user'] = Users.user(current_user.id)
+        info['wallets'] = Wallets.wallets(current_user.id)
+        info['history'] = History.user_history(current_user.id)
+        info['report'] = History.month_report(current_user.id, '2021-11')
 
-    info = [
-        Users.user(current_user.id),
-        Wallets.wallets(current_user.id)
-    ]
-
-    return render_template("home.html", forms=forms, info=info)
+    app.logger.info(current_user.id)
+    return render_template("home.html", mf=mf, info=info)
 
 
 @app.route("/welcome")

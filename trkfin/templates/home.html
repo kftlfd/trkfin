@@ -9,33 +9,57 @@
 {% block main %}
 
   <div>
-    <h4>Spending</h4>
-    {% include "forms/spending.html" %}
+    <h4>Form</h4>
+    {% include "mainform.html" %}
     <hr>
     <br>
   </div>
 
-  
-  <div>
-    <h4>Income</h4>
-    {% include "forms/income.html" %}
-    <hr>
-    <br>
-  </div>
 
-    
   <div>
-    <h4>Transfer</h4>
-    {% include "forms/transfer.html" %}
-    <hr>
-    <br>
+    <h4>This month</h4>
+    <div>
+      <table>
+        <thead>
+          <tr>
+            <th>Report</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ info['report'] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
 
   <div>
     <h4>History</h4>
     <div>
-    {{ history }}
+      <table class="table">
+        <thead>
+          <th>Ts</th>
+          <th>action</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Amount</th>
+          <th>Description</th>
+        </thead>
+        <tbody>
+          {% for row in info['history'] %}
+          <tr>
+            <td>{{ row.ts_utc }}</td>
+            <td>{{ row.action }}</td>
+            <td>{{ row.source or '-' }}</td>
+            <td>{{ row.destination or '-' }}</td>
+            <td>{{ row.amount or '-'}}</td>
+            <td>{{ row.description or '-' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
 

@@ -1,0 +1,54 @@
+<form name="mainform" action="" method="POST">  
+  {{ mf.hidden_tag() }}
+
+  {% for subfield in mf.action %}
+    {{ subfield }}
+    {{ subfield.label }}
+  {% endfor %}
+
+  <br>
+
+  {{ mf.source.label }}
+  {{ mf.source }}
+
+  {{ mf.destination.label }}
+  {{ mf.destination }}
+
+  {{ mf.amount }}
+
+  {{ mf.description }}
+
+  {{ mf.submit }}
+  
+</form>
+
+<script>
+  function lz(n) {
+    // add leading zeros
+    if (n <= 9) {
+      return "0" + n;
+    }
+    return n;
+  }
+  function lzms(n) {
+    // add leading zeros to miliseconds
+    if (n <= 9) {
+      return "00" + n;
+    }
+    else if (n <= 99) {
+      return "0" + n;
+    }
+    return n;
+  }  
+  document.forms['mainform'].addEventListener('submit', function() {
+    // input timestamp
+    let date = new Date()
+    document.forms['mainform'].timestamp.value = date.getFullYear() + "-" + 
+                                                 lz(date.getMonth() + 1) + "-" + 
+                                                 lz(date.getDate()) + "_" +
+                                                 lz(date.getHours()) + "-" + 
+                                                 lz(date.getMinutes()) + "-" + 
+                                                 lz(date.getSeconds()) + "_" +
+                                                 lzms(date.getMilliseconds());    
+  });
+</script>

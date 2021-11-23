@@ -2,7 +2,7 @@ from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from trkfin import db, login
+from trkfin import db, login, app
 
 
 class Users(UserMixin, db.Model):
@@ -71,8 +71,8 @@ class History(db.Model):
     ts_ms = db.Column(db.Integer)
     
     action = db.Column(db.String(20))
-    source_id = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))
-    destination_id = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))
+    source = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))
+    destination = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))
     amount = db.Column(db.Float)
     description = db.Column(db.String(120))
 
@@ -80,12 +80,63 @@ class History(db.Model):
         return str({
             'user': self.user_id,
             'ts_uts': self.ts_utc,
+            'ts_local': str(self.ts_year) + '-' + str(self.ts_month) + '-' + str(self.ts_day) + '_' + \
+                str(self.ts_hour) + '-' + str(self.ts_minute) + '-' + str(self.ts_second) + '_' + str(self.ts_ms),
             'action': self.action,
-            'from': self.source_id,
-            'to': self.destination_id,
+            'from': self.source,
+            'to': self.destination,
             'amount': self.amount,
             'description': self.description
         })
 
     def user_history(uid):
         return History.query.filter_by(user_id=uid).order_by(History.id.desc()).all()
+
+    def month_report(uid, month):
+        if len(month) is not 7:
+            return False
+        user = Users.query.get(int(uid))
+        if not user:
+            return False
+        data = History.query.join(Users).filter(Users.id==uid, History.ts_year==month[0:4], History.ts_month==month[5:]).all()
+
+        app.logger.info(data)
+
+        inc_records = []
+        inc_wallets = set()
+        spend_records = []
+        spend_wallets = set()
+        for record in data:
+            if record.action == "income":
+                inc_records.append(record)
+                inc_wallets.add(record.destination)
+            elif record.action == "spending":
+                spend_records.append(record)
+                spend_wallets.add(record.source)
+        
+        # income
+        income = {}
+        for wallet in inc_wallets:
+            income[wallet] = 0
+            for record in inc_records:
+                if record.destination == wallet:
+                    income[wallet] += record.amount
+        income['total'] = sum([x for x in income.values()])
+        
+        # spending
+        spending = {}
+        for wallet in spend_wallets:
+            spending[wallet] = 0
+            for record in spend_records:
+                if record.source == wallet:
+                    spending[wallet] += record.amount
+        spending['total'] = sum([x for x in spending.values()])
+
+        out = {
+            'income': income,
+            'spending': spending
+        }
+
+        app.logger.info(out)
+        
+        return out
