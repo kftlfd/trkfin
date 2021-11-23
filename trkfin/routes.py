@@ -66,9 +66,8 @@ def home():
         info['user'] = Users.user(current_user.id)
         info['wallets'] = Wallets.wallets(current_user.id)
         info['history'] = History.user_history(current_user.id)
-        info['report'] = History.month_report(current_user.id, '2021-11')
+        info['report'] = History.month_report(current_user.id, 2021, 11)
 
-    app.logger.info(current_user.id)
     return render_template("home.html", mf=mf, info=info)
 
 

@@ -92,51 +92,60 @@ class History(db.Model):
     def user_history(uid):
         return History.query.filter_by(user_id=uid).order_by(History.id.desc()).all()
 
-    def month_report(uid, month):
-        if len(month) is not 7:
-            return False
-        user = Users.query.get(int(uid))
-        if not user:
-            return False
-        data = History.query.join(Users).filter(Users.id==uid, History.ts_year==month[0:4], History.ts_month==month[5:]).all()
+    def month_report(uid, year, month):
 
-        app.logger.info(data)
+        # query db for all records
+        data = History.query.filter(History.user_id==uid, History.ts_year==year, History.ts_month==month).all()
+        if not data:
+            return False
 
-        inc_records = []
+        # sort data, populate income and spending dicts
+        income = {'total': 0}
         inc_wallets = set()
-        spend_records = []
+        spending = {'total': 0}
         spend_wallets = set()
         for record in data:
+            
+            # income
             if record.action == "income":
-                inc_records.append(record)
-                inc_wallets.add(record.destination)
+                if record.destination not in inc_wallets:
+                    w = Wallets.query.filter(Wallets.wallet_id==record.destination).first()
+                    income[record.destination] = {
+                        'name': w.name,
+                        'type': w.type,
+                        'amount': record.amount
+                    }
+                    inc_wallets.add(record.destination)
+                else:
+                    income[record.destination]['amount'] += record.amount
+                income['total'] += record.amount
+            
+            # spending
             elif record.action == "spending":
-                spend_records.append(record)
-                spend_wallets.add(record.source)
+                if record.source not in spend_wallets:
+                    w = Wallets.query.filter(Wallets.wallet_id==record.source).first()
+                    spending[record.source] = {
+                        'name': w.name,
+                        'type': w.type,
+                        'amount': record.amount
+                    }
+                    spend_wallets.add(record.source)
+                else:
+                    spending[record.source]['amount'] += record.amount
+                spending['total'] += record.amount
         
-        # income
-        income = {}
-        for wallet in inc_wallets:
-            income[wallet] = 0
-            for record in inc_records:
-                if record.destination == wallet:
-                    income[wallet] += record.amount
-        income['total'] = sum([x for x in income.values()])
-        
-        # spending
-        spending = {}
-        for wallet in spend_wallets:
-            spending[wallet] = 0
-            for record in spend_records:
-                if record.source == wallet:
-                    spending[wallet] += record.amount
-        spending['total'] = sum([x for x in spending.values()])
+        # balance
+        balance = {}
+        user_wallets = Wallets.query.filter(Wallets.user_id==uid).all()
+        for w in user_wallets:
+            balance[w.wallet_id] = {
+                'name': w.name,
+                'type': w.type,
+                'amount': w.amount
+            }
 
-        out = {
+        return {
             'income': income,
-            'spending': spending
+            'spending': spending,
+            'balance': balance
         }
-
-        app.logger.info(out)
-        
-        return out
