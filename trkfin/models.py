@@ -1,5 +1,6 @@
 from datetime import datetime
 from flask_login import UserMixin
+from sqlalchemy.types import PickleType
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from trkfin import db, login, app
@@ -11,9 +12,10 @@ class Users(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True)
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
+    stats = db.Column(PickleType)
 
     def __repr__(self):
-        return f'< user | id:{self.id} | username:{self.username} | created:{self.created}>'
+        return f'< user | id:{self.id} | username:{self.username} | created:{self.created} | stats:{len(self.stats)}>'
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -23,6 +25,12 @@ class Users(UserMixin, db.Model):
 
     def user(id):
         return Users.query.filter_by(id=id).first()
+
+    def get_stats(self):
+        return self.stats
+
+    def wallets_count(self):
+        return Wallets.query.filter_by(user_id=self.id).count()
 
 
 @login.user_loader
