@@ -17,6 +17,24 @@ def index():
         return redirect(url_for('home'))
 
 
+@app.route("/haddw", methods=['GET', 'POST'])
+def haddw():
+    form = AddWallet()
+    if form.validate_on_submit():
+        new_wallet = Wallets(user_id=current_user.id)
+        new_wallet.name = form.name.data
+        if form.type.data is not None:
+            new_wallet.type = form.type.data
+        else:
+            new_wallet.type = form.type_new.data
+        new_wallet.currency = None
+        new_wallet.amount = 0
+
+        db.session.add(new_wallet)
+        db.session.commit()  
+
+        return redirect(url_for('home'))
+
 @app.route("/home", methods=['GET', 'POST'])
 def home():    
 
@@ -24,7 +42,11 @@ def home():
         return redirect(url_for('welcome'))
 
     # prepare form objects
-    mf = MainForm()
+    if current_user.wallets_count() < 1:
+        mf = AddWallet()
+        return render_template("home.html", mf=mf, nw=True)
+    else:
+        mf = MainForm()
 
     # load wallets
     srcs = [(w.wallet_id, w.name) for w in Wallets.query.filter_by(user_id=current_user.id).order_by('name')]
@@ -55,6 +77,9 @@ def home():
         record.destination = mf.destination.data
         record.amount = mf.amount.data
         record.description = mf.description.data
+
+        current_user.stats = {}
+        current_user.stats['test'] = 'test'
         
         db.session.add(record)
         db.session.commit()
@@ -67,6 +92,7 @@ def home():
         info['wallets'] = Wallets.wallets(current_user.id)
         info['history'] = History.user_history(current_user.id)
         info['report'] = History.month_report(current_user.id, 2021, 11)
+        info['stats'] = current_user.get_stats()
 
     return render_template("home.html", mf=mf, info=info)
 

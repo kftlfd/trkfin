@@ -10,24 +10,35 @@
 
   <div>
     <h4>Form</h4>
-    {% include "mainform.html" %}
+    {% if nw == True %}
+      {% include "forms/addwallet_h.html" %}
+    {% else %}
+      {% include "mainform.html" %}
+    {% endif %}
     <hr>
     <br>
   </div>
 
 
+  {% if info %}
   <div>
     <h4>This month</h4>
     <div>
-      <table>
+      <table class="table">
         <thead>
           <tr>
-            <th>Report</th>
+            <th>Title</th>
+            <th>Data</th>
           </tr>
         </thead>
         <tbody>
           <tr>
+            <td>Report</td>
             <td>{{ info['report'] }}</td>
+          </tr>
+          <tr>
+            <td>Stats</td>
+            <td>{{ info['stats'] }}</td>
           </tr>
         </tbody>
       </table>
@@ -62,5 +73,6 @@
       </table>
     </div>
   </div>
+  {% endif %}
 
 {% endblock %}
