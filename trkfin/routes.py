@@ -2,7 +2,7 @@ from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 
-from os import remove
+from os import remove, path
 
 from trkfin import app, db
 from trkfin.models import Users, Wallets, History
@@ -215,6 +215,9 @@ def account(username):
 
 @app.route('/resetdb')
 def resetdb():
-    remove("trkfin.db")
+    if path.exists('trkfin.db'):
+        remove("trkfin.db")
+    f = open('trkfin.db', 'x')
+    f.close()
     db.create_all()
     return redirect('/')
