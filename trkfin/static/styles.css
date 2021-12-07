@@ -1,10 +1,23 @@
+html, body {
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+  }
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
 main {
     max-width: 800px;
     margin: auto;
+    flex-grow: 1;
 }
 
 h3 {
     color: grey;
+    margin: 1rem;
 }
 
 h3, h4 {
@@ -13,4 +26,11 @@ h3, h4 {
 
 header ul {
     list-style-type: none;
+}
+
+footer {    
+    margin: 0, auto;
+    padding: 5px 0;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
 }
