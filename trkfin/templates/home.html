@@ -45,34 +45,6 @@
     </div>
   </div>
 
-
-  <div>
-    <h4>History</h4>
-    <div>
-      <table class="table">
-        <thead>
-          <th>Ts</th>
-          <th>action</th>
-          <th>From</th>
-          <th>To</th>
-          <th>Amount</th>
-          <th>Description</th>
-        </thead>
-        <tbody>
-          {% for row in info['history'] %}
-          <tr>
-            <td>{{ row.ts_utc }}</td>
-            <td>{{ row.action }}</td>
-            <td>{{ row.source or '-' }}</td>
-            <td>{{ row.destination or '-' }}</td>
-            <td>{{ row.amount or '-'}}</td>
-            <td>{{ row.description or '-' }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
   {% endif %}
 
 {% endblock %}

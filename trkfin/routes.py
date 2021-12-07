@@ -211,6 +211,31 @@ def account(username):
         return redirect(url_for('account', username=current_user.username))    
 
     return render_template('account.html', user=user, wallets=wallets, history=history, form=form)
+
+
+@app.route("/u/<username>/history")
+@login_required
+def history(username):
+    
+    if username is not current_user.username:
+        return redirect('/u/' + current_user.username + '/history')
+
+    history = History.user_history(current_user.id)
+
+    return render_template('history.html', history=history)
+
+
+@app.route("/u/<username>/wallets")
+@login_required
+def wallets(username):
+    
+    if username is not current_user.username:
+        return redirect('/u/' + current_user.username + '/wallets')
+
+    wallets = Wallets.wallets(current_user.id)
+    form = AddWallet()
+
+    return render_template('wallets.html', wallets=wallets, form=form)
     
 
 @app.route('/resetdb')
