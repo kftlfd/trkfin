@@ -1,37 +1,50 @@
 <form name="mainform" action="" method="POST">  
   {{ mf.hidden_tag() }}
+  
+  <div class="btn-group btn-group-toggle form-select" role="group" data-toggle="buttons" aria-label="select-form">
+    {% for subfield in mf.action %}
+      <label class="btn btn-secondary">
+        {{ subfield }}{{ subfield.label }}
+      </label>
+    {% endfor %}
+  </div>
+  <!-- (style="display: none;") -->
 
-  {% for subfield in mf.action %}
-    {{ subfield }}
-    {{ subfield.label }}
-  {% endfor %}
+  <!-- <div class="btn-group btn-group-toggle form-select" role="group" data-toggle="buttons" aria-label="select-form">
+    {% for subfield in mf.action %}
+      {{ subfield.label(class_="btn btn-primary") }}
+    {% endfor %}
+  </div> -->
+  
+  <div>
+    {{ mf.source.label }}
+    {{ mf.source }}
 
-  <br>
+    {{ mf.destination.label }}
+    {{ mf.destination }}
 
-  {{ mf.source.label }}
-  {{ mf.source }}
+    {{ mf.amount }}
 
-  {{ mf.destination.label }}
-  {{ mf.destination }}
+    {{ mf.description }}
 
-  {{ mf.amount }}
-
-  {{ mf.description }}
-
-  {{ mf.submit }}
+    {{ mf.submit }}
+  </div>
   
 </form>
 
 <script>
+  
+  // add leading zeros
   function lz(n) {
-    // add leading zeros
     if (n <= 9) {
       return "0" + n;
     }
     return n;
   }
+  
+
+  // add leading zeros to miliseconds
   function lzms(n) {
-    // add leading zeros to miliseconds
     if (n <= 9) {
       return "00" + n;
     }
@@ -40,8 +53,10 @@
     }
     return n;
   }  
+  
+
+  // input timestamp on form submit
   document.forms['mainform'].addEventListener('submit', function() {
-    // input timestamp
     let date = new Date()
     document.forms['mainform'].timestamp.value = date.getFullYear() + "-" + 
                                                  lz(date.getMonth() + 1) + "-" + 
@@ -51,4 +66,32 @@
                                                  lz(date.getSeconds()) + "_" +
                                                  lzms(date.getMilliseconds());    
   });
+
+
+  // show/hide form fields
+  document.forms['mainform'].addEventListener('click', function() {
+    let select = document.forms['mainform'].action;
+    if (select.value == 'spending') {
+      document.forms['mainform'].source.hidden = false;
+      document.forms['mainform'].source.labels[0].hidden = false;
+      document.forms['mainform'].destination.hidden = true;
+      document.forms['mainform'].destination.labels[0].hidden = true;
+    }
+    else if (select.value == 'income') {
+      document.forms['mainform'].source.hidden = true;
+      document.forms['mainform'].source.labels[0].hidden = true;
+      document.forms['mainform'].destination.hidden = false;
+      document.forms['mainform'].destination.labels[0].hidden = false;
+    }
+    else { // 'transfer'
+      document.forms['mainform'].source.hidden = false;
+      document.forms['mainform'].source.labels[0].hidden = false;
+      document.forms['mainform'].destination.hidden = false;
+      document.forms['mainform'].destination.labels[0].hidden = false;
+    }
+  });
+
+  // select 'spending' as default
+  document.forms['mainform'].action.item(0).click();
+
 </script>

@@ -10,7 +10,7 @@ body {
 }
 
 main {
-    max-width: 800px;
+    width: 700px;
     margin: auto;
     flex-grow: 1;
 }
@@ -33,4 +33,18 @@ footer {
     padding: 5px 0;
     background-color: #f8f9fa;
     border-top: 1px solid #dee2e6;
+}
+
+.form-select {
+display: flex;
+margin-bottom: 5px;
+}
+
+label {
+margin: 0;
+cursor: pointer;
+}
+
+.btn.focus {
+box-shadow: none;
 }
