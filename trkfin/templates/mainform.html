@@ -1,36 +1,54 @@
-<form name="mainform" action="" method="POST">  
-  {{ mf.hidden_tag() }}
-  
-  <div class="btn-group btn-group-toggle form-select" role="group" data-toggle="buttons" aria-label="select-form">
-    {% for subfield in mf.action %}
-      <label class="btn btn-secondary">
-        {{ subfield }}{{ subfield.label }}
-      </label>
-    {% endfor %}
-  </div>
-  <!-- (style="display: none;") -->
+<div class="mainform">
 
-  <!-- <div class="btn-group btn-group-toggle form-select" role="group" data-toggle="buttons" aria-label="select-form">
-    {% for subfield in mf.action %}
-      {{ subfield.label(class_="btn btn-primary") }}
-    {% endfor %}
-  </div> -->
-  
-  <div>
-    {{ mf.source.label }}
-    {{ mf.source }}
+  <form name="mainform" action="" method="POST">  
+    
+    {{ mf.hidden_tag() }}
+    
+    <div class="mainform-select btn-group btn-group-toggle" role="group" data-toggle="buttons" aria-label="select-form">
+      
+      {% for subfield in mf.action %}
+        <label class="btn btn-secondary shadow-none">
+          {{ subfield }}
+          {{ subfield.label }}
+        </label>
+      {% endfor %}
 
-    {{ mf.destination.label }}
-    {{ mf.destination }}
+    </div>
+    
+    <div class="mainform-body">
+      
+      <div class="mainform-body-top">
 
-    {{ mf.amount }}
+        <div id="mainform-source" class="input-group">
+          <div class="input-group-prepend">
+            {{ mf.source.label(class_="input-group-text") }}
+          </div>
+          {{ mf.source(class_="form-control") }}
+        </div>
 
-    {{ mf.description }}
+        <div id="mainform-destination" class="input-group">
+          <div class="input-group-prepend">
+            {{ mf.destination.label(class_="input-group-text") }}
+          </div>
+          {{ mf.destination(class_="form-control") }}
+        </div>
 
-    {{ mf.submit }}
-  </div>
-  
-</form>
+        {{ mf.amount(class_="form-control") }}
+
+      </div>
+
+      <div>
+        {{ mf.description(class_="form-control") }}
+        {{ mf.submit(class_="btn btn-primary") }}
+      </div>
+      
+    </div>
+    
+  </form>
+
+</div>
+
+
 
 <script>
   
@@ -72,22 +90,16 @@
   document.forms['mainform'].addEventListener('click', function() {
     let select = document.forms['mainform'].action;
     if (select.value == 'spending') {
-      document.forms['mainform'].source.hidden = false;
-      document.forms['mainform'].source.labels[0].hidden = false;
-      document.forms['mainform'].destination.hidden = true;
-      document.forms['mainform'].destination.labels[0].hidden = true;
+      document.querySelector('#mainform-source').hidden = false;
+      document.querySelector('#mainform-destination').hidden = true;
     }
     else if (select.value == 'income') {
-      document.forms['mainform'].source.hidden = true;
-      document.forms['mainform'].source.labels[0].hidden = true;
-      document.forms['mainform'].destination.hidden = false;
-      document.forms['mainform'].destination.labels[0].hidden = false;
+      document.querySelector('#mainform-source').hidden = true;
+      document.querySelector('#mainform-destination').hidden = false;
     }
     else { // 'transfer'
-      document.forms['mainform'].source.hidden = false;
-      document.forms['mainform'].source.labels[0].hidden = false;
-      document.forms['mainform'].destination.hidden = false;
-      document.forms['mainform'].destination.labels[0].hidden = false;
+      document.querySelector('#mainform-source').hidden = false;
+      document.querySelector('#mainform-destination').hidden = false;
     }
   });
 

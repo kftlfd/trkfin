@@ -7,12 +7,23 @@ html, body {
 body {
     display: flex;
     flex-direction: column;
+    align-items: center;
+}
+
+nav, footer {
+    width: 100%;
 }
 
 main {
-    width: 700px;
-    margin: auto;
+    width: 100%;
+    padding: 0 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     flex-grow: 1;
+}
+main > div {
+    width: 100%;
 }
 
 h3 {
@@ -35,16 +46,62 @@ footer {
     border-top: 1px solid #dee2e6;
 }
 
-.form-select {
-display: flex;
-margin-bottom: 5px;
+.mainform {
+    display: flex;
+    flex-direction: column;
+}
+
+.mainform-select {
+    display: flex;
+    width: 100%;
+    margin-top: 2rem;
+}
+
+.mainform-select, .mainform-body-top {
+    margin-bottom: 5px;
+}
+
+.mainform-body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    /* justify-content: space-between; */
+    justify-content: space-evenly;
+}
+
+.mainform-body > div {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+#mainform-source, #mainform-destination {
+    margin-right: 5px;
+}
+#submit {
+    margin-left: 5px;
 }
 
 label {
-margin: 0;
-cursor: pointer;
+    margin: 0;
+    cursor: pointer;
 }
 
-.btn.focus {
-box-shadow: none;
+@media (min-width: 700px) {
+    main {
+        width: 700px;
+    }
+    .mainform-body {
+        display: flex;
+        flex-direction: row;
+    }
+    .mainform-body > div {
+        display: flex;
+        flex-direction: row;
+        width: 50%;
+    }
+    .mainform-body-top {
+        margin-bottom: 0px;
+        margin-right: 5px;
+    }
 }
