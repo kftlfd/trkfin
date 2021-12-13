@@ -30,7 +30,7 @@
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="accountDropdown">
             <a class="dropdown-item" href="{{ url_for('account', username=current_user.username) }}">Account</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{{ url_for('logout') }}">Log Out</a>
+            <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Log Out</a>
           </div>
         </li>
       </ul>	
@@ -39,8 +39,8 @@
 
       <!-- right -->
       <ul class="navbar-nav ml-auto mt-2">
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">Register</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Log In</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">Register</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a></li>
       </ul>			
     
     {% endif %}

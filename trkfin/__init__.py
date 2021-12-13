@@ -15,7 +15,7 @@ db = SQLAlchemy(app)
 login = LoginManager(app)
 login.login_view = 'login'
 
-# logging
+# setup logging
 if not os.path.exists('logs'):
     os.mkdir('logs')
 file_handler = RotatingFileHandler('logs/trkfin.log', maxBytes=10240, backupCount=10)
@@ -24,6 +24,11 @@ file_handler.setLevel(logging.INFO)
 app.logger.addHandler(file_handler)
 app.logger.setLevel(logging.INFO)
 
+# blueprints
+from trkfin.auth import bp as auth_bp
+app.register_blueprint(auth_bp)
+
+# import other app modules
 from trkfin import routes, models, errors
 
 app.logger.info('application launched')
