@@ -8,40 +8,45 @@
 
 {% block main %}
 
+  <!-- Main Form or add wallet form -->
   <div>
     {% if nw == True %}
       {% include "forms/addwallet_h.html" %}
     {% else %}
       {% include "mainform.html" %}
-    {% endif %}
-    <hr>
-    <br>
+    {% endif %}  
   </div>
 
 
+  <!-- Current report -->
   {% if info %}
   <div>
-    <h3>This month</h3>
-    <div>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Data</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Report</td>
-            <td>{{ info['report'] }}</td>
-          </tr>
-          <tr>
-            <td>Stats</td>
-            <td>{{ info['stats'] }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <hr>
+    <h3>This month/week</h3>    
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Report</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ info['report'] }}</td>
+        </tr>
+      </tbody>
+    </table>
+    
+  </div>
+
+  <!-- for developing -->
+  <div>
+    <hr>
+    <h3>Test</h3>
+    <table class="table">
+      {% for data in info %}
+      <tr><td>{{ data }}:</td><td>{{ info[data] }}</td></tr>
+      {% endfor %}
+    </table>
   </div>
 
   {% endif %}

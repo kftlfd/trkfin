@@ -17,6 +17,8 @@
       <!-- left -->
       <ul class="navbar-nav mr-auto mt-2">
         <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('wallets', username=current_user.username) }}">Wallets</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('history', username=current_user.username) }}">History</a></li>
       </ul>					
 
       <!-- right -->
@@ -27,8 +29,6 @@
           </a>
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="accountDropdown">
             <a class="dropdown-item" href="{{ url_for('account', username=current_user.username) }}">Account</a>
-            <a class="dropdown-item" href="{{ url_for('wallets', username=current_user.username) }}">Wallets</a>
-            <a class="dropdown-item" href="{{ url_for('history', username=current_user.username) }}">History</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{{ url_for('logout') }}">Log Out</a>
           </div>

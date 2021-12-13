@@ -6,7 +6,7 @@ from os import remove, path
 
 from trkfin import app, db
 from trkfin.models import Users, Wallets, History
-from trkfin.forms import LoginForm, RegistrationForm, AddWallet, MainForm
+from trkfin.forms import LoginForm, RegistrationForm, AddWalletForm, MainForm
 
 
 @app.route("/")
@@ -19,7 +19,7 @@ def index():
 
 @app.route("/haddw", methods=['GET', 'POST'])
 def haddw():
-    form = AddWallet()
+    form = AddWalletForm()
     if form.validate_on_submit():
         new_wallet = Wallets(user_id=current_user.id)
         new_wallet.name = form.name.data
@@ -43,7 +43,7 @@ def home():
 
     # prepare form objects
     if current_user.wallets_count() < 1:
-        mf = AddWallet()
+        mf = AddWalletForm()
         return render_template("home.html", mf=mf, nw=True)
     else:
         mf = MainForm()
@@ -115,7 +115,7 @@ def register():
     if form.validate_on_submit():
 
         # record user to db
-        new_user = Users(username=form.username.data, email=form.email.data)
+        new_user = Users(username=form.username.data, email=form.email.data, stats={})
         new_user.set_password(form.password.data)
         db.session.add(new_user)
         db.session.commit()
@@ -189,7 +189,7 @@ def account(username):
     wallets = Wallets.wallets(current_user.id)
     history = History.user_history(current_user.id)
 
-    form = AddWallet()
+    form = AddWalletForm()
     srcs = []
     for w in Wallets.query.filter_by(user_id=current_user.id).all():
         srcs.append(w.type)
@@ -233,7 +233,7 @@ def wallets(username):
         return redirect('/u/' + current_user.username + '/wallets')
 
     wallets = Wallets.wallets(current_user.id)
-    form = AddWallet()
+    form = AddWalletForm()
 
     return render_template('wallets.html', wallets=wallets, form=form)
     

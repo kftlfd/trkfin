@@ -28,7 +28,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Sign In')
 
 
-class AddWallet(FlaskForm):
+class AddWalletForm(FlaskForm):
     timestamp = HiddenField('timestamp')
     name = StringField('Name', validators=[Optional()], render_kw={'placeholder': 'Name'})
     type = SelectField('Type', validators=[Optional()], render_kw={'placeholder': 'Type'})
