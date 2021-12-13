@@ -9,26 +9,24 @@
 		{% include "navbar.html" %}
 
 		{% if get_flashed_messages() %}
-		<!-- flash messages -->
-			<header>
-				<div class="alert alert-primary border text-center" role="alert">
-					{% with messages = get_flashed_messages() %}                    
-						<ul>
-							{% for message in messages %}
-							<li>{{ message }}</li>
-							{% endfor %}
-						</ul>                    
-					{% endwith %}
-				</div>
-			</header>
+    <header>
+      <div class="alert alert-primary border text-center" role="alert">
+        {% with messages = get_flashed_messages() %}                    
+          <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+          </ul>                    
+        {% endwith %}
+      </div>
+    </header>
 		{% endif %}
 
-		<!-- main body -->
-		<main>
-			{% block main %}{% endblock %}
-		</main>
-
-		{% include "footer.html" %}
+    <main>
+      {% block main %}{% endblock %}      
+    </main>
+      
+    {% include "footer.html" %}
 
 	</body>
 
