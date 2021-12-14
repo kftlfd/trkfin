@@ -1,6 +1,6 @@
 <div class="mainform card">
 
-  <form name="mainform" action="" method="POST">  
+  <form name="mainform" action="/mainform" method="POST">  
     
     {{ mf.hidden_tag() }}
     
@@ -41,6 +41,30 @@
         {{ mf.description(class_="form-control") }}
         {{ mf.submit(class_="btn btn-primary") }}
       </div>
+      
+    </div>
+
+    <div>
+      
+      {% for error in mf.hidden_tag.errors %}
+        hidden: <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+
+      {% for error in mf.source.errors %}
+        source: <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+
+      {% for error in mf.destination.errors %}
+        dest: <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+
+      {% for error in mf.amount.errors %}
+        amount: <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+
+      {% for error in mf.description.errors %}
+        descr: <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
       
     </div>
     

@@ -6,7 +6,7 @@ from os import remove, path
 
 from trkfin import app, db
 from trkfin.models import Users, Wallets, History
-from trkfin.forms import LoginForm, RegistrationForm, AddWalletForm, MainForm
+from trkfin.forms import MainForm, AddWalletForm
 
 
 @app.route("/")
@@ -17,25 +17,12 @@ def index():
         return redirect(url_for('home'))
 
 
-@app.route("/haddw", methods=['GET', 'POST'])
-def haddw():
-    form = AddWalletForm()
-    if form.validate_on_submit():
-        new_wallet = Wallets(user_id=current_user.id)
-        new_wallet.name = form.name.data
-        if form.type.data is not None:
-            new_wallet.type = form.type.data
-        else:
-            new_wallet.type = form.type_new.data
-        new_wallet.currency = None
-        new_wallet.amount = 0
+@app.route("/welcome")
+def welcome():
+    return render_template("welcome.html")
 
-        db.session.add(new_wallet)
-        db.session.commit()  
 
-        return redirect(url_for('home'))
-
-@app.route("/home", methods=['GET', 'POST'])
+@app.route("/home")
 def home():    
 
     if not current_user.is_authenticated:
@@ -52,38 +39,6 @@ def home():
     srcs = [(w.wallet_id, w.name) for w in Wallets.query.filter_by(user_id=current_user.id).order_by('name')]
     mf.source.choices = srcs
     mf.destination.choices = srcs
-
-    # received main form
-    if mf.submit.data and mf.validate():
-
-        if mf.action.data == 'spending':
-            mf.amount.data = float(mf.amount.data) * (-1.0)
-
-        w = Wallets.query.get(mf.source.data)
-        w.amount += float(mf.amount.data)
-        
-        record = History()
-        record.user_id = current_user.id
-        ts = mf.timestamp.data
-        record.ts_year = ts[0:4]
-        record.ts_month = ts[5:7]
-        record.ts_day = ts[8:10]
-        record.ts_hour = ts[11:13]
-        record.ts_minute = ts[14:16]
-        record.ts_second = ts[17:19]
-        record.ts_ms = ts[20:]
-        record.action = mf.action.data
-        record.source = mf.source.data
-        record.destination = mf.destination.data
-        record.amount = mf.amount.data
-        record.description = mf.description.data
-
-        current_user.stats = {}
-        current_user.stats['test'] = 'test'
-        
-        db.session.add(record)
-        db.session.commit()
-        flash(record)
         
 
     info = {}
@@ -97,10 +52,110 @@ def home():
     return render_template("home.html", mf=mf, info=info)
 
 
-@app.route("/welcome")
-def welcome():
-    return render_template("welcome.html")
+@app.route("/mainform", methods=["POST"])
+@login_required
+def mainform():
+    mf = MainForm()
+    srcs = [(w.wallet_id, w.name) for w in Wallets.query.filter_by(user_id=current_user.id).order_by('name')]
+    mf.source.choices = srcs
+    mf.destination.choices = srcs
+    if mf.validate_on_submit():
 
+        # if mf.action.data == 'spending':
+        #     mf.amount.data = float(mf.amount.data) * (-1.0)
+
+        # w = Wallets.query.get(mf.source.data)
+        # w.amount += float(mf.amount.data)
+        
+        # record = History()
+        # record.user_id = current_user.id
+        # ts = mf.timestamp.data
+        # record.ts_year = ts[0:4]
+        # record.ts_month = ts[5:7]
+        # record.ts_day = ts[8:10]
+        # record.ts_hour = ts[11:13]
+        # record.ts_minute = ts[14:16]
+        # record.ts_second = ts[17:19]
+        # record.ts_ms = ts[20:]
+        # record.action = mf.action.data
+        # record.source = mf.source.data
+        # record.destination = mf.destination.data
+        # record.amount = mf.amount.data
+        # record.description = mf.description.data
+
+        # current_user.stats = {}
+        # current_user.stats['test'] = 'test'
+        
+        # db.session.add(record)
+        # db.session.commit()
+        # flash(record)
+
+        flash("Processing MainForm")
+
+        # redirect to next page
+        next_page = request.args.get('next')
+        if not next_page or url_parse(next_page).netloc != '':
+            next_page = url_for('home')
+        return redirect(next_page)
+    
+    flash('Mainform submition failed')
+    # return redirect(url_for('home'))
+    return render_template("home.html", mf=mf)
+
+
+@app.route("/addwalletform", methods=["POST"])
+@login_required
+def addwalletform():
+    next_page = request.args.get('next')
+    if not next_page or url_parse(next_page).netloc != '':
+        next_page = url_for('wallets', username=current_user.username)
+    form = AddWalletForm()
+    if form.validate_on_submit():
+        # new_wallet = Wallets(user_id=current_user.id)
+        # new_wallet.name = form.name.data
+        # if form.type.data is not None:
+        #     new_wallet.type = form.type.data
+        # else:
+        #     new_wallet.type = form.type_new.data
+        # new_wallet.currency = None
+        # new_wallet.amount = 0
+
+        # db.session.add(new_wallet)
+        # db.session.commit()
+        
+        flash("Processing AddWalletForm")  
+
+        # redirect to next page
+        
+        return redirect(next_page)
+    
+    flash("AddWalletForm submition failed")
+    return redirect(next_page)
+
+
+@app.route("/u/<username>/wallets")
+@login_required
+def wallets(username):
+    
+    if username is not current_user.username:
+        return redirect('/u/' + current_user.username + '/wallets')
+
+    wallets = Wallets.wallets(current_user.id)
+    form = AddWalletForm()
+
+    return render_template('wallets.html', wallets=wallets, form=form)
+    
+
+@app.route("/u/<username>/history")
+@login_required
+def history(username):
+    
+    if username is not current_user.username:
+        return redirect('/u/' + current_user.username + '/history')
+
+    history = History.user_history(current_user.id)
+
+    return render_template('history.html', history=history)
 
 
 @app.route('/u/<username>', methods=['GET', 'POST'])
@@ -137,31 +192,6 @@ def account(username):
 
     return render_template('account.html', user=user, wallets=wallets, history=history, form=form)
 
-
-@app.route("/u/<username>/history")
-@login_required
-def history(username):
-    
-    if username is not current_user.username:
-        return redirect('/u/' + current_user.username + '/history')
-
-    history = History.user_history(current_user.id)
-
-    return render_template('history.html', history=history)
-
-
-@app.route("/u/<username>/wallets")
-@login_required
-def wallets(username):
-    
-    if username is not current_user.username:
-        return redirect('/u/' + current_user.username + '/wallets')
-
-    wallets = Wallets.wallets(current_user.id)
-    form = AddWalletForm()
-
-    return render_template('wallets.html', wallets=wallets, form=form)
-    
 
 @app.route('/resetdb')
 def resetdb():

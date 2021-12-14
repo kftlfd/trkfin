@@ -7,27 +7,6 @@ from wtforms.widgets.html5 import NumberInput
 from trkfin.models import Users, Wallets
 
 
-class RegistrationForm(FlaskForm):    
-    username = StringField('Username', validators=[DataRequired()])    
-    email = StringField('E-Mail', validators=[Optional()])    
-    password = PasswordField('Password', validators=[DataRequired()])    
-    confirm = PasswordField('Repeat password', validators=[DataRequired(), EqualTo('password', message="must match")])    
-    submit = SubmitField('Sign Up')
-
-    def validate_username(self, username):
-        user = Users.query.filter_by(username=username.data).first()
-        if user is not None:
-            raise ValidationError('Username is not available.')
-
-
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('E-Mail', validators=[Optional()])    
-    password = PasswordField('Password', validators=[DataRequired()])    
-    remember_me = BooleanField('Remember Me')    
-    submit = SubmitField('Sign In')
-
-
 class AddWalletForm(FlaskForm):
     timestamp = HiddenField('timestamp')
     name = StringField('Name', validators=[Optional()], render_kw={'placeholder': 'Name'})
@@ -40,8 +19,15 @@ class AddWalletForm(FlaskForm):
 class MainForm(FlaskForm):
     timestamp = HiddenField('timestamp')
     action = RadioField(choices=['spending', 'income', 'transfer'], default='spending')
-    source = SelectField("From", validators=[DataRequired()]) 
-    destination = SelectField("To", validators=[DataRequired()])
+    source = SelectField("From", validators=[Optional()]) 
+    destination = SelectField("To", validators=[Optional()])
     amount = DecimalField('amount', validators=[DataRequired()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})
     description = StringField('description', validators=[Optional()], render_kw={'placeholder': 'description'})
     submit = SubmitField('>')
+
+    def validate_source(self, source):
+        w = Wallets.query.get(source.data)
+        if w is None:
+            raise ValidationError('No such wallet')
+        if w.user_id is not current_user.id:
+            raise ValidationError('Wallet owned by someone else')
