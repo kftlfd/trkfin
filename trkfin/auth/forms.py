@@ -1,12 +1,13 @@
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import HiddenField, StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Optional, EqualTo
 
 from trkfin.models import Users
 
 
-class RegistrationForm(FlaskForm):    
+class RegistrationForm(FlaskForm):
+    timestamp = HiddenField('timestamp')
     username = StringField('Username', validators=[DataRequired()])    
     email = StringField('E-Mail', validators=[Optional()])    
     password = PasswordField('Password', validators=[DataRequired()])    
