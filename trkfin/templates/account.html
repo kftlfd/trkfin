@@ -1,47 +1,20 @@
 {% extends "base.html" %}
 
-
-{% block title %}
-	| Account
-{% endblock %}
-
+{% block title %} | Account{% endblock %}
 
 {% block main %}
-  
-  <div>
-    <h3>Add new wallet</h3>
-    {% include "forms/addwalletform.html" %}
-    <hr>
-    <br>
-  </div>
 
-  
-  <div>
-    <h3>Wallets</h3>
-    <p>{{ wallets }}</p>
-    <dl>
-      {% for w in wallets %}
-      <dt>{{ w.type }}</dt>
-      <dd>{{ w.name }}: {{ w.amount }}</dd>
-      {% endfor %}
-    </dl>
-    <hr>
-    <br>
-  </div>
+<h3>add email</h3>
 
-  
-  <div>
-    <h3>History</h3>
-    <table class="table">
-      {% for row in history %}
-      <tr>
-        <td>{{ row.timestamp }}</td>
-        <td>{{ row.action }}</td>
-      </tr>
-      {% endfor %}
-    </table>
-    <hr>
-    <br>
-  </div>
+<h3>change password</h3>
+
+<h3>change timezone</h3>
+
+<h3>change defaults</h3>
+<p>wallet selection: spending from, income to, transfer from to.</p>
+<p>report: month, week.</p>
+<p>send reports to email</p>
+
+<h3>delete all data</h3>
 
 {% endblock %}
