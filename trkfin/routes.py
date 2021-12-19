@@ -1,5 +1,6 @@
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_user, logout_user, login_required
+from functools import wraps
 from werkzeug.urls import url_parse
 
 from os import remove, path
@@ -11,55 +12,36 @@ from trkfin.forms import MainForm, AddWalletForm
 
 @app.route("/")
 def index():
-    if not current_user.is_authenticated:
-        return redirect(url_for('welcome'))
-    else:
+    if current_user.is_authenticated:
         return redirect(url_for('home'))
-
-
-@app.route("/welcome")
-def welcome():
-    return render_template("welcome.html")
-
-
-@app.route("/home")
-def home():    
-
-    if not current_user.is_authenticated:
-        return redirect(url_for('welcome'))
-
-    # prepare form objects
-    if current_user.wallets_count() < 1:
-        mf = AddWalletForm()
-        return render_template("home.html", mf=mf, nw=True)
     else:
-        mf = MainForm()
+        return render_template("welcome.html")
 
+
+@app.route("/home", methods=["GET", "POST"])
+@login_required
+def home():
+
+    if current_user.walletcount < 1:
+        return redirect(url_for('wallets', username=current_user.username, next='home'))
+
+    # report - TODO
+    report = {'test': 1}
+    info = {}
+    info['user'] = current_user
+    info['wallets'] = current_user.get_wallets_list()
+    info['history'] = current_user.get_history()
+    info['report'] = History.query.filter(History.user_id==current_user.id).filter(History.ts_local.like('2021%')).all()
+    info['stats'] = current_user.stats
+
+    # MainForm
+    form = MainForm()
     # load wallets
     srcs = [(w.wallet_id, w.name) for w in Wallets.query.filter_by(user_id=current_user.id).order_by('name')]
-    mf.source.choices = srcs
-    mf.destination.choices = srcs
-        
-
-    info = {}
-    if current_user.is_authenticated:
-        info['user'] = Users.user(current_user.id)
-        info['wallets'] = Wallets.wallets(current_user.id)
-        info['history'] = History.user_history(current_user.id)
-        info['report'] = History.month_report(current_user.id, 2021, 11)
-        info['stats'] = current_user.get_stats()
-
-    return render_template("home.html", mf=mf, info=info)
-
-
-@app.route("/mainform", methods=["POST"])
-@login_required
-def mainform():
-    mf = MainForm()
-    srcs = [(w.wallet_id, w.name) for w in Wallets.query.filter_by(user_id=current_user.id).order_by('name')]
-    mf.source.choices = srcs
-    mf.destination.choices = srcs
-    if mf.validate_on_submit():
+    form.source.choices = srcs
+    form.destination.choices = srcs
+    # process MainForm - TODO
+    if form.validate_on_submit():
 
         # if mf.action.data == 'spending':
         #     mf.amount.data = float(mf.amount.data) * (-1.0)
@@ -92,107 +74,83 @@ def mainform():
 
         flash("Processing MainForm")
 
-        # redirect to next page
-        next_page = request.args.get('next')
-        if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('home')
-        return redirect(next_page)
-    
-    flash('Mainform submition failed')
-    # return redirect(url_for('home'))
-    return render_template("home.html", mf=mf)
+        return redirect(url_for('home'))
+
+    return render_template("home.html", form=form, report=report, info=info)
 
 
-@app.route("/addwalletform", methods=["POST"])
+# decorator to restrict user to only their own data
+def only_personal_data(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if kwargs['username'] is not current_user.username:
+            return redirect(url_for(func.__name__, username=current_user.username))
+        return func(*args, **kwargs)
+    return wrapper
+
+
+@app.route("/u/<username>/wallets", methods=["GET", "POST"])
 @login_required
-def addwalletform():
-    next_page = request.args.get('next')
-    if not next_page or url_parse(next_page).netloc != '':
-        next_page = url_for('wallets', username=current_user.username)
-    form = AddWalletForm()
-    if form.validate_on_submit():
-        # new_wallet = Wallets(user_id=current_user.id)
-        # new_wallet.name = form.name.data
-        # if form.type.data is not None:
-        #     new_wallet.type = form.type.data
-        # else:
-        #     new_wallet.type = form.type_new.data
-        # new_wallet.currency = None
-        # new_wallet.amount = 0
-
-        # db.session.add(new_wallet)
-        # db.session.commit()
-        
-        flash("Processing AddWalletForm")  
-
-        # redirect to next page
-        
-        return redirect(next_page)
-    
-    flash("AddWalletForm submition failed")
-    return redirect(next_page)
-
-
-@app.route("/u/<username>/wallets")
-@login_required
-def wallets(username):
-    
-    if username is not current_user.username:
-        return redirect('/u/' + current_user.username + '/wallets')
-
-    wallets = Wallets.wallets(current_user.id)
-    form = AddWalletForm()
-
-    return render_template('wallets.html', wallets=wallets, form=form)
-    
-
-@app.route("/u/<username>/history")
-@login_required
-def history(username):
-    
-    if username is not current_user.username:
-        return redirect('/u/' + current_user.username + '/history')
-
-    history = History.user_history(current_user.id)
-
-    return render_template('history.html', history=history)
-
-
-@app.route('/u/<username>', methods=['GET', 'POST'])
-@login_required
-def account(username):
-    
-    if username is not current_user.username:
-        return redirect('/u/' + current_user.username)
-
-    user = Users.query.filter_by(username=username).first_or_404()
-    wallets = Wallets.wallets(current_user.id)
-    history = History.user_history(current_user.id)
+@only_personal_data
+def wallets(username, **kwargs):
 
     form = AddWalletForm()
-    srcs = []
-    for w in Wallets.query.filter_by(user_id=current_user.id).all():
-        srcs.append(w.type)
-    form.type.choices = srcs
+    # load wallet types - TODO
 
     if form.validate_on_submit():
-        new_wallet = Wallets(user_id=current_user.id)
-        new_wallet.name = form.name.data
+        
+        # record new wallet
+        new_wallet = Wallets()
+        new_wallet.user_id = current_user.id
         if form.type.data is not None:
             new_wallet.type = form.type.data
         else:
             new_wallet.type = form.type_new.data
-        new_wallet.currency = None
-        new_wallet.amount = 0
-
+        new_wallet.name = form.name.data
+        new_wallet.amount = form.amount.data
         db.session.add(new_wallet)
-        db.session.commit()  
+        current_user.walletcount += 1
+        db.session.commit()
+        
+        # add history entry
+        record = History()
+        record.user_id = current_user.id
+        record.ts_local = form.timestamp.data
+        record.action = "Added wallet"
+        if new_wallet.type:
+            record.description = str(new_wallet.type) + ": " + str(new_wallet.name)
+        else:
+            record.description = str(new_wallet.name)
+        record.amount = new_wallet.amount
+        db.session.add(record)
+        db.session.commit()
 
-        return redirect(url_for('account', username=current_user.username))    
+        flash("Added new wallet")
+        if request.args:
+            next_page = url_for(request.args.get('next'))
+        else:
+            next_page = url_for('wallets', username=current_user.username)
+        return redirect(next_page)
+    
+    return render_template('wallets.html', form=form, wallets=current_user.get_wallets_list())
 
-    return render_template('account.html', user=user, wallets=wallets, history=history, form=form)
+
+@app.route("/u/<username>/history")
+@login_required
+@only_personal_data
+def history(username):
+    # pagination or continuous load - TODO
+    return render_template('history.html', history=current_user.get_history())
 
 
+@app.route('/u/<username>', methods=['GET', 'POST'])
+@login_required
+@only_personal_data
+def account(username):
+    return render_template('account.html')
+
+
+# RESET DB - FOR TESTING ONLY
 @app.route('/resetdb')
 def resetdb():
     if path.exists('trkfin.db'):

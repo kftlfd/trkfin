@@ -9,10 +9,17 @@ from trkfin import db, login, app
 class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     username = db.Column(db.String(64), index=True, unique=True, nullable=False)
-    email = db.Column(db.String(120), index=True)
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
+    email = db.Column(db.String(120), index=True)
+    walletcount = db.Column(db.Integer)
     stats = db.Column(PickleType)
+    password_hash = db.Column(db.String(128), nullable=False)
+    # timezone - TODO
+
+    def __init__(self, username):
+        self.username = username
+        self.walletcount = 0
+        self.stats = {}
 
     def __repr__(self):
         return f'< user | id:{self.id} | username:{self.username} | created:{self.created} | stats:{len(self.stats)}>'
@@ -23,82 +30,11 @@ class Users(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def user(id):
-        return Users.query.filter_by(id=id).first()
+    def get_wallets_list(self):
+        return Wallets.query.filter_by(user_id=self.id).order_by('type').all()
 
-    def get_stats(self):
-        return self.stats
-
-    def wallets_count(self):
-        return Wallets.query.filter_by(user_id=self.id).count()
-
-
-@login.user_loader
-def load_user(id):
-    return Users.query.get(int(id))
-
-
-class Wallets(db.Model):
-    wallet_id = db.Column(db.Integer, primary_key=True, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    type = db.Column(db.String(20), nullable=False)
-    name = db.Column(db.String(20), nullable=False)
-    currency = db.Column(db.String(8))
-    amount = db.Column(db.Float, nullable=False)
-
-    def __repr__(self):
-        return str({
-            'wallet': self.wallet_id,
-            'user': self.user_id,
-            'name': self.name,
-            'type': self.type,
-            'currency': self.currency,
-            'amount': self.amount
-        })
-        # f'< wallet | uid:{self.user_id} | type:{self.type} | name:{self.name} | amount:{self.amount} >'
-
-    def count(uid):
-        return Wallets.query.filter((user_id==uid).count())
-        # len(Wallets.query.filter_by(user_id=uid).all())
-
-    def wallets(uid):
-        return Wallets.query.filter_by(user_id=uid).order_by('type').all()
-
-
-class History(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    
-    ts_utc = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)    
-    ts_year = db.Column(db.Integer)
-    ts_month = db.Column(db.Integer)
-    ts_day = db.Column(db.Integer)
-    ts_hour = db.Column(db.Integer)
-    ts_minute = db.Column(db.Integer)
-    ts_second = db.Column(db.Integer)
-    ts_ms = db.Column(db.Integer)
-    
-    action = db.Column(db.String(20))
-    source = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))
-    destination = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))
-    amount = db.Column(db.Float)
-    description = db.Column(db.String(120))
-
-    def __repr__(self):
-        return str({
-            'user': self.user_id,
-            'ts_uts': self.ts_utc,
-            'ts_local': str(self.ts_year) + '-' + str(self.ts_month) + '-' + str(self.ts_day) + '_' + \
-                str(self.ts_hour) + '-' + str(self.ts_minute) + '-' + str(self.ts_second) + '_' + str(self.ts_ms),
-            'action': self.action,
-            'from': self.source,
-            'to': self.destination,
-            'amount': self.amount,
-            'description': self.description
-        })
-
-    def user_history(uid):
-        return History.query.filter_by(user_id=uid).order_by(History.id.desc()).all()
+    def get_history(self):
+        return History.query.filter_by(user_id=self.id).order_by(History.id.desc()).all()
 
     def month_report(uid, year, month):
 
@@ -157,3 +93,62 @@ class History(db.Model):
             'spending': spending,
             'balance': balance
         }
+
+
+@login.user_loader
+def load_user(id):
+    return Users.query.get(int(id))
+
+
+class Wallets(db.Model):
+    wallet_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    type = db.Column(db.String(20), nullable=False)
+    name = db.Column(db.String(20), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    # currency = db.Column(db.String(8)) - TODO
+
+    def __repr__(self):
+        return str({
+            'wallet': self.wallet_id,
+            'user': self.user_id,
+            'name': self.name,
+            'type': self.type,
+            # 'currency': self.currency,
+            'amount': self.amount
+        })
+
+
+class History(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    
+    ts_utc = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    ts_local = db.Column(db.String(23))
+
+    ts_year = db.Column(db.Integer)
+    ts_month = db.Column(db.Integer)
+    ts_day = db.Column(db.Integer)
+    ts_hour = db.Column(db.Integer)
+    ts_minute = db.Column(db.Integer)
+    ts_second = db.Column(db.Integer)
+    ts_ms = db.Column(db.Integer)
+    
+    action = db.Column(db.String(20))
+    source = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))
+    destination = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))
+    amount = db.Column(db.Float)
+    description = db.Column(db.String(120))
+    
+    def __repr__(self):
+        return str({
+            'id': self.id,
+            'user': self.user_id,
+            'ts_uts': self.ts_utc,
+            'ts_local': self.ts_local,
+            'action': self.action,
+            'from': self.source,
+            'to': self.destination,
+            'amount': self.amount,
+            'description': self.description
+        })
