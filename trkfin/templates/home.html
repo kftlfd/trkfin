@@ -1,54 +1,42 @@
 {% extends "base.html" %}
 
-
-{% block title %}
-	| Home
-{% endblock %}
-
+{% block title %} | Home{% endblock %}
 
 {% block main %}
 
-  <!-- Main Form or add wallet form -->
-  <div>
-    {% if nw == True %}
-      {% include "forms/addwalletform.html" %}
-    {% else %}
-      {% include "forms/mainform.html" %}
-    {% endif %}  
-  </div>
+{% include "forms/mainform.html" %}
 
+<!-- Current report -->
+{% if info %}
+<div>
+  <hr>
+  <h3>This month/week</h3>    
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Report</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ info['report'] }}</td>
+      </tr>
+    </tbody>
+  </table>
+  
+</div>
 
-  <!-- Current report -->
-  {% if info %}
-  <div>
-    <hr>
-    <h3>This month/week</h3>    
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Report</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>{{ info['report'] }}</td>
-        </tr>
-      </tbody>
-    </table>
-    
-  </div>
+<!-- for developing -->
+<div>
+  <hr>
+  <h3>Test</h3>
+  <table class="table">
+    {% for data in info %}
+    <tr><td>{{ data }}:</td><td>{{ info[data] }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
 
-  <!-- for developing -->
-  <div>
-    <hr>
-    <h3>Test</h3>
-    <table class="table">
-      {% for data in info %}
-      <tr><td>{{ data }}:</td><td>{{ info[data] }}</td></tr>
-      {% endfor %}
-    </table>
-  </div>
-
-  {% endif %}
+{% endif %}
 
 {% endblock %}

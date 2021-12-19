@@ -1,4 +1,4 @@
-<form action="/addwalletform" method="POST" class="form-row align-items-center">
+<form action="" method="POST" class="form-row align-items-center">
   {{ form.hidden_tag() }}
 
   {{ form.type.label() }}
@@ -10,8 +10,31 @@
   {{ form.name.label() }}
   {{ form.name }}
 
-  {{ form.currency.label() }}
-  {{ form.currency }}
+  {{ form.amount.label() }}
+  {{ form.amount }}
 
   {{ form.submit() }}
+
+  <div>
+    {% for error in form.hidden_tag.errors %}
+      hidden: <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+
+    {% for error in form.type.errors %}
+      type: <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+
+    {% for error in form.type_new.errors %}
+      type_new: <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+
+    {% for error in form.name.errors %}
+      name: <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+
+    {% for error in form.amount.errors %}
+      amount: <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </div>
+
 </form>

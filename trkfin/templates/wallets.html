@@ -1,34 +1,22 @@
 {% extends "base.html" %}
 
+{% block title %} | Wallets{% endblock %}
 
-{% block title %}
-	| Wallets
+{% block main %}  
+<div>
+  <h3>Add new wallet</h3>
+  {% include "forms/addwalletform.html" %}
+</div>
+{% if wallets %}
+<div>
+  <h3>Wallets</h3>
+  <p>{{ wallets }}</p>
+  <dl>
+    {% for w in wallets %}
+    <dt>{{ w.type }}</dt>
+    <dd>{{ w.name }}: {{ w.amount }}</dd>
+    {% endfor %}
+  </dl>
+</div>
+{% endif %}
 {% endblock %}
-
-
-{% block main %}
-  
-  <div>
-
-    <h3>Wallets</h3>
-
-    <p>{{ wallets }}</p>
-    
-    <dl>
-      {% for w in wallets %}
-      <dt>{{ w.type }}</dt>
-      <dd>{{ w.name }}: {{ w.amount }}</dd>
-      {% endfor %}
-    </dl>
-    
-  </div>
-
-  <div>
-    
-    <h3>Add new wallet</h3>
-    
-    {% include "forms/addwalletform.html" %}
-    
-  </div>
-
-  {% endblock %}

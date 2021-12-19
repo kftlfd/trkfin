@@ -1,12 +1,12 @@
 <div class="mainform card">
 
-  <form name="mainform" action="/mainform" method="POST">  
+  <form name="mainform" action="" method="POST">  
     
-    {{ mf.hidden_tag() }}
+    {{ form.hidden_tag() }}
     
     <div class="mainform-select btn-group btn-group-toggle" role="group" data-toggle="buttons" aria-label="select-form">
       
-      {% for subfield in mf.action %}
+      {% for subfield in form.action %}
         <label class="btn btn-secondary shadow-none">
           {{ subfield }}
           {{ subfield.label }}
@@ -21,48 +21,48 @@
 
         <div id="mainform-source" class="input-group">
           <div class="input-group-prepend">
-            {{ mf.source.label(class_="input-group-text") }}
+            {{ form.source.label(class_="input-group-text") }}
           </div>
-          {{ mf.source(class_="form-control") }}
+          {{ form.source(class_="form-control") }}
         </div>
 
         <div id="mainform-destination" class="input-group">
           <div class="input-group-prepend">
-            {{ mf.destination.label(class_="input-group-text") }}
+            {{ form.destination.label(class_="input-group-text") }}
           </div>
-          {{ mf.destination(class_="form-control") }}
+          {{ form.destination(class_="form-control") }}
         </div>
 
-        {{ mf.amount(class_="form-control") }}
+        {{ form.amount(class_="form-control") }}
 
       </div>
 
       <div>
-        {{ mf.description(class_="form-control") }}
-        {{ mf.submit(class_="btn btn-primary") }}
+        {{ form.description(class_="form-control") }}
+        {{ form.submit(class_="btn btn-primary") }}
       </div>
       
     </div>
 
     <div>
       
-      {% for error in mf.hidden_tag.errors %}
+      {% for error in form.hidden_tag.errors %}
         hidden: <span style="color: red;">[{{ error }}]</span>
       {% endfor %}
 
-      {% for error in mf.source.errors %}
+      {% for error in form.source.errors %}
         source: <span style="color: red;">[{{ error }}]</span>
       {% endfor %}
 
-      {% for error in mf.destination.errors %}
+      {% for error in form.destination.errors %}
         dest: <span style="color: red;">[{{ error }}]</span>
       {% endfor %}
 
-      {% for error in mf.amount.errors %}
+      {% for error in form.amount.errors %}
         amount: <span style="color: red;">[{{ error }}]</span>
       {% endfor %}
 
-      {% for error in mf.description.errors %}
+      {% for error in form.description.errors %}
         descr: <span style="color: red;">[{{ error }}]</span>
       {% endfor %}
       
@@ -75,39 +75,11 @@
 
 
 <script>
-  
-  // add leading zeros
-  function lz(n) {
-    if (n <= 9) {
-      return "0" + n;
-    }
-    return n;
-  }
-  
-
-  // add leading zeros to miliseconds
-  function lzms(n) {
-    if (n <= 9) {
-      return "00" + n;
-    }
-    else if (n <= 99) {
-      return "0" + n;
-    }
-    return n;
-  }  
-  
 
   // input timestamp on form submit
-  document.forms['mainform'].addEventListener('submit', function() {
-    let date = new Date()
-    document.forms['mainform'].timestamp.value = date.getFullYear() + "-" + 
-                                                 lz(date.getMonth() + 1) + "-" + 
-                                                 lz(date.getDate()) + "_" +
-                                                 lz(date.getHours()) + "-" + 
-                                                 lz(date.getMinutes()) + "-" + 
-                                                 lz(date.getSeconds()) + "_" +
-                                                 lzms(date.getMilliseconds());    
-  });
+  // document.forms['mainform'].addEventListener('submit', function() {
+  //   document.forms['mainform'].timestamp.value = getLocalTime();
+  // });
 
 
   // show/hide form fields
