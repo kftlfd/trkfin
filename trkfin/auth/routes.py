@@ -19,24 +19,23 @@ def register():
     if form.validate_on_submit():
 
         # record user to db
-        new_user = Users(username=form.username.data, email=form.email.data, stats={})
+        new_user = Users(form.username.data)
         new_user.set_password(form.password.data)
         db.session.add(new_user)
         db.session.commit()
 
-        # history entry        
-        user = Users.query.filter_by(username=new_user.username).first()
+        # add history entry
         record = History()
-        record.user_id = user.id
+        record.user_id = new_user.id
         record.action = 'Created account'
+        record.ts_local = form.timestamp.data
         db.session.add(record)
         db.session.commit()
 
-        # success; log user in / redirect to login page
-        flash('Successfully Registered')       
-        # login_user(user, remember=False)
-        # return redirect(url_for('home'))
-        return redirect(url_for('login'))
+        # prevent auto-login
+        # logout_user()
+        flash('Successfully Registered')
+        return redirect(url_for('auth.login'))
 
     return render_template("auth/register.html", form=form)
 
