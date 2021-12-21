@@ -22,7 +22,14 @@ class Users(UserMixin, db.Model):
         self.stats = {}
 
     def __repr__(self):
-        return f'< user | id:{self.id} | username:{self.username} | created:{self.created} | stats:{len(self.stats)}>'
+        return '< User: ' + str({
+            'id': self.id,
+            'username': self.username,
+            'created': self.created,
+            'email': self.email,
+            'walletcount': self.walletcount,
+            'stats': self.stats
+        }) + ' >'
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -31,7 +38,15 @@ class Users(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def get_wallets_list(self):
-        return Wallets.query.filter_by(user_id=self.id).order_by('type').all()
+        parsed = {}
+        sorted_by_type = Wallets.query.filter_by(user_id=self.id).order_by('type').order_by('name').all()
+        types = set()
+        for w in sorted_by_type:
+            if w.type not in types:
+                types.add(w.type)
+                parsed[w.type] = []
+            parsed[w.type].append(w)
+        return parsed
 
     def get_history(self):
         return History.query.filter_by(user_id=self.id).order_by(History.id.desc()).all()
@@ -109,14 +124,14 @@ class Wallets(db.Model):
     # currency = db.Column(db.String(8)) - TODO
 
     def __repr__(self):
-        return str({
+        return '< Wallet: ' + str({
             'wallet': self.wallet_id,
             'user': self.user_id,
             'name': self.name,
             'type': self.type,
             # 'currency': self.currency,
             'amount': self.amount
-        })
+        }) + ' >'
 
 
 class History(db.Model):
@@ -141,7 +156,7 @@ class History(db.Model):
     description = db.Column(db.String(120))
     
     def __repr__(self):
-        return str({
+        return '< History: ' + str({
             'id': self.id,
             'user': self.user_id,
             'ts_uts': self.ts_utc,
@@ -151,4 +166,4 @@ class History(db.Model):
             'to': self.destination,
             'amount': self.amount,
             'description': self.description
-        })
+        }) + ' >'

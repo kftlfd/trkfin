@@ -8,15 +8,30 @@
   {% include "forms/addwalletform.html" %}
 </div>
 {% if wallets %}
-<div>
+<style>
+  caption {
+    caption-side: top;
+    padding-left: 2em;
+    font-weight: bold;
+  }
+</style>
+<hr>
+<div class="table-responsive">
   <h3>Wallets</h3>
-  <p>{{ wallets }}</p>
-  <dl>
-    {% for w in wallets %}
-    <dt>{{ w.type }}</dt>
-    <dd>{{ w.name }}: {{ w.amount }}</dd>
+  
+  {% for type in wallets %}
+  <br>
+  <table class='table caption-top'>
+    {% if type != '' %}
+    <caption>{{ type }}</caption>
+    {% endif %}
+    <tbody>
+    {% for w in wallets[type] %}
+    <tr><td>{{ w.name }}</td><td>{{ w.amount }}</td></tr>
     {% endfor %}
-  </dl>
+  </table>
+  {% endfor %}
+  
 </div>
 {% endif %}
 {% endblock %}

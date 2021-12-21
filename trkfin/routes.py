@@ -95,7 +95,10 @@ def only_personal_data(func):
 def wallets(username, **kwargs):
 
     form = AddWalletForm()
-    # load wallet types - TODO
+    wallets = current_user.get_wallets_list()
+    form.type.choices = [t for t in wallets]
+    form.type.choices[0] = '-'
+    form.type.choices.append('New')
 
     if form.validate_on_submit():
         
@@ -132,7 +135,7 @@ def wallets(username, **kwargs):
             next_page = url_for('wallets', username=current_user.username)
         return redirect(next_page)
     
-    return render_template('wallets.html', form=form, wallets=current_user.get_wallets_list())
+    return render_template('wallets.html', form=form, wallets=wallets)
 
 
 @app.route("/u/<username>/history")
