@@ -94,23 +94,32 @@ def only_personal_data(func):
 @only_personal_data
 def wallets(username, **kwargs):
 
-    form = AddWalletForm()
     wallets = current_user.get_wallets_list()
-    form.type.choices = [t for t in wallets]
-    form.type.choices[0] = '-'
-    form.type.choices.append('New')
+    form = AddWalletForm()
+    if wallets:
+        form.type.choices = [(t, t) for t in wallets]
+    else:
+        form.type.choices = [1]
+    form.type.choices[0] = ('', '-- None --')
+    form.type.choices.append(('New', '-- New --'))
 
     if form.validate_on_submit():
         
         # record new wallet
         new_wallet = Wallets()
         new_wallet.user_id = current_user.id
-        if form.type.data is not None:
-            new_wallet.type = form.type.data
-        else:
+        if form.type.data is 'None':
+            flash('type is none')
+            new_wallet.type = None
+        elif form.type.data is 'New':
+            flash('type is new')
             new_wallet.type = form.type_new.data
+        else:
+            new_wallet.type = form.type.data
         new_wallet.name = form.name.data
         new_wallet.amount = form.amount.data
+        if not form.amount.data:
+            new_wallet.amount = 0
         db.session.add(new_wallet)
         current_user.walletcount += 1
         db.session.commit()

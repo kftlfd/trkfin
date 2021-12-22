@@ -9,11 +9,11 @@ from trkfin.models import Users, Wallets
 
 class AddWalletForm(FlaskForm):
     timestamp = HiddenField('timestamp')
-    name = StringField('Name', validators=[DataRequired()], render_kw={'placeholder': 'Name'})
-    type = SelectField('Type', validators=[Optional()], render_kw={'placeholder': 'Type'})
-    type_new = StringField('Type', validators=[Optional()], render_kw={'placeholder': 'Type'})
+    name = StringField('Name', validators=[DataRequired()], render_kw={'placeholder': 'Wallet name'})
+    type = SelectField('Type', validators=[Optional()], render_kw={'placeholder': 'Wallet type'})
+    type_new = StringField('Type', validators=[Optional()], render_kw={'placeholder': 'New type'})
     # currency = StringField('Currency', validators=[Optional()], render_kw={'placeholder': 'Currency'})
-    amount = DecimalField('amount', default=0, validators=[Optional()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})
+    amount = DecimalField('amount', validators=[Optional()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})
     submit = SubmitField('Add')
 
 

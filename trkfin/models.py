@@ -38,15 +38,15 @@ class Users(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def get_wallets_list(self):
-        parsed = {}
+        grouped = {}
         sorted_by_type = Wallets.query.filter_by(user_id=self.id).order_by('type').order_by('name').all()
         types = set()
         for w in sorted_by_type:
             if w.type not in types:
                 types.add(w.type)
-                parsed[w.type] = []
-            parsed[w.type].append(w)
-        return parsed
+                grouped[w.type] = []
+            grouped[w.type].append(w)
+        return grouped
 
     def get_history(self):
         return History.query.filter_by(user_id=self.id).order_by(History.id.desc()).all()
