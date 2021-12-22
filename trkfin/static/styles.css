@@ -50,46 +50,31 @@ footer {
     border-top: 1px solid #dee2e6;
 }
 
-.mainform {
+
+/* --- FORMS --- */
+.form, .form-vert, .form-horiz {
     display: flex;
+    /* width: 100%; */
+}
+.form, .form-vert {
     flex-direction: column;
-    padding: 1em;
-    margin-top: 2em;
 }
-
-.mainform-select {
-    display: flex;
-    width: 100%;
-    /* margin-top: 2rem; */
-}
-
-.mainform-select, .mainform-body-top {
-    margin-bottom: 5px;
-}
-
-.mainform-body {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    /* justify-content: space-between; */
-    justify-content: space-evenly;
-}
-
-.mainform-body > div {
-    display: flex;
+.form-horiz {
     flex-direction: row;
-    width: 100%;
 }
-
-#mainform-source, #mainform-destination {
-    margin-right: 5px;
+.form {
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+}  
+.form-vert + .form-vert, .form-horiz + .form-horiz, .form-horiz + .form-vert {
+    margin-top: 5px;
 }
-#submit {
+input + input, .input-group + input {
     margin-left: 5px;
 }
-
-label {
-    margin: 0;
+label>label {
+    margin-bottom: 0;
     cursor: pointer;
 }
 
