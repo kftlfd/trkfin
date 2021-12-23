@@ -2,13 +2,12 @@ html, body {
     margin: 0px;
     padding: 0px;
     height: 100%;
-  }
+}
 
 body {
     display: flex;
     flex-direction: column;
     align-items: center;
-
 }
 
 nav, header, main, footer {
@@ -16,14 +15,18 @@ nav, header, main, footer {
 }
 
 main {
-    padding: 0 5px;
+    padding: 1em;
     display: flex;
     flex-direction: column;
     align-items: center;
     flex-grow: 1;
 }
-main > div {
+main>div {
+    margin: 1em 0;
     width: 100%;
+}
+main>div + main>div {
+    border-top: 3px solid red;
 }
 
 hr {
@@ -48,6 +51,12 @@ footer {
     padding: 5px 0;
     background-color: #f8f9fa;
     border-top: 1px solid #dee2e6;
+}
+
+caption {
+    caption-side: top;
+    padding-left: 2em;
+    font-weight: bold;
 }
 
 

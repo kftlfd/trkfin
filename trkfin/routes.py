@@ -37,7 +37,7 @@ def home():
     # MainForm
     form = MainForm()
     # load wallets
-    srcs = [(w.wallet_id, w.name) for w in Wallets.query.filter_by(user_id=current_user.id).order_by('name')]
+    srcs = [(w.wallet_id, w.group + ' | ' + w.name) for w in Wallets.query.filter_by(user_id=current_user.id).order_by('name')]
     form.source.choices = srcs
     form.destination.choices = srcs
     # process MainForm - TODO
@@ -97,25 +97,21 @@ def wallets(username, **kwargs):
     wallets = current_user.get_wallets_list()
     form = AddWalletForm()
     if wallets:
-        form.type.choices = [(t, t) for t in wallets]
+        form.group.choices = [(t, t) for t in wallets]
     else:
-        form.type.choices = [1]
-    form.type.choices[0] = ('', '-- None --')
-    form.type.choices.append(('New', '-- New --'))
+        form.group.choices = [1]
+    form.group.choices[0] = ('', '-- None --')
+    form.group.choices.append(('New', '-- New --'))
 
     if form.validate_on_submit():
         
         # record new wallet
         new_wallet = Wallets()
         new_wallet.user_id = current_user.id
-        if form.type.data is 'None':
-            flash('type is none')
-            new_wallet.type = None
-        elif form.type.data is 'New':
-            flash('type is new')
-            new_wallet.type = form.type_new.data
+        if form.group.data == 'New':
+            new_wallet.group = form.group_new.data
         else:
-            new_wallet.type = form.type.data
+            new_wallet.group = form.group.data
         new_wallet.name = form.name.data
         new_wallet.amount = form.amount.data
         if not form.amount.data:
@@ -129,8 +125,8 @@ def wallets(username, **kwargs):
         record.user_id = current_user.id
         record.ts_local = form.timestamp.data
         record.action = "Added wallet"
-        if new_wallet.type:
-            record.description = str(new_wallet.type) + ": " + str(new_wallet.name)
+        if new_wallet.group:
+            record.description = str(new_wallet.group) + ": " + str(new_wallet.name)
         else:
             record.description = str(new_wallet.name)
         record.amount = new_wallet.amount

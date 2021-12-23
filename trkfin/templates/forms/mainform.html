@@ -61,21 +61,15 @@
 
 <script>
 
-  // input timestamp on form submit
-  // document.forms['mainform'].addEventListener('submit', function() {
-  //   document.forms['mainform'].timestamp.value = getLocalTime();
-  // });
-
-
   // show/hide form fields
   document.forms['mainform'].addEventListener('click', function() {
     let select = document.forms['mainform'].action;
-    if (select.value == 'spending') {
+    if (select.value == 'Spending') {
       document.querySelector('#mainform-source').hidden = false;
       document.querySelector('#mainform-source').style.marginRight = '0';
       document.querySelector('#mainform-destination').hidden = true;
     }
-    else if (select.value == 'income') {
+    else if (select.value == 'Income') {
       document.querySelector('#mainform-source').hidden = true;
       document.querySelector('#mainform-source').style.marginRight = '0';
       document.querySelector('#mainform-destination').hidden = false;

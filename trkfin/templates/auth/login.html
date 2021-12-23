@@ -8,31 +8,25 @@
 
 {% block main %}
 
-  <div clas="container-sm">
+<div>
 
-	  <h3>Log-in</h3>
+  <h3>Log-in</h3>
 
-    <form action="" method="POST" novalidate>
+  <form action="" method="POST" novalidate>
 
-      {{ form.hidden_tag() }}
+    {{ form.hidden_tag() }}
+
+    <div class="form">
           
-      <div>
+      <div class="form-vert">
         {{ form.username.label(class_="form-label") }}<br>
         {{ form.username(class_="form-control") }}
         {% for error in form.username.errors %}
           <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
       </div>
-
-      <!-- <div>
-        {{ form.email.label(class_="form-label") }}<br>
-        {{ form.email(class_="form-control") }}
-        {% for error in form.email.errors %}
-          <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-      </div> -->
       
-      <div>
+      <div class="form-vert">
         {{ form.password.label(class_="form-label") }}<br>
         {{ form.password(class_="form-control") }}
         {% for error in form.password.errors %}
@@ -40,14 +34,18 @@
         {% endfor %}
       </div>
           
-      <div>{{ form.remember_me(class_="form-check") }} {{ form.remember_me.label(class_="form-label") }}</div>
+      <div>
+        {{ form.remember_me(class_="form-check") }} {{ form.remember_me.label(class_="form-label") }}
+      </div>
       
       <div>{{ form.submit(class_="btn btn-primary") }}</div>
 
-    </form>
+    </div>
 
-    <a href="{{ url_for('auth.register') }}"><button class="btn btn-primary">Sign-Up</button></a>
-  
-  </div>
+  </form>
+
+  <a href="{{ url_for('auth.register') }}"><button class="btn btn-primary">Sign-Up</button></a>
+
+</div>
 
 {% endblock %}

@@ -10,20 +10,19 @@ from trkfin.models import Users, Wallets
 class AddWalletForm(FlaskForm):
     timestamp = HiddenField('timestamp')
     name = StringField('Name', validators=[DataRequired()], render_kw={'placeholder': 'Wallet name'})
-    type = SelectField('Type', validators=[Optional()], render_kw={'placeholder': 'Wallet type'})
-    type_new = StringField('Type', validators=[Optional()], render_kw={'placeholder': 'New type'})
-    # currency = StringField('Currency', validators=[Optional()], render_kw={'placeholder': 'Currency'})
-    amount = DecimalField('amount', validators=[Optional()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})
+    group = SelectField('Group', validators=[Optional()], render_kw={'placeholder': 'Wallet group'})
+    group_new = StringField('Group_New', validators=[Optional()], render_kw={'placeholder': 'New group'})
+    amount = DecimalField('Amount', validators=[Optional()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})
     submit = SubmitField('Add')
 
 
 class MainForm(FlaskForm):
     timestamp = HiddenField('timestamp')
-    action = RadioField(choices=['spending', 'income', 'transfer'], default='spending')
+    action = RadioField(choices=['Spending', 'Income', 'Transfer'], default='Spending')
     source = SelectField("From", validators=[Optional()]) 
     destination = SelectField("To", validators=[Optional()])
-    amount = DecimalField('amount', validators=[DataRequired()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})
-    description = StringField('description', validators=[Optional()], render_kw={'placeholder': 'description'})
+    amount = DecimalField('Amount', validators=[DataRequired()], widget=NumberInput(min=0.0, step=0.01), render_kw={'placeholder': '0.00'})
+    description = StringField('Description', validators=[Optional()], render_kw={'placeholder': 'Description'})
     submit = SubmitField('>')
 
     def validate_source(self, source):

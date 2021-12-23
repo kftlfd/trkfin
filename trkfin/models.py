@@ -39,13 +39,13 @@ class Users(UserMixin, db.Model):
 
     def get_wallets_list(self):
         grouped = {}
-        sorted_by_type = Wallets.query.filter_by(user_id=self.id).order_by('type').order_by('name').all()
-        types = set()
+        sorted_by_type = Wallets.query.filter_by(user_id=self.id).order_by('group').order_by('name').all()
+        groups = set()
         for w in sorted_by_type:
-            if w.type not in types:
-                types.add(w.type)
-                grouped[w.type] = []
-            grouped[w.type].append(w)
+            if w.group not in groups:
+                groups.add(w.group)
+                grouped[w.group] = []
+            grouped[w.group].append(w)
         return grouped
 
     def get_history(self):
@@ -118,7 +118,7 @@ def load_user(id):
 class Wallets(db.Model):
     wallet_id = db.Column(db.Integer, primary_key=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    type = db.Column(db.String(20), nullable=False)
+    group = db.Column(db.String(20), nullable=False)
     name = db.Column(db.String(20), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     # currency = db.Column(db.String(8)) - TODO
@@ -128,8 +128,7 @@ class Wallets(db.Model):
             'wallet': self.wallet_id,
             'user': self.user_id,
             'name': self.name,
-            'type': self.type,
-            # 'currency': self.currency,
+            'group': self.group,
             'amount': self.amount
         }) + ' >'
 

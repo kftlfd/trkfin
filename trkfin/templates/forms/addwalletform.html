@@ -1,5 +1,5 @@
 <style>
-  #type-input {
+  #group_input {
     display: none;
   }  
 </style>
@@ -9,20 +9,26 @@
   {{ form.hidden_tag() }}
 
   <div class='form'>
+
     <div class='form-vert'>
+
       <div class='form-horiz'>
         <span class='input-group'>
           <div class="input-group-prepend">
-            {{ form.type.label(class_="input-group-text") }}
+            {{ form.group.label(class_="input-group-text") }}
           </div>
-          {{ form.type(class_="form-control") }}
+          {{ form.group(class_="form-control") }}
         </span>
       </div>
-      <div class='form-horiz' id='type-input'>
-        {{ form.type_new(class_="form-control") }}
+
+      <div class='form-horiz' id='group_input'>
+        {{ form.group_new(class_="form-control") }}
       </div>
+
     </div>
+
     <div class='form-vert'>
+      
       <div class='form-horiz'>
         <span class='input-group'>
           <div class="input-group-prepend">
@@ -31,6 +37,7 @@
           {{ form.name(class_="form-control") }}
         </span>
       </div>
+      
       <div class='form-horiz'>
         <span class='input-group'>
           <div class="input-group-prepend">
@@ -40,18 +47,20 @@
         </span>
         {{ form.submit(class_="btn btn-secondary") }}
       </div>
+
     </div>
+
   </div>
 
   <div>
     {% for error in form.hidden_tag.errors %}
       hidden: <span style="color: red;">[{{ error }}]</span>
     {% endfor %}
-    {% for error in form.type.errors %}
-      type: <span style="color: red;">[{{ error }}]</span>
+    {% for error in form.group.errors %}
+    group: <span style="color: red;">[{{ error }}]</span>
     {% endfor %}
-    {% for error in form.type_new.errors %}
-      type_new: <span style="color: red;">[{{ error }}]</span>
+    {% for error in form.group_new.errors %}
+      group_input: <span style="color: red;">[{{ error }}]</span>
     {% endfor %}
     {% for error in form.name.errors %}
       name: <span style="color: red;">[{{ error }}]</span>
@@ -65,34 +74,35 @@
 
 <script>
   
-  const type_select = document.querySelector('#type');
+  const group_select = document.querySelector('#group');
+  const group_input = document.querySelector('#group_input');
   
-  // hide type-input
-  function hide_type_input() {
-    if (type_select.value == 'New') {
-      document.querySelector('#type-input').style.display = 'block';
+  // hide group_input
+  function hide_group_input() {
+    if (group_select.value == 'New') {
+      group_input.style.display = 'block';
     }
     else {
-      document.querySelector('#type-input').style.display = 'none';
+      group_input.style.display = 'none';
     }
   }
-  hide_type_input();
+  hide_group_input();
 
   // grey out None and New types
-  function grey_types() {
-    if (type_select.value == "" || type_select.value == "New") {
-      type_select.style.color = '#6c757d';
-      type_select.style.fontStyle = 'italic';
+  function grey_groups() {
+    if (group_select.value == "" || group_select.value == "New") {
+      group_select.style.color = '#6c757d';
+      group_select.style.fontStyle = 'italic';
     }
     else {
-      type_select.style.color = 'black';
-      type_select.style.fontStyle = 'normal';
+      group_select.style.color = 'black';
+      group_select.style.fontStyle = 'normal';
     }
   }
-  grey_types();
+  grey_groups();
 
-  document.querySelector('#type').addEventListener('change', function() {
-    hide_type_input();
-    grey_types();
+  group_select.addEventListener('change', function() {
+    hide_group_input();
+    grey_groups();
   });
 </script>

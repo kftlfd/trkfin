@@ -4,39 +4,15 @@
 
 {% block main %}
 
-{% include "forms/mainform.html" %}
+<div name='form'>
+  {% include "forms/mainform.html" %}
+</div>
 
-<!-- Current report -->
 {% if info %}
-<div>
-  <hr>
-  <h3>This month/week</h3>    
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Report</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>{{ info['report'] }}</td>
-      </tr>
-    </tbody>
-  </table>
-  
+<div name='report'>
+  <h3>This month</h3>
+  <div>TBD</div>
 </div>
-
-<!-- for developing -->
-<div>
-  <hr>
-  <h3>Test</h3>
-  <table class="table">
-    {% for data in info %}
-    <tr><td>{{ data }}:</td><td>{{ info[data] }}</td></tr>
-    {% endfor %}
-  </table>
-</div>
-
 {% endif %}
 
 {% endblock %}

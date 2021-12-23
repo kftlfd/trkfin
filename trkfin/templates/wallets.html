@@ -2,36 +2,28 @@
 
 {% block title %} | Wallets{% endblock %}
 
-{% block main %}  
-<div>
-  <h3>Add new wallet</h3>
+{% block main %}
+
+<div name='form'>
   {% include "forms/addwalletform.html" %}
 </div>
+
 {% if wallets %}
-<style>
-  caption {
-    caption-side: top;
-    padding-left: 2em;
-    font-weight: bold;
-  }
-</style>
-<hr>
-<div class="table-responsive">
+<div name='wallets-list' class="table-responsive">
   <h3>Wallets</h3>
-  
-  {% for type in wallets %}
-  <br>
+  {% for group in wallets %}
   <table class='table caption-top'>
-    {% if type != '' %}
-    <caption>{{ type }}</caption>
-    {% endif %}
+    <caption>{{ group }}</caption>
     <tbody>
-    {% for w in wallets[type] %}
-    <tr><td>{{ w.name }}</td><td>{{ w.amount }}</td></tr>
-    {% endfor %}
+      {% for w in wallets[group] %}
+      <tr>
+        <td>{{ w.name }}</td><td>{{ w.amount }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
   </table>
   {% endfor %}
-  
 </div>
 {% endif %}
+
 {% endblock %}
