@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask_login import UserMixin
-from sqlalchemy.types import PickleType
+from sqlalchemy_json import NestedMutableJson
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from trkfin import db, login, app
@@ -12,7 +12,9 @@ class Users(UserMixin, db.Model):
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     email = db.Column(db.String(120), index=True)
     walletcount = db.Column(db.Integer)
-    stats = db.Column(PickleType)
+    stats = db.Column(NestedMutableJson)
+    report_previous = db.Column(db.Integer, db.ForeignKey('reports.id'))
+    report_current = db.Column(db.Integer, db.ForeignKey('reports.id'))
     password_hash = db.Column(db.String(128), nullable=False)
     # timezone - TODO
 
@@ -38,76 +40,27 @@ class Users(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def get_wallets_list(self):
-        grouped = {}
+        list = {}
         sorted_by_type = Wallets.query.filter_by(user_id=self.id).order_by('group').order_by('name').all()
         groups = set()
         for w in sorted_by_type:
             if w.group not in groups:
                 groups.add(w.group)
-                grouped[w.group] = []
-            grouped[w.group].append(w)
-        return grouped
+                list[w.group] = {'list': [], 'sum': 0}
+            list[w.group]['list'].append({'wallet_id': w.wallet_id,
+                                          'name': w.name,
+                                          'amount': w.amount})
+            list[w.group]['sum'] += w.amount
+        return list
+
+    def get_report_previous(self):
+        return Reports.query.get(int(self.report_previous))
+
+    def get_report_current(self):
+        return Reports.query.get(int(self.report_current))
 
     def get_history(self):
         return History.query.filter_by(user_id=self.id).order_by(History.id.desc()).all()
-
-    def month_report(uid, year, month):
-
-        # query db for all records
-        data = History.query.filter(History.user_id==uid, History.ts_year==year, History.ts_month==month).all()
-        if not data:
-            return False
-
-        # sort data, populate income and spending dicts
-        income = {'total': 0}
-        inc_wallets = set()
-        spending = {'total': 0}
-        spend_wallets = set()
-        for record in data:
-            
-            # income
-            if record.action == "income":
-                if record.destination not in inc_wallets:
-                    w = Wallets.query.filter(Wallets.wallet_id==record.destination).first()
-                    income[record.destination] = {
-                        'name': w.name,
-                        'type': w.type,
-                        'amount': record.amount
-                    }
-                    inc_wallets.add(record.destination)
-                else:
-                    income[record.destination]['amount'] += record.amount
-                income['total'] += record.amount
-            
-            # spending
-            elif record.action == "spending":
-                if record.source not in spend_wallets:
-                    w = Wallets.query.filter(Wallets.wallet_id==record.source).first()
-                    spending[record.source] = {
-                        'name': w.name,
-                        'type': w.type,
-                        'amount': record.amount
-                    }
-                    spend_wallets.add(record.source)
-                else:
-                    spending[record.source]['amount'] += record.amount
-                spending['total'] += record.amount
-        
-        # balance
-        balance = {}
-        user_wallets = Wallets.query.filter(Wallets.user_id==uid).all()
-        for w in user_wallets:
-            balance[w.wallet_id] = {
-                'name': w.name,
-                'type': w.type,
-                'amount': w.amount
-            }
-
-        return {
-            'income': income,
-            'spending': spending,
-            'balance': balance
-        }
 
 
 @login.user_loader
@@ -166,3 +119,14 @@ class History(db.Model):
             'amount': self.amount,
             'description': self.description
         }) + ' >'
+
+
+class Reports(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    date = db.Column(db.String(23))
+    data = db.Column(NestedMutableJson)
+
+    def __init__(self, user_id):
+        self.user_id = user_id
+        self.data = {}

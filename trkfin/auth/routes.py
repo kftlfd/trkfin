@@ -5,7 +5,7 @@ from werkzeug.urls import url_parse
 from trkfin import db
 from trkfin.auth import bp
 from trkfin.auth.forms import RegistrationForm, LoginForm
-from trkfin.models import Users, Wallets, History
+from trkfin.models import Users, Wallets, History, Reports
 
 
 @bp.route("/register", methods=['GET', 'POST'])
@@ -22,6 +22,16 @@ def register():
         new_user = Users(form.username.data)
         new_user.set_password(form.password.data)
         db.session.add(new_user)
+        db.session.commit()
+
+        # create empty reports for user
+        rep_pr = Reports(new_user.id)
+        rep_cr = Reports(new_user.id)
+        db.session.add(rep_pr)
+        db.session.add(rep_cr)
+        db.session.commit()
+        new_user.report_previous = rep_pr.id
+        new_user.report_current = rep_cr.id
         db.session.commit()
 
         # add history entry

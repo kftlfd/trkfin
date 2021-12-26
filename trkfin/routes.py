@@ -26,20 +26,25 @@ def home():
         return redirect(url_for('wallets', username=current_user.username, next='home'))
 
     # report - TODO
-    report = {'test': 1}
-    info = {}
-    info['user'] = current_user
-    info['wallets'] = current_user.get_wallets_list()
-    info['history'] = current_user.get_history()
-    info['report'] = History.query.filter(History.user_id==current_user.id).filter(History.ts_local.like('2021%')).all()
-    info['stats'] = current_user.stats
+    report = {'prev': current_user.get_report_previous().data,
+              'curr': current_user.get_report_current().data}
 
     # MainForm
     form = MainForm()
     # load wallets
-    srcs = [(w.wallet_id, w.group + ' | ' + w.name) for w in Wallets.query.filter_by(user_id=current_user.id).order_by('name')]
+    srcs = []
+    tmp =report['prev'] 
+    for g in tmp:
+        for w in tmp[g]['list']:
+            if len(g) > 0:
+                srcs.append((w['wallet_id'], g + ' | ' + w['name']))
+            else:
+                srcs.append((w['wallet_id'], w['name']))
+    # srcs = [(w.wallet_id, w.group + ' | ' + w.name) for w in report]
+    # srcs = [(w.wallet_id, w.group + ' | ' + w.name) for w in Wallets.query.filter_by(user_id=current_user.id).order_by('name')]
     form.source.choices = srcs
     form.destination.choices = srcs
+
     # process MainForm - TODO
     if form.validate_on_submit():
 
@@ -76,7 +81,7 @@ def home():
 
         return redirect(url_for('home'))
 
-    return render_template("home.html", form=form, report=report, info=info)
+    return render_template("home.html", form=form, report=report)
 
 
 # decorator to restrict user to only their own data
@@ -118,6 +123,20 @@ def wallets(username, **kwargs):
             new_wallet.amount = 0
         db.session.add(new_wallet)
         current_user.walletcount += 1
+        db.session.commit()
+
+        # add wallet to user's reports
+        rep_pr = current_user.get_report_previous()
+        rep_cr = current_user.get_report_current()
+        for r in [rep_pr.data, rep_cr.data]:
+            if new_wallet.group not in r:
+                r[new_wallet.group] = {'list': [], 'sum': 0}
+            r[new_wallet.group]['list'].append({'wallet_id': new_wallet.wallet_id, 
+                                                'name': new_wallet.name,
+                                                'amount': new_wallet.amount})
+            r[new_wallet.group]['sum'] += new_wallet.amount
+        db.session.add(rep_pr)
+        db.session.add(rep_cr)
         db.session.commit()
         
         # add history entry

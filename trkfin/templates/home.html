@@ -8,10 +8,58 @@
   {% include "forms/mainform.html" %}
 </div>
 
-{% if info %}
+{% if report %}
 <div name='report'>
   <h3>This month</h3>
-  <div>TBD</div>
+
+  <div name='report-prev'>
+    <h6>From pevious period</h6>
+    {% with b = report['prev'] %}
+    {% for group in b %}
+    <div>
+      <table border="1px solid black">
+        <tr>
+          <th colspan="2">{{ group or '.' }}</th>
+        </tr>
+        {% for w in b[group]['list'] %}
+        <tr>
+          <td>{{ w.name }}</td>
+          <td>{{ w.amount }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+          <th colspan="2">{{ b[group]['sum'] }}</th>
+        </tr>
+      </table>
+    </div>
+    {% endfor %}
+    {% endwith %}
+  </div>
+
+  <div name='report-curr'>
+    <h6>Current balance</h6>
+    {% with b = report['curr'] %}
+    {% for group in b %}
+    <div>
+      <table border="1px solid black">
+        <tr>
+          <th colspan="2">{{ group or '.' }}</th>
+        </tr>
+        {% for w in b[group]['list'] %}
+        <tr>
+          <td>{{ w.name }}</td>
+          <td>{{ w.amount }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+          <th colspan="2">{{ b[group]['sum'] }}</th>
+        </tr>
+      </table>
+    </div>
+    {% endfor %}
+    {% endwith %}
+  </div>
+
 </div>
 {% endif %}
 

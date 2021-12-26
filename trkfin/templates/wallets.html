@@ -15,7 +15,7 @@
   <table class='table caption-top'>
     <caption>{{ group }}</caption>
     <tbody>
-      {% for w in wallets[group] %}
+      {% for w in wallets[group]['list'] %}
       <tr>
         <td>{{ w.name }}</td><td>{{ w.amount }}</td>
       </tr>
