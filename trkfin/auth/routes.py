@@ -25,13 +25,10 @@ def register():
         db.session.commit()
 
         # create empty reports for user
-        rep_pr = Reports(new_user.id)
-        rep_cr = Reports(new_user.id)
-        db.session.add(rep_pr)
-        db.session.add(rep_cr)
+        report = Reports(new_user.id)
+        db.session.add(report)
         db.session.commit()
-        new_user.report_previous = rep_pr.id
-        new_user.report_current = rep_cr.id
+        new_user.current_report = report.id
         db.session.commit()
 
         # add history entry

@@ -27,57 +27,63 @@ def home():
 
     # report - TODO
     report = {'prev': current_user.get_report_previous().data,
-              'curr': current_user.get_report_current().data}
+            #   'curr': current_user.get_report_current().data
+              'curr': current_user.get_wallets_list()}
 
     # MainForm
     form = MainForm()
+    
     # load wallets
     srcs = []
-    tmp =report['prev'] 
+    tmp = report['prev'] 
     for g in tmp:
         for w in tmp[g]['list']:
             if len(g) > 0:
                 srcs.append((w['wallet_id'], g + ' | ' + w['name']))
             else:
                 srcs.append((w['wallet_id'], w['name']))
-    # srcs = [(w.wallet_id, w.group + ' | ' + w.name) for w in report]
-    # srcs = [(w.wallet_id, w.group + ' | ' + w.name) for w in Wallets.query.filter_by(user_id=current_user.id).order_by('name')]
     form.source.choices = srcs
     form.destination.choices = srcs
 
     # process MainForm - TODO
     if form.validate_on_submit():
 
-        # if mf.action.data == 'spending':
-        #     mf.amount.data = float(mf.amount.data) * (-1.0)
+        # add history entry
+        record = History()
+        record.user_id = current_user.id
+        record.ts_local = form.timestamp.data
+        record.action = form.action.data
+        if record.action == 'Spending':
+            record.source = form.source.data
+        elif record.action == 'Income':
+            record.destination = form.destination.data
+        else:
+            record.source = form.source.data
+            record.destination = form.destination.data
+        record.amount = form.amount.data
+        record.description = form.description.data
+        db.session.add(record)
 
-        # w = Wallets.query.get(mf.source.data)
-        # w.amount += float(mf.amount.data)
-        
-        # record = History()
-        # record.user_id = current_user.id
-        # ts = mf.timestamp.data
-        # record.ts_year = ts[0:4]
-        # record.ts_month = ts[5:7]
-        # record.ts_day = ts[8:10]
-        # record.ts_hour = ts[11:13]
-        # record.ts_minute = ts[14:16]
-        # record.ts_second = ts[17:19]
-        # record.ts_ms = ts[20:]
-        # record.action = mf.action.data
-        # record.source = mf.source.data
-        # record.destination = mf.destination.data
-        # record.amount = mf.amount.data
-        # record.description = mf.description.data
+        # update wallets
+        if form.action.data == 'Spending':
+            ws = Wallets.query.get(form.source.data)
+            ws.amount -= float(form.amount.data)
+            db.session.add(ws)
+        elif form.action.data == 'Income':
+            wi = Wallets.query.get(form.destination.data)
+            wi.amount += float(form.amount.data)
+            db.session.add(wi)
+        else:
+            ws = Wallets.query.get(form.source.data)
+            wi = Wallets.query.get(form.destination.data)
+            ws.amount -= float(form.amount.data)
+            wi.amount += float(form.amount.data)
+            db.session.add(ws)
+            db.session.add(wi)
 
-        # current_user.stats = {}
-        # current_user.stats['test'] = 'test'
-        
-        # db.session.add(record)
-        # db.session.commit()
-        # flash(record)
+        db.session.commit()
 
-        flash("Processing MainForm")
+        flash("action recorded")
 
         return redirect(url_for('home'))
 
@@ -108,6 +114,7 @@ def wallets(username, **kwargs):
     form.group.choices[0] = ('', '-- None --')
     form.group.choices.append(('New', '-- New --'))
 
+    # process add-wallet form
     if form.validate_on_submit():
         
         # record new wallet
@@ -125,18 +132,16 @@ def wallets(username, **kwargs):
         current_user.walletcount += 1
         db.session.commit()
 
-        # add wallet to user's reports
-        rep_pr = current_user.get_report_previous()
-        rep_cr = current_user.get_report_current()
-        for r in [rep_pr.data, rep_cr.data]:
+        # add wallet to user's current report
+        report = current_user.get_report()
+        for r in [report.balance_initial, report.balance_current]:
             if new_wallet.group not in r:
                 r[new_wallet.group] = {'list': [], 'sum': 0}
             r[new_wallet.group]['list'].append({'wallet_id': new_wallet.wallet_id, 
                                                 'name': new_wallet.name,
                                                 'amount': new_wallet.amount})
             r[new_wallet.group]['sum'] += new_wallet.amount
-        db.session.add(rep_pr)
-        db.session.add(rep_cr)
+        db.session.add(report)
         db.session.commit()
         
         # add history entry
@@ -152,7 +157,11 @@ def wallets(username, **kwargs):
         db.session.add(record)
         db.session.commit()
 
-        flash("Added new wallet")
+        # show success message and redirect
+        msg = f'Added new wallet "{new_wallet.name}"'
+        if len(new_wallet.group) > 0:
+            msg += f' to group "{new_wallet.group}"'
+        flash(msg)
         if request.args:
             next_page = url_for(request.args.get('next'))
         else:
