@@ -12,6 +12,12 @@
 <div name='report'>
   <h3>This month</h3>
 
+  <div>
+    {% for w in raw %}
+    <span>{{ w.name }}, {{ w.balance_current }}</span>
+    {% endfor %}
+  </div>
+
   <div name='report-prev'>
     <h6>From pevious period</h6>
     {% with b = report['prev'] %}
