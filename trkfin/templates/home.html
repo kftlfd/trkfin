@@ -8,6 +8,86 @@
   {% include "forms/mainform.html" %}
 </div>
 
+{% if wallets %}
+<div>
+  {{ wallets }}
+</div>
+
+<div name='wallets'>
+
+  <div>
+    <h6>Income</h6>
+    <div style="display: flex;">
+    {% for group in wallets['groups'] %}
+      <table class='table'>
+        <caption>{{ group or '.' }}</caption>
+        {% for w_id in wallets['groups'][group] %}
+        <tr>
+          <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
+          <td>{{ wallets['groups'][group][w_id]['income'] }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+          <td>sum:</td>
+          <td>{{ wallets['sums'][group]['income_sum'] }}</td>
+        </tr>
+      </table>
+    {% endfor %}
+    </div>
+  </div>
+
+  <div name='current' class='table'>
+    <table>
+      <caption>Balance</caption>      
+      {% for w in wallets %}
+      <tr>
+        <td>{{ w.name }}</td><td>{{ w.balance_current }}</td>
+      </tr>
+      {% endfor %}  
+    </table>
+  </div>
+
+  <div name='income' class='table'>
+    <table>
+      <caption>Income</caption>
+      {% for w in wallets %}
+      <tr>
+        <td>{{ w.name }}</td><td>+{{ w.income }}</td>
+      </tr>
+      {% endfor %}  
+    </table>
+  </div>
+
+  <div name='spending' class='table'>
+    <table>
+      <caption>Spending</caption>
+      {% for w in wallets %}
+      <tr>
+        <td>{{ w.name }}</td><td>{{ w.spendings }}</td>
+      </tr>
+      {% endfor %}  
+    </table>
+  </div>
+
+  <div name='transfers' class='table'>
+    <table>
+      <caption>Transfers</caption>
+      {% for w in wallets %}
+      <tr>
+        <td>{{ w.name }}</td><td>{{ w.transfers_from }}</td><td>+{{ w.transfers_to }}</td>
+      </tr>
+      {% endfor %}  
+    </table>
+  </div>
+
+  
+
+  {% for w in wallets %}
+  {% endfor %}
+
+</div>
+{% endif %}
+
 {% if report %}
 <div name='report'>
   <h3>This month</h3>

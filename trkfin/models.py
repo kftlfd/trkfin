@@ -86,6 +86,49 @@ class Users(UserMixin, db.Model):
     def get_history(self):
         return History.query.filter_by(user_id=self.id).order_by(History.id.desc()).all()
 
+    def generate_current_report(self):
+
+        wallets = self.get_wallets()
+
+        report = {
+            'groups': {},
+            'sums': {}
+        }
+
+        for w in wallets:
+
+            if w.group not in report['groups']:
+                report['groups'][w.group] = {}
+                report['sums'][w.group] = {
+                    'balance_initial_sum': 0,
+                    'income_sum': 0,
+                    'spendings_sum': 0,
+                    'transfers_from_sum': 0,
+                    'transfers_to_sum': 0,
+                    'balance_current_sum': 0
+                }
+            
+            report['groups'][w.group][w.wallet_id] = {
+                'name': w.name,
+                'balance_initial': w.balance_initial,
+                'income': w.income,
+                'spendings': w.spendings,
+                'transfers_from': w.transfers_from,
+                'transfers_to': w.transfers_to,
+                'balance_current': w.balance_current
+            }
+            
+            report['sums'][w.group]['balance_initial_sum'] += w.balance_initial
+            report['sums'][w.group]['income_sum'] += w.income
+            report['sums'][w.group]['spendings_sum'] += w.spendings
+            report['sums'][w.group]['transfers_from_sum'] += w.transfers_from
+            report['sums'][w.group]['transfers_to_sum'] += w.transfers_to
+            report['sums'][w.group]['balance_current_sum'] += w.balance_current
+            
+
+        
+        return report
+
 
 @login.user_loader
 def load_user(id):

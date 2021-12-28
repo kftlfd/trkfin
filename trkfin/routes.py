@@ -1,4 +1,4 @@
-from flask import flash, redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, request, url_for, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from functools import wraps
 from werkzeug.urls import url_parse
@@ -27,18 +27,16 @@ def home():
 
     form = MainForm()
 
-    # load report - TODO
+    wallets = current_user.generate_current_report()
 
-    wallets_p = current_user.get_wallets_list()
-
-    wallets = current_user.get_wallets()
-    # load wallets
+    # load user's wallets to form
     srcs = []
-    for w in wallets:
-        if len(w.group) > 0:
-            srcs.append( (w.wallet_id, w.group + ' | ' + w.name) )
-        else:
-            srcs.append( (w.wallet_id, w.name) )
+    for group in wallets['groups']:
+        for w_id in wallets['groups'][group]:
+            if len(group) > 0:
+                srcs.append( (w_id, group + ' | ' + wallets['groups'][group][w_id]['name']) )
+            else:
+                srcs.append( (w_id, wallets['groups'][group][w_id]['name']) )
     form.source.choices = srcs
     form.destination.choices = srcs
 
@@ -91,7 +89,12 @@ def home():
 
         return redirect(url_for('home'))
 
-    return render_template("home.html", form=form, report=wallets_p, raw=wallets)
+    return render_template("home.html", form=form, wallets=wallets, dump=jsonify(wallets))
+
+@app.route('/test')
+def test():
+    wallets = current_user.generate_current_report()
+    return jsonify(wallets)
 
 
 # decorator to restrict user to only their own data
