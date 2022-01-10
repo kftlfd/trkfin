@@ -24,13 +24,6 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        # create empty reports for user
-        report = Reports(new_user.id)
-        db.session.add(report)
-        db.session.commit()
-        new_user.current_report = report.id
-        db.session.commit()
-
         # add history entry
         record = History()
         record.user_id = new_user.id

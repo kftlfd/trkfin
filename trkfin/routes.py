@@ -1,4 +1,4 @@
-from flask import flash, redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, request, url_for, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from functools import wraps
 from werkzeug.urls import url_parse
@@ -25,23 +25,18 @@ def home():
     if current_user.walletcount < 1:
         return redirect(url_for('wallets', username=current_user.username, next='home'))
 
-    # report - TODO
-    report = {'prev': current_user.get_report_previous().data,
-            #   'curr': current_user.get_report_current().data
-              'curr': current_user.get_wallets_list()}
-
-    # MainForm
     form = MainForm()
-    
-    # load wallets
+
+    wallets = current_user.generate_current_report()
+
+    # load user's wallets to form
     srcs = []
-    tmp = report['prev'] 
-    for g in tmp:
-        for w in tmp[g]['list']:
-            if len(g) > 0:
-                srcs.append((w['wallet_id'], g + ' | ' + w['name']))
+    for group in wallets['groups']:
+        for w_id in wallets['groups'][group]:
+            if len(group) > 0:
+                srcs.append( (w_id, group + ' | ' + wallets['groups'][group][w_id]['name']) )
             else:
-                srcs.append((w['wallet_id'], w['name']))
+                srcs.append( (w_id, wallets['groups'][group][w_id]['name']) )
     form.source.choices = srcs
     form.destination.choices = srcs
 
@@ -67,17 +62,24 @@ def home():
         # update wallets
         if form.action.data == 'Spending':
             ws = Wallets.query.get(form.source.data)
-            ws.amount -= float(form.amount.data)
+            ws.balance_current -= float(form.amount.data)
+            ws.spendings -= float(form.amount.data)
             db.session.add(ws)
         elif form.action.data == 'Income':
             wi = Wallets.query.get(form.destination.data)
-            wi.amount += float(form.amount.data)
+            wi.balance_current += float(form.amount.data)
+            wi.income += float(form.amount.data)
             db.session.add(wi)
         else:
-            ws = Wallets.query.get(form.source.data)
+            ws = Wallets.query.get(form.source.data)            
             wi = Wallets.query.get(form.destination.data)
-            ws.amount -= float(form.amount.data)
-            wi.amount += float(form.amount.data)
+
+            ws.balance_current -= float(form.amount.data)
+            ws.transfers_from -= float(form.amount.data)
+
+            wi.balance_current += float(form.amount.data)
+            wi.transfers_to += float(form.amount.data)
+
             db.session.add(ws)
             db.session.add(wi)
 
@@ -87,7 +89,12 @@ def home():
 
         return redirect(url_for('home'))
 
-    return render_template("home.html", form=form, report=report)
+    return render_template("home.html", form=form, wallets=wallets, dump=jsonify(wallets))
+
+@app.route('/test')
+def test():
+    wallets = current_user.generate_current_report()
+    return jsonify(wallets)
 
 
 # decorator to restrict user to only their own data
@@ -105,10 +112,19 @@ def only_personal_data(func):
 @only_personal_data
 def wallets(username, **kwargs):
 
-    wallets = current_user.get_wallets_list()
     form = AddWalletForm()
-    if wallets:
-        form.group.choices = [(t, t) for t in wallets]
+    
+    wallets_parsed = current_user.get_wallets_list()
+
+    wallets = current_user.get_wallets()
+
+    # load wallet groups
+    groups = set()
+    for w in wallets:
+        if w.group not in groups:
+            groups.add(w.group)
+    if groups:
+        form.group.choices = [(t, t) for t in groups]
     else:
         form.group.choices = [1]
     form.group.choices[0] = ('', '-- None --')
@@ -118,30 +134,13 @@ def wallets(username, **kwargs):
     if form.validate_on_submit():
         
         # record new wallet
-        new_wallet = Wallets()
-        new_wallet.user_id = current_user.id
+        new_wallet = Wallets(current_user.id, form.name.data, form.amount.data)
         if form.group.data == 'New':
             new_wallet.group = form.group_new.data
         else:
             new_wallet.group = form.group.data
-        new_wallet.name = form.name.data
-        new_wallet.amount = form.amount.data
-        if not form.amount.data:
-            new_wallet.amount = 0
         db.session.add(new_wallet)
         current_user.walletcount += 1
-        db.session.commit()
-
-        # add wallet to user's current report
-        report = current_user.get_report()
-        for r in [report.balance_initial, report.balance_current]:
-            if new_wallet.group not in r:
-                r[new_wallet.group] = {'list': [], 'sum': 0}
-            r[new_wallet.group]['list'].append({'wallet_id': new_wallet.wallet_id, 
-                                                'name': new_wallet.name,
-                                                'amount': new_wallet.amount})
-            r[new_wallet.group]['sum'] += new_wallet.amount
-        db.session.add(report)
         db.session.commit()
         
         # add history entry
@@ -153,7 +152,7 @@ def wallets(username, **kwargs):
             record.description = str(new_wallet.group) + ": " + str(new_wallet.name)
         else:
             record.description = str(new_wallet.name)
-        record.amount = new_wallet.amount
+        record.amount = form.amount.data
         db.session.add(record)
         db.session.commit()
 
@@ -168,14 +167,14 @@ def wallets(username, **kwargs):
             next_page = url_for('wallets', username=current_user.username)
         return redirect(next_page)
     
-    return render_template('wallets.html', form=form, wallets=wallets)
+    return render_template('wallets.html', form=form, wallets=wallets_parsed)
 
 
 @app.route("/u/<username>/history")
 @login_required
 @only_personal_data
 def history(username):
-    # pagination or continuous load - TODO
+    # add pagination or continuous load - TODO
     return render_template('history.html', history=current_user.get_history())
 
 

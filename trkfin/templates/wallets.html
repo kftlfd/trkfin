@@ -17,7 +17,7 @@
     <tbody>
       {% for w in wallets[group]['list'] %}
       <tr>
-        <td>{{ w.name }}</td><td>{{ w.amount }}</td>
+        <td>{{ wallets[group]['list'][w]['name'] }}</td><td>{{ wallets[group]['list'][w]['amount'] }}</td>
       </tr>
       {% endfor %}
     </tbody>
