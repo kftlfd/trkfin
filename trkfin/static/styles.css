@@ -60,6 +60,7 @@ caption {
 }
 
 
+
 /* --- FORMS --- */
 .form, .form-vert, .form-horiz {
     display: flex;
@@ -86,6 +87,32 @@ label>label {
     margin-bottom: 0;
     cursor: pointer;
 }
+
+
+
+/* REPORTS */
+.report {
+    padding: 5px;
+}
+.report + .report {
+    margin-top: 1em;
+}
+.report-tb {
+    width: 100%;
+    border-collapse: collapse;
+}
+.report-tb td, .report-tb th {
+    border: 1px solid #dee2e6;
+    width: 50%;
+}
+.report-tb, .report-tb td, .report-tb th, .report-tb caption {
+    padding: 0;
+}
+.report-tb + .report-tb {
+    margin-top: 5px;
+}
+
+
 
 @media (min-width: 700px) {
     main {

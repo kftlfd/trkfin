@@ -12,113 +12,105 @@
 
 <div name='wallets'>
 
-  <div style="margin: 2rem;">
-    <h6>Initial</h6>
-    <div style="display: flex;">
+  <div name='balance' class='report'>
+    <h6>Balance</h6>
     {% for group in wallets['groups'] %}
-      <table class='table' style="margin: 2rem;">
-        <caption>{{ group or '.' }}</caption>
-        {% for w_id in wallets['groups'][group] %}
-        <tr>
-          <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
-          <td>{{ wallets['groups'][group][w_id]['balance_initial'] }}</td>
-        </tr>
-        {% endfor %}
-        <tr>
-          <th>sum:</th>
-          <th>{{ wallets['sums'][group]['balance_initial_sum'] }}</th>
-        </tr>
-      </table>
+    <table class='report-tb'>
+      <caption>{{ group or ' ' }}</caption>
+      {% for w_id in wallets['groups'][group] %}
+      <tr>
+        <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
+        <td>{{ wallets['groups'][group][w_id]['balance_current'] | num }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <th>sum:</th>
+        <th>{{ wallets['sums'][group]['balance_current_sum'] | num }}</th>
+      </tr>
+    </table>
     {% endfor %}
-    </div>
   </div>
 
-  <div style="margin: 2rem;">
-    <h6>Income</h6>
-    <div style="display: flex;">
+  <div name='initial' class='report'>
+    <h6>Initial</h6>
     {% for group in wallets['groups'] %}
-      <table class='table' style="margin: 2rem;">
-        <caption>{{ group or '.' }}</caption>
-        {% for w_id in wallets['groups'][group] %}
-        <tr>
-          <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
-          <td>+{{ wallets['groups'][group][w_id]['income'] }}</td>
-        </tr>
-        {% endfor %}
-        <tr>
-          <th>sum:</th>
-          <th>+{{ wallets['sums'][group]['income_sum'] }}</th>
-        </tr>
-      </table>
+    <table class='report-tb'>
+      <caption>{{ group or ' ' }}</caption>
+      {% for w_id in wallets['groups'][group] %}
+      <tr>
+        <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
+        <td>{{ wallets['groups'][group][w_id]['balance_initial'] | num }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <th>sum:</th>
+        <th>{{ wallets['sums'][group]['balance_initial_sum'] | num }}</th>
+      </tr>
+    </table>
     {% endfor %}
-    </div>
+  </div>
+
+  <div name='income' class='report'>
+    <h6>Income</h6>
+    {% for group in wallets['groups'] %}
+    <table class='report-tb'>
+      <caption>{{ group or ' ' }}</caption>
+      {% for w_id in wallets['groups'][group] %}
+      <tr>
+        <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
+        <td>{{ wallets['groups'][group][w_id]['income'] | num }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <th>sum:</th>
+        <th>{{ wallets['sums'][group]['income_sum'] | num }}</th>
+      </tr>
+    </table>
+    {% endfor %}
   </div>
   
-  <div style="margin: 2rem;">
+  <div name='spendings' class='report'>
     <h6>Spendings</h6>
-    <div style="display: flex;">
     {% for group in wallets['groups'] %}
-      <table class='table' style="margin: 2rem;">
-        <caption>{{ group or '.' }}</caption>
-        {% for w_id in wallets['groups'][group] %}
-        <tr>
-          <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
-          <td>{{ wallets['groups'][group][w_id]['spendings'] }}</td>
-        </tr>
-        {% endfor %}
-        <tr>
-          <th>sum:</th>
-          <th>{{ wallets['sums'][group]['spendings_sum'] }}</th>
-        </tr>
-      </table>
+    <table class='report-tb'>
+      <caption>{{ group or ' ' }}</caption>
+      {% for w_id in wallets['groups'][group] %}
+      <tr>
+        <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
+        <td>{{ wallets['groups'][group][w_id]['spendings'] | num}}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <th>sum:</th>
+        <th>{{ wallets['sums'][group]['spendings_sum'] | num }}</th>
+      </tr>
+    </table>
     {% endfor %}
-    </div>
   </div>
 
-  <div style="margin: 2rem;">
+  <div name='transfers' class='report'>
     <h6>Transfers</h6>
-    <div style="display: flex;">
     {% for group in wallets['groups'] %}
-      <table class='table' style="margin: 2rem;">
-        <caption>{{ group or '.' }}</caption>
-        {% for w_id in wallets['groups'][group] %}
-        <tr>
-          <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
-          <td>{{ wallets['groups'][group][w_id]['transfers_from'] }}</td>
-          <td>{{ wallets['groups'][group][w_id]['transfers_to'] }}</td>
-        </tr>
-        {% endfor %}
-        <tr>
-          <th>sum:</th>
-          <th>{{ wallets['sums'][group]['transfers_from_sum'] }}</th>
-          <th>{{ wallets['sums'][group]['transfers_to_sum'] }}</th>
-        </tr>
-      </table>
+    <table class='report-tb'>
+      <caption>{{ group or ' ' }}</caption>
+      {% for w_id in wallets['groups'][group] %}
+      <tr>
+        <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
+        <td>{{ wallets['groups'][group][w_id]['transfers'] | num }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <th>sum:</th>
+        <th>{{ wallets['sums'][group]['transfers_sum'] | num }}</th>
+      </tr>
+    </table>
     {% endfor %}
-    </div>
   </div>
 
-  <div style="margin: 2rem;">
-    <h6>Balance</h6>
-    <div style="display: flex;">
-    {% for group in wallets['groups'] %}
-      <table class='table' style="margin: 2rem;">
-        <caption>{{ group or '.' }}</caption>
-        {% for w_id in wallets['groups'][group] %}
-        <tr>
-          <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
-          <td>{{ wallets['groups'][group][w_id]['balance_current'] }}</td>
-        </tr>
-        {% endfor %}
-        <tr>
-          <th>sum:</th>
-          <th>{{ wallets['sums'][group]['balance_current_sum'] }}</th>
-        </tr>
-      </table>
-    {% endfor %}
-    </div>
-  </div>
+</div>
 
+<div>
+  {{ wallets | tojson }}
 </div>
 {% endif %}
 
