@@ -30,6 +30,7 @@
           <ul class="navbar-nav mr-auto mt-2">
             <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Home</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('wallets', username=current_user.username) }}">Wallets</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('reports', username=current_user.username) }}">Reports</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('history', username=current_user.username) }}">History</a></li>
           </ul>
           <!-- right -->

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %} | Reports{% endblock %}
+
+{% block main %}
+<div>
+  <button id='nrbtn' class='btn btn-outline-primary'>
+    New report
+  </button>
+</div>
+
+<div id='newreport'>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+
+    var httpRequest;
+    let nrbtn = document.querySelector('#nrbtn')
+
+    // AJAX
+    nrbtn.addEventListener('click', function() {
+      httpRequest = new XMLHttpRequest();
+      if (!httpRequest) {
+        alert('Error: no httpRequest');
+        return false;
+      }
+      httpRequest.onreadystatechange = function() {
+        if (httpRequest.readyState === XMLHttpRequest.DONE) {
+          if (httpRequest.status === 200) {
+            // alert(httpRequest.responce);
+            console.log(httpRequest);
+            // console.log(httpRequest.response);
+            // document.querySelector('#newreport').innerHTML = httpRequest.response;
+            nrbtn.insertAdjacentHTML('afterEnd', '<div class="report">'+httpRequest.response+'</div>');
+          } else {
+            alert('Error: problem with request');
+          }
+        }
+      };
+      httpRequest.open('GET', '/test');
+      httpRequest.send();
+    });
+  
+  });
+</script>
+{% endblock %}

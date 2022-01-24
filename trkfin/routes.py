@@ -93,11 +93,14 @@ def home():
 
 @app.route('/test')
 def test():
-    wallets = current_user.generate_current_report()
-    return jsonify(wallets)
+    # wallets = current_user.generate_current_report()
+    # return jsonify(wallets)
+    return current_user.get_full_report()
+    # return current_user.get_history()
 
 
 # decorator to restrict user to only their own data
+# not necessary, affects only page address (adress bar)
 def only_personal_data(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -168,6 +171,13 @@ def wallets(username, **kwargs):
         return redirect(next_page)
     
     return render_template('wallets.html', form=form, wallets=wallets_parsed)
+
+
+@app.route('/u/<username>/reports')
+@login_required
+@only_personal_data
+def reports(username):
+    return render_template('reports.html')
 
 
 @app.route("/u/<username>/history")

@@ -103,6 +103,7 @@ class Users(UserMixin, db.Model):
                     'balance_initial_sum': 0,
                     'income_sum': 0,
                     'spendings_sum': 0,
+                    'transfers_sum': 0,
                     'transfers_from_sum': 0,
                     'transfers_to_sum': 0,
                     'balance_current_sum': 0
@@ -113,6 +114,7 @@ class Users(UserMixin, db.Model):
                 'balance_initial': w.balance_initial,
                 'income': w.income,
                 'spendings': w.spendings,
+                'transfers': w.transfers_from + w.transfers_to,
                 'transfers_from': w.transfers_from,
                 'transfers_to': w.transfers_to,
                 'balance_current': w.balance_current
@@ -121,12 +123,20 @@ class Users(UserMixin, db.Model):
             report['sums'][w.group]['balance_initial_sum'] += w.balance_initial
             report['sums'][w.group]['income_sum'] += w.income
             report['sums'][w.group]['spendings_sum'] += w.spendings
+            report['sums'][w.group]['transfers_sum'] += w.transfers_from + w.transfers_to
             report['sums'][w.group]['transfers_from_sum'] += w.transfers_from
             report['sums'][w.group]['transfers_to_sum'] += w.transfers_to
             report['sums'][w.group]['balance_current_sum'] += w.balance_current
-            
-
         
+        return report
+    
+    def get_full_report(self):
+        report = self.generate_current_report()
+        history_raw = self.get_history()
+        history = []
+        for i in history_raw:
+            history.append(i.__repr__())
+        report['history'] = history
         return report
 
 
