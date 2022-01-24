@@ -15,6 +15,10 @@ db = SQLAlchemy(app)
 login = LoginManager(app)
 login.login_view = 'login'
 
+def num(value):
+    return f'{value:,.2f}'
+app.jinja_env.filters['num'] = num
+
 # setup logging
 if not os.path.exists('logs'):
     os.mkdir('logs')
