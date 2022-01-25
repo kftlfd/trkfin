@@ -9,9 +9,6 @@
   </button>
 </div>
 
-<div id='newreport'>
-</div>
-
 <script>
   document.addEventListener('DOMContentLoaded', function() {
 
@@ -28,11 +25,9 @@
       httpRequest.onreadystatechange = function() {
         if (httpRequest.readyState === XMLHttpRequest.DONE) {
           if (httpRequest.status === 200) {
-            // alert(httpRequest.responce);
-            console.log(httpRequest);
             // console.log(httpRequest.response);
             // document.querySelector('#newreport').innerHTML = httpRequest.response;
-            nrbtn.insertAdjacentHTML('afterEnd', '<div class="report">'+httpRequest.response+'</div>');
+            nrbtn.insertAdjacentHTML('afterEnd', '<div class="report">' + httpRequest.response + '</div>');
           } else {
             alert('Error: problem with request');
           }
@@ -41,6 +36,8 @@
       httpRequest.open('GET', '/test');
       httpRequest.send();
     });
+
+    // nrbtn.click()
   
   });
 </script>

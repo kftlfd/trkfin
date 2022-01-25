@@ -23,11 +23,12 @@ def index():
 def home():
 
     if current_user.walletcount < 1:
+        # mb do addWalletForm here after all
+        # no need to load groups/ids
         return redirect(url_for('wallets', username=current_user.username, next='home'))
 
     form = MainForm()
-
-    wallets = current_user.generate_current_report()
+    wallets = current_user.get_wallets_status()
 
     # load user's wallets to form
     srcs = []
@@ -89,14 +90,19 @@ def home():
 
         return redirect(url_for('home'))
 
-    return render_template("home.html", form=form, wallets=wallets, dump=jsonify(wallets))
+    return render_template("home.html", form=form, wallets=wallets)
 
 @app.route('/test')
 def test():
     # wallets = current_user.generate_current_report()
     # return jsonify(wallets)
-    return current_user.get_full_report()
+    # return current_user.get_full_report()
+    # return current_user.get_wallets_status()
     # return current_user.get_history()
+    # return jsonify(current_user.get_wallets_groups())
+    # return current_user.get_wallets_list()
+    report = current_user.get_full_report()
+    return render_template('rep.html', report=report)
 
 
 # decorator to restrict user to only their own data
@@ -116,21 +122,17 @@ def only_personal_data(func):
 def wallets(username, **kwargs):
 
     form = AddWalletForm()
-    
-    wallets_parsed = current_user.get_wallets_list()
+    wallets = current_user.get_wallets_status()
 
-    wallets = current_user.get_wallets()
-
-    # load wallet groups
+    # load wallet group names to form
     groups = set()
-    for w in wallets:
-        if w.group not in groups:
-            groups.add(w.group)
+    for g in wallets['groups']:
+        groups.add(g)
     if groups:
-        form.group.choices = [(t, t) for t in groups]
+        form.group.choices = [(g, g) for g in groups]
     else:
         form.group.choices = [1]
-    form.group.choices[0] = ('', '-- None --')
+    form.group.choices[0] = ('', '-- None --') # change display of unnamed group
     form.group.choices.append(('New', '-- New --'))
 
     # process add-wallet form
@@ -170,7 +172,7 @@ def wallets(username, **kwargs):
             next_page = url_for('wallets', username=current_user.username)
         return redirect(next_page)
     
-    return render_template('wallets.html', form=form, wallets=wallets_parsed)
+    return render_template('wallets.html', form=form, wallets=wallets)
 
 
 @app.route('/u/<username>/reports')

@@ -1,0 +1,138 @@
+<div style='border: 1px solid gray;'>
+  <button class='btn btn-secondary' style='width: 100%;' data-bs-toggle='collapse' data-bs-target='#newreport'>Show Report</button>
+  <div id='newreport' class='collapse'>
+  
+    <div name='report'>
+
+      <div name='wallets'>
+
+        <div name='balance' class='report'>
+          <h6>Balance</h6>
+          {% for group in report['groups'] %}
+          <table class='report-tb'>
+            <caption>{{ group or ' ' }}</caption>
+            {% for w_id in report['groups'][group] %}
+            <tr>
+              <td>{{ report['groups'][group][w_id]['name'] }}:</td>
+              <td>{{ report['groups'][group][w_id]['balance_current'] | num }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+              <th>sum:</th>
+              <th>{{ report['sums'][group]['balance_current_sum'] | num }}</th>
+            </tr>
+          </table>
+          {% endfor %}
+        </div>
+
+        <div name='initial' class='report'>
+          <h6>Initial</h6>
+          {% for group in report['groups'] %}
+          <table class='report-tb'>
+            <caption>{{ group or ' ' }}</caption>
+            {% for w_id in report['groups'][group] %}
+            <tr>
+              <td>{{ report['groups'][group][w_id]['name'] }}:</td>
+              <td>{{ report['groups'][group][w_id]['balance_initial'] | num }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+              <th>sum:</th>
+              <th>{{ report['sums'][group]['balance_initial_sum'] | num }}</th>
+            </tr>
+          </table>
+          {% endfor %}
+        </div>
+
+        <div name='income' class='report'>
+          <h6>Income</h6>
+          {% for group in report['groups'] %}
+          <table class='report-tb'>
+            <caption>{{ group or ' ' }}</caption>
+            {% for w_id in report['groups'][group] %}
+            <tr>
+              <td>{{ report['groups'][group][w_id]['name'] }}:</td>
+              <td>{{ report['groups'][group][w_id]['income'] | num }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+              <th>sum:</th>
+              <th>{{ report['sums'][group]['income_sum'] | num }}</th>
+            </tr>
+          </table>
+          {% endfor %}
+        </div>
+        
+        <div name='spendings' class='report'>
+          <h6>Spendings</h6>
+          {% for group in report['groups'] %}
+          <table class='report-tb'>
+            <caption>{{ group or ' ' }}</caption>
+            {% for w_id in report['groups'][group] %}
+            <tr>
+              <td>{{ report['groups'][group][w_id]['name'] }}:</td>
+              <td>{{ report['groups'][group][w_id]['spendings'] | num}}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+              <th>sum:</th>
+              <th>{{ report['sums'][group]['spendings_sum'] | num }}</th>
+            </tr>
+          </table>
+          {% endfor %}
+        </div>
+
+        <div name='transfers' class='report'>
+          <h6>Transfers</h6>
+          {% for group in report['groups'] %}
+          <table class='report-tb'>
+            <caption>{{ group or ' ' }}</caption>
+            {% for w_id in report['groups'][group] %}
+            <tr>
+              <td>{{ report['groups'][group][w_id]['name'] }}:</td>
+              <td>{{ report['groups'][group][w_id]['transfers'] | num }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+              <th>sum:</th>
+              <th>{{ report['sums'][group]['transfers_sum'] | num }}</th>
+            </tr>
+          </table>
+          {% endfor %}
+        </div>
+
+      </div>
+
+      <div name='history'>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Action</th>
+              <th>From</th>
+              <th>To</th>
+              <th>Amount</th>
+              <th>Description</th>
+            </thead>
+            <tbody>
+              {% for row in report['history'] %}
+              <tr>
+                <td>{{ row.ts_local[:10] }}</td>
+                <td>{{ row.ts_local[10:16] }}</td>
+                <td>{{ row.action }}</td>
+                <td>{{ row.source or '' }}</td>
+                <td>{{ row.destination or '' }}</td>
+                <td>{{ row.amount or ''}}</td>
+                <td>{{ row.description or '' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>    
+          </table>
+        </div>
+      </div>
+
+    </div>
+  
+  </div>
+</div>

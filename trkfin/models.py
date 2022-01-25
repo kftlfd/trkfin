@@ -15,6 +15,11 @@ class Users(UserMixin, db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     # timezone - TODO
 
+
+    #
+    # Basics
+    #
+
     def __init__(self, username):
         self.username = username
         self.walletcount = 0
@@ -29,74 +34,91 @@ class Users(UserMixin, db.Model):
             'report-id': self.current_report
         }) + ' >'
 
+
+    #
+    # Password
+    #
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
     
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def get_wallets_list(self):
-        ''' output dict:
-            {w_group1: {'list': {w1_id: {name: ... ,
-                                         amount: ...
-                                        },
-                                w2_id: {...}
-                                ... 
-                                },
-                        'sum': sum
-                        },
-            w_group2: ...,
-            ...
-            }
-        '''
-        
-        wallets = {}
-        sorted_by_type = Wallets.query.filter_by(user_id=self.id).order_by('group').order_by('name').all()
-        groups = set()
-        for w in sorted_by_type:
-            if w.group not in groups:
-                groups.add(w.group)
-                wallets[w.group] = {'list': {}, 'sum': 0}
-            wallets[w.group]['list'][w.wallet_id] = {'name': w.name,
-                                                     'amount': w.balance_current}
-            wallets[w.group]['sum'] += w.balance_current
-        return wallets
 
-    def get_wallets_groups(self):
-        sorted_by_type = Wallets.query.filter_by(user_id=self.id).order_by('group').order_by('name').all()
-        groups = set()
-        for w in sorted_by_type:
-            if w.group not in groups:
-                groups.add(w.group)
-        return groups
+    #
+    # Wallets
+    #
 
     def get_wallets(self):
         return Wallets.query.filter_by(user_id=self.id).order_by('group').order_by('name').all()
 
-    def get_last_report(self):
-        return Reports.query.filter(Reports.user_id==self.id).order_by(Reports.id.desc()).first()
+    # no need ?
+    # def get_wallets_json(self):
+    #     wallets_raw = self.get_wallets()
+    #     wallets = {}
+    #     for w in wallets_raw:
+    #         wallets[w.wallet_id] = {
+    #             'name': w.name,
+    #             'group': w.group,
+    #             'balance': w.balance_current
+    #         }
+    #     return wallets
+
+    # only for AddWalletForm ?
+    # def get_wallets_groups(self):
+    #     sorted_by_type = self.get_wallets()
+    #     groups = set()
+    #     out = []
+    #     for w in sorted_by_type:
+    #         if w.group not in groups:
+    #             groups.add(w.group)
+    #             out.append(w.group)
+    #     return out
+        
+    # def get_wallets_list(self):
+    #     ''' 
+    #     output dict = {
+    #         w_group1: {
+    #             'list': {
+    #                 w1_id: {
+    #                     name: ... ,
+    #                     amount: ...
+    #                 },
+    #                 w2_id ...
+    #             },
+    #             'sum': ...
+    #         },
+    #         w_group2: ...
+    #     }
+    #     '''
+    #     wallets = {}
+    #     groups = set()
+    #     sorted_by_type = self.get_wallets()
+    #     for w in sorted_by_type:
+    #         if w.group not in groups:
+    #             groups.add(w.group)
+    #             wallets[w.group] = {'list': {}, 'sum': 0}
+    #         wallets[w.group]['list'][w.wallet_id] = {
+    #             'name': w.name,
+    #             'amount': w.balance_current
+    #         }
+    #         wallets[w.group]['sum'] += w.balance_current
+    #     return wallets
     
-    def create_report(self, date):
-        pass
-        # TODO:
-        # 1) get all wallets, parse into json, create Report()
-        # 2) write Report time: start = end of last report (or account creation); end = 'date'
-        # 3) reset all user's wallets (initial balance = current; inc/spend/transf = 0)
-
-    def get_history(self):
-        return History.query.filter_by(user_id=self.id).order_by(History.id.desc()).all()
-
-    def generate_current_report(self):
-
+    def get_wallets_status(self):
         wallets = self.get_wallets()
-
         report = {
+            'wallets': {},
             'groups': {},
             'sums': {}
         }
-
         for w in wallets:
-
+            report['wallets'][w.wallet_id] = {
+                'name': w.name,
+                'group': w.group,
+                'balance': w.balance_current
+            }
             if w.group not in report['groups']:
                 report['groups'][w.group] = {}
                 report['sums'][w.group] = {
@@ -108,7 +130,6 @@ class Users(UserMixin, db.Model):
                     'transfers_to_sum': 0,
                     'balance_current_sum': 0
                 }
-            
             report['groups'][w.group][w.wallet_id] = {
                 'name': w.name,
                 'balance_initial': w.balance_initial,
@@ -119,7 +140,6 @@ class Users(UserMixin, db.Model):
                 'transfers_to': w.transfers_to,
                 'balance_current': w.balance_current
             }
-            
             report['sums'][w.group]['balance_initial_sum'] += w.balance_initial
             report['sums'][w.group]['income_sum'] += w.income
             report['sums'][w.group]['spendings_sum'] += w.spendings
@@ -127,17 +147,58 @@ class Users(UserMixin, db.Model):
             report['sums'][w.group]['transfers_from_sum'] += w.transfers_from
             report['sums'][w.group]['transfers_to_sum'] += w.transfers_to
             report['sums'][w.group]['balance_current_sum'] += w.balance_current
-        
         return report
-    
-    def get_full_report(self):
-        report = self.generate_current_report()
+
+
+    #
+    # History
+    #
+
+    def get_history(self):
+        return History.query.filter_by(user_id=self.id).order_by(History.id.desc()).all()
+
+    def get_history_json(self):
         history_raw = self.get_history()
         history = []
-        for i in history_raw:
-            history.append(i.__repr__())
-        report['history'] = history
+        for entry in history_raw:
+            history.append({
+                'id': entry.id,
+                'ts_utc': entry.ts_utc,
+                'ts_local': entry.ts_local,
+                'action': entry.action,
+                'source': entry.source,
+                'destination': entry.destination,
+                'amount': entry.amount,
+                'description': entry.description,
+            })
+        return history
+    
+    
+    #
+    # Reports
+    #
+
+    def get_last_report(self):
+        return Reports.query.filter(Reports.user_id==self.id).order_by(Reports.id.desc()).first()
+    
+    def create_report(self, date):
+        pass
+        # TODO:
+        # 1) get all wallets, parse into json, create Report()
+        # 2) write Report time: start = end of last report (or account creation); end = 'date'
+        # 3) reset all user's wallets (initial balance = current; inc/spend/transf = 0)
+
+    # def generate_current_report(self):
+    #     return self.get_wallets_status()
+    
+    def get_full_report(self):
+        report = self.get_wallets_status()
+        report['history'] = self.get_history_json()
         return report
+
+
+
+
 
 
 @login.user_loader
