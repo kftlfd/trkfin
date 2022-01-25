@@ -8,16 +8,17 @@
   {% include "forms/addwalletform.html" %}
 </div>
 
-{% if wallets %}
+{% if wallets['groups'] %}
 <div name='wallets-list' class="table-responsive">
   <h3>Wallets</h3>
-  {% for group in wallets %}
+  <!-- <div>{{ wallets }}</div> -->
+  {% for group in wallets['groups'] %}
   <table class='table caption-top'>
     <caption>{{ group }}</caption>
     <tbody>
-      {% for w in wallets[group]['list'] %}
+      {% for w in wallets['groups'][group] %}
       <tr>
-        <td>{{ wallets[group]['list'][w]['name'] }}</td><td>{{ wallets[group]['list'][w]['amount'] }}</td>
+        <td>{{ wallets['groups'][group][w]['name'] }}</td><td>{{ wallets['groups'][group][w]['balance_current'] }}</td>
       </tr>
       {% endfor %}
     </tbody>
