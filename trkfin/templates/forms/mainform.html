@@ -4,28 +4,22 @@
 
   <div class="form">
 
-    <div class="form-horiz btn-group btn-group-toggle" role="group" data-toggle="buttons" aria-label="select-form">
-    {% for subfield in form.action %}
-      <label class="btn btn-secondary shadow-none">
-        {{ subfield }}
-        {{ subfield.label }}
-      </label>
-    {% endfor %}
+    <div class="form-horiz btn-group" role="group" aria-label="Select action">
+      {% for subfield in form.action %}
+        {{ subfield(class_="btn-check") }}
+        {{ subfield.label(class_="btn btn-secondary shadow-none") }}
+      {% endfor %}
     </div>
     
     <div class="form-horiz">
 
       <span id="mainform-source" class="input-group">
-        <div class="input-group-prepend">
-          {{ form.source.label(class_="input-group-text") }}
-        </div>
+        {{ form.source.label(class_="input-group-text") }}
         {{ form.source(class_="form-control") }}
       </span>
 
       <span id="mainform-destination" class="input-group">
-        <div class="input-group-prepend">
-          {{ form.destination.label(class_="input-group-text") }}
-        </div>
+        {{ form.destination.label(class_="input-group-text") }}
         {{ form.destination(class_="form-control") }}
       </span>
     

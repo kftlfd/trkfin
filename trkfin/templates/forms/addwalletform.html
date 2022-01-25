@@ -14,10 +14,8 @@
 
       <div class='form-horiz'>
         <span class='input-group'>
-          <div class="input-group-prepend">
-            {{ form.group.label(class_="input-group-text") }}
-          </div>
-          {{ form.group(class_="form-control") }}
+          {{ form.group.label(class_="input-group-text") }}
+          {{ form.group(class_="form-select") }}
         </span>
       </div>
 
@@ -31,18 +29,14 @@
       
       <div class='form-horiz'>
         <span class='input-group'>
-          <div class="input-group-prepend">
-            {{ form.name.label(class_="input-group-text") }}
-          </div>
+          {{ form.name.label(class_="input-group-text") }}
           {{ form.name(class_="form-control") }}
         </span>
       </div>
       
       <div class='form-horiz'>
         <span class='input-group'>
-          <div class="input-group-prepend">
-            {{ form.amount.label(class_="input-group-text") }}
-          </div>
+          {{ form.amount.label(class_="input-group-text") }}
           {{ form.amount(class_="form-control") }}
         </span>
         {{ form.submit(class_="btn btn-secondary") }}
