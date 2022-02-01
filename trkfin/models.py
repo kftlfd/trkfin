@@ -1,6 +1,5 @@
 from datetime import datetime
 from flask_login import UserMixin
-from sqlalchemy_json import NestedMutableJson
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from trkfin import db, login, app
@@ -16,28 +15,17 @@ class Users(UserMixin, db.Model):
     # timezone - TODO
 
 
-    #
-    # Basics
-    #
+    ###   Basics   ###
 
     def __init__(self, username):
         self.username = username
         self.walletcount = 0
 
     def __repr__(self):
-        return '< User: ' + str({
-            'id': self.id,
-            'username': self.username,
-            'created': self.created,
-            'email': self.email,
-            'walletcount': self.walletcount,
-            'report-id': self.current_report
-        }) + ' >'
+        return f'< User id-{self.id} >'
 
 
-    #
-    # Password
-    #
+    ###   Password   ###
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -46,66 +34,11 @@ class Users(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
 
-    #
-    # Wallets
-    #
+    ###   Wallets   ###
 
     def get_wallets(self):
         return Wallets.query.filter_by(user_id=self.id).order_by('group').order_by('name').all()
 
-    # no need ?
-    # def get_wallets_json(self):
-    #     wallets_raw = self.get_wallets()
-    #     wallets = {}
-    #     for w in wallets_raw:
-    #         wallets[w.wallet_id] = {
-    #             'name': w.name,
-    #             'group': w.group,
-    #             'balance': w.balance_current
-    #         }
-    #     return wallets
-
-    # only for AddWalletForm ?
-    # def get_wallets_groups(self):
-    #     sorted_by_type = self.get_wallets()
-    #     groups = set()
-    #     out = []
-    #     for w in sorted_by_type:
-    #         if w.group not in groups:
-    #             groups.add(w.group)
-    #             out.append(w.group)
-    #     return out
-        
-    # def get_wallets_list(self):
-    #     ''' 
-    #     output dict = {
-    #         w_group1: {
-    #             'list': {
-    #                 w1_id: {
-    #                     name: ... ,
-    #                     amount: ...
-    #                 },
-    #                 w2_id ...
-    #             },
-    #             'sum': ...
-    #         },
-    #         w_group2: ...
-    #     }
-    #     '''
-    #     wallets = {}
-    #     groups = set()
-    #     sorted_by_type = self.get_wallets()
-    #     for w in sorted_by_type:
-    #         if w.group not in groups:
-    #             groups.add(w.group)
-    #             wallets[w.group] = {'list': {}, 'sum': 0}
-    #         wallets[w.group]['list'][w.wallet_id] = {
-    #             'name': w.name,
-    #             'amount': w.balance_current
-    #         }
-    #         wallets[w.group]['sum'] += w.balance_current
-    #     return wallets
-    
     def get_wallets_status(self):
         wallets = self.get_wallets()
         report = {
@@ -150,9 +83,7 @@ class Users(UserMixin, db.Model):
         return report
 
 
-    #
-    # History
-    #
+    ###   History   ###
 
     def get_history(self):
         return History.query.filter_by(user_id=self.id).order_by(History.id.desc()).all()
@@ -163,7 +94,7 @@ class Users(UserMixin, db.Model):
         for entry in history_raw:
             history.append({
                 'id': entry.id,
-                'ts_utc': entry.ts_utc,
+                # 'ts_utc': entry.ts_utc,
                 'ts_local': entry.ts_local,
                 'action': entry.action,
                 'source': entry.source,
@@ -174,36 +105,37 @@ class Users(UserMixin, db.Model):
         return history
     
     
-    #
-    # Reports
-    #
+    ###   Reports   ###
 
+    def get_all_reports(self):
+        return Reports.query.filter(Reports.user_id==self.id).order_by(Reports.id.desc()).all()
+    
     def get_last_report(self):
         return Reports.query.filter(Reports.user_id==self.id).order_by(Reports.id.desc()).first()
     
     def create_report(self, date):
-        pass
-        # TODO:
-        # 1) get all wallets, parse into json, create Report()
-        # 2) write Report time: start = end of last report (or account creation); end = 'date'
-        # 3) reset all user's wallets (initial balance = current; inc/spend/transf = 0)
+        # 1) [✓] get all wallets, parse into json, create Report();
+        # 2) [ ] write Report time: start = end of last report (or account creation),
+        #        end = datetime.utcnow default in db;
+        # 3) [ ] reset all user's wallets (initial balance = current; inc/spend/transf = 0);
+        
+        new_rep = Reports(self.id)
+        new_rep.time_start = 'test'
+        # new_rep.time_start = self.get_last_report()[0]['time_end'] or None
+        
+        data = self.get_wallets_status()
+        data['history'] = self.get_history_json()
+        new_rep.data = data
 
-    # def generate_current_report(self):
-    #     return self.get_wallets_status()
-    
-    def get_full_report(self):
-        report = self.get_wallets_status()
-        report['history'] = self.get_history_json()
-        return report
-
-
-
+        db.session.add(new_rep)
+        db.session.commit()
 
 
 
 @login.user_loader
 def load_user(id):
     return Users.query.get(int(id))
+
 
 
 class Wallets(db.Model):
@@ -222,21 +154,16 @@ class Wallets(db.Model):
     def __init__(self, user_id, name, amount):
         self.user_id = user_id
         self.name = name
-        self.balance_initial = amount
+        self.balance_initial = amount or 0
         self.income = 0
         self.spendings = 0
         self.transfers_from = 0
         self.transfers_to = 0
-        self.balance_current = amount
+        self.balance_current = amount or 0
 
     def __repr__(self):
-        return '< Wallet: ' + str({
-            'w_id': self.wallet_id,
-            'u_id': self.user_id,
-            'name': self.name,
-            'group': self.group,
-            'amount': self.balance_current
-        }) + ' >'
+        return f'< Wallet id-{self.wallet_id} >'
+
 
 
 class History(db.Model):
@@ -251,17 +178,8 @@ class History(db.Model):
     description = db.Column(db.String(120))
     
     def __repr__(self):
-        return '< History: ' + str({
-            'record-id': self.id,
-            'u_id': self.user_id,
-            'ts_uts': self.ts_utc,
-            'ts_local': self.ts_local,
-            'action': self.action,
-            'from': self.source,
-            'to': self.destination,
-            'amount': self.amount,
-            'description': self.description
-        }) + ' >'
+        return f'< History id-{self.id} >'
+
 
 
 class Reports(db.Model):
@@ -269,16 +187,11 @@ class Reports(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     time_start = db.Column(db.String(23))
     time_end = db.Column(db.String(23))
-    data = db.Column(NestedMutableJson)
+    data = db.Column(db.JSON)
 
     def __init__(self, user_id):
         self.user_id = user_id
         self.data = {}
 
     def __repr__(self):
-        return '< Report: ' + str({
-            'rep_id': self.id,
-            'u_id': self.user_id,
-            'date': self.date,
-            'data': self.data
-        })
+        return f'< Report id-{self.id} >'
