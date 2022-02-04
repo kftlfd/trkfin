@@ -9,6 +9,7 @@ from trkfin.models import Users, Wallets
 
 class AddWalletForm(FlaskForm):
     timestamp = HiddenField('timestamp')
+    tz_offset = HiddenField('timezone offset')
     name = StringField('Name', validators=[DataRequired()], render_kw={'placeholder': 'Wallet name'})
     group = SelectField('Group', validators=[Optional()], render_kw={'placeholder': 'Wallet group'})
     group_new = StringField('Group_New', validators=[Optional()], render_kw={'placeholder': 'New group'})
@@ -18,6 +19,7 @@ class AddWalletForm(FlaskForm):
 
 class MainForm(FlaskForm):
     timestamp = HiddenField('timestamp')
+    tz_offset = HiddenField('timezone offset')
     action = RadioField(choices=['Spending', 'Income', 'Transfer'], default='Spending')
     source = SelectField("From", validators=[Optional()]) 
     destination = SelectField("To", validators=[Optional()])

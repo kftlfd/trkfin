@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import flash, redirect, render_template, request, url_for, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from functools import wraps
@@ -15,7 +16,7 @@ def index():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     else:
-        return render_template("welcome.html")
+        return render_template("index.html")
 
 
 @app.route("/home", methods=["GET", "POST"])
@@ -44,10 +45,16 @@ def home():
     # process MainForm - TODO
     if form.validate_on_submit():
 
+        # calculate time
+        ts_utc = datetime.utcnow().timestamp() # float
+        ts_user_local = ts_utc + float(form.tz_offset.data) # float
+        user_local_time = datetime.fromtimestamp(ts_user_local).__str__()[:19]
+
         # add history entry
         record = History()
         record.user_id = current_user.id
-        record.ts_local = form.timestamp.data
+        record.ts_utc = ts_utc
+        record.ts_local = user_local_time
         record.action = form.action.data
         if record.action == 'Spending':
             record.source = form.source.data
@@ -94,15 +101,10 @@ def home():
 
 @app.route('/test')
 def test():
-    # wallets = current_user.generate_current_report()
-    # return jsonify(wallets)
-    # return current_user.get_full_report()
-    # return current_user.get_wallets_status()
-    # return current_user.get_history()
-    # return jsonify(current_user.get_wallets_groups())
-    # return current_user.get_wallets_list()
-    report = current_user.get_full_report()
-    return render_template('rep.html', report=report)
+    report = current_user.get_wallets_status()
+    report['history'] = current_user.get_history_json()
+    # return render_template('rep.html', report=report)
+    return report
 
 
 # decorator to restrict user to only their own data
@@ -138,6 +140,11 @@ def wallets(username, **kwargs):
     # process add-wallet form
     if form.validate_on_submit():
         
+        # calculate time
+        ts_utc = datetime.utcnow().timestamp() # float
+        ts_user_local = ts_utc + float(form.tz_offset.data) # float
+        user_local_time = datetime.fromtimestamp(ts_user_local).__str__()[:19]
+        
         # record new wallet
         new_wallet = Wallets(current_user.id, form.name.data, form.amount.data)
         if form.group.data == 'New':
@@ -151,7 +158,8 @@ def wallets(username, **kwargs):
         # add history entry
         record = History()
         record.user_id = current_user.id
-        record.ts_local = form.timestamp.data
+        record.ts_utc = ts_utc
+        record.ts_local = user_local_time
         record.action = "Added wallet"
         if new_wallet.group:
             record.description = str(new_wallet.group) + ": " + str(new_wallet.name)
@@ -179,7 +187,11 @@ def wallets(username, **kwargs):
 @login_required
 @only_personal_data
 def reports(username):
-    return render_template('reports.html')
+    if request.args.get('newrep') == "yes":
+        current_user.create_report('date')
+        return redirect(url_for('reports', username=current_user.username))
+    reports = current_user.get_all_reports()
+    return render_template('reports.html', reports=reports)
 
 
 @app.route("/u/<username>/history")

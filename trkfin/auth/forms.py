@@ -8,6 +8,7 @@ from trkfin.models import Users
 
 class RegistrationForm(FlaskForm):
     timestamp = HiddenField('timestamp')
+    tz_offset = HiddenField('timezone offset')
     username = StringField('Username', validators=[DataRequired()])    
     email = StringField('E-Mail', validators=[Optional()])    
     password = PasswordField('Password', validators=[DataRequired()])    

@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import render_template, redirect, url_for, flash, request
 from flask_login import current_user, login_user, logout_user
 from werkzeug.urls import url_parse
@@ -20,6 +21,8 @@ def register():
 
         # record user to db
         new_user = Users(form.username.data)
+        new_user.created = datetime.utcnow().timestamp() # float
+        new_user.tz_offset = int(form.tz_offset.data) # int
         new_user.set_password(form.password.data)
         db.session.add(new_user)
         db.session.commit()
@@ -27,8 +30,9 @@ def register():
         # add history entry
         record = History()
         record.user_id = new_user.id
+        record.ts_utc = new_user.created
+        record.ts_local = datetime.fromtimestamp(new_user.created + new_user.tz_offset).__str__()[:19]
         record.action = 'Created account'
-        record.ts_local = form.timestamp.data
         db.session.add(record)
         db.session.commit()
 

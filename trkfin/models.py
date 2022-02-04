@@ -1,4 +1,4 @@
-from datetime import datetime
+# from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -8,11 +8,11 @@ from trkfin import db, login, app
 class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     username = db.Column(db.String(64), index=True, unique=True, nullable=False)
-    created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    created = db.Column(db.Float, nullable=False) # utc-posix-timestamp
     email = db.Column(db.String(120), index=True)
     walletcount = db.Column(db.Integer)
     password_hash = db.Column(db.String(128), nullable=False)
-    # timezone - TODO
+    tz_offset = db.Column(db.Integer) # no. of seconds to add to utc_ts to get users local time
 
 
     ###   Basics   ###
@@ -169,8 +169,8 @@ class Wallets(db.Model):
 class History(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    ts_utc = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    ts_local = db.Column(db.String(23))
+    ts_utc = db.Column(db.Float, nullable=False) # utc-posix-timestamp
+    ts_local = db.Column(db.String(19)) # user's local time in ISO format
     action = db.Column(db.String(20))
     source = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))
     destination = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))

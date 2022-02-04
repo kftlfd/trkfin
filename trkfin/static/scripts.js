@@ -26,10 +26,17 @@ document.addEventListener("DOMContentLoaded", function() {
           lz(date.getHours()) + ":" + lz(date.getMinutes()) + ":" + lz(date.getSeconds()) + ":" +
           lzms(date.getMilliseconds());
   }
+
   if (document.forms[0]) {
     document.forms[0].addEventListener('submit', function() {
       document.forms[0].timestamp.value = getLocalTime();
+      
     });
+
+
+    // no. of seconds to add to utc-timestamp to get users local time
+    let d = new Date();
+    document.forms[0].tz_offset.value = d.getTimezoneOffset() * (-60);
   }
 
 });
