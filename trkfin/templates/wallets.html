@@ -11,14 +11,13 @@
 {% if wallets['groups'] %}
 <div name='wallets-list' class="table-responsive">
   <h3>Wallets</h3>
-  <!-- <div>{{ wallets }}</div> -->
   {% for group in wallets['groups'] %}
   <table class='table caption-top'>
     <caption>{{ group }}</caption>
     <tbody>
       {% for w in wallets['groups'][group] %}
       <tr>
-        <td>{{ wallets['groups'][group][w]['name'] }}</td><td>{{ wallets['groups'][group][w]['balance_current'] }}</td>
+        <td>{{ wallets['groups'][group][w]['name'] }}</td><td>{{ wallets['groups'][group][w]['balance'] }}</td>
       </tr>
       {% endfor %}
     </tbody>
