@@ -23,6 +23,8 @@ def register():
         new_user = Users(form.username.data)
         new_user.created = datetime.utcnow().timestamp() # float
         new_user.tz_offset = int(form.tz_offset.data) # int
+        new_user.report_frequency = 'month'
+        new_user.next_report = new_user.get_next_report_ts()       
         new_user.set_password(form.password.data)
         db.session.add(new_user)
         db.session.commit()
@@ -31,7 +33,7 @@ def register():
         record = History()
         record.user_id = new_user.id
         record.ts_utc = new_user.created
-        record.ts_local = datetime.fromtimestamp(new_user.created + new_user.tz_offset).__str__()[:19]
+        record.local_time = datetime.fromtimestamp(new_user.created + new_user.tz_offset).__str__()[:19]
         record.action = 'Created account'
         db.session.add(record)
         db.session.commit()

@@ -50,11 +50,14 @@ def home():
         ts_user_local = ts_utc + float(form.tz_offset.data) # float
         user_local_time = datetime.fromtimestamp(ts_user_local).__str__()[:19]
 
+        if ts_utc >= current_user.next_report:
+            current_user.generate_report()
+
         # add history entry
         record = History()
         record.user_id = current_user.id
         record.ts_utc = ts_utc
-        record.ts_local = user_local_time
+        record.local_time = user_local_time
         record.action = form.action.data
         if record.action == 'Spending':
             record.source = form.source.data
@@ -70,26 +73,23 @@ def home():
         # update wallets
         if form.action.data == 'Spending':
             ws = Wallets.query.get(form.source.data)
-            ws.balance_current -= float(form.amount.data)
+            ws.balance -= float(form.amount.data)
             ws.spendings -= float(form.amount.data)
-            db.session.add(ws)
+            # db.session.add(ws)
         elif form.action.data == 'Income':
             wi = Wallets.query.get(form.destination.data)
-            wi.balance_current += float(form.amount.data)
+            wi.balance += float(form.amount.data)
             wi.income += float(form.amount.data)
-            db.session.add(wi)
+            # db.session.add(wi)
         else:
             ws = Wallets.query.get(form.source.data)            
+            ws.balance -= float(form.amount.data)
+            ws.transfers -= float(form.amount.data)
             wi = Wallets.query.get(form.destination.data)
-
-            ws.balance_current -= float(form.amount.data)
-            ws.transfers_from -= float(form.amount.data)
-
-            wi.balance_current += float(form.amount.data)
-            wi.transfers_to += float(form.amount.data)
-
-            db.session.add(ws)
-            db.session.add(wi)
+            wi.balance += float(form.amount.data)
+            wi.transfers += float(form.amount.data)
+            # db.session.add(ws)
+            # db.session.add(wi)
 
         db.session.commit()
 
@@ -144,6 +144,9 @@ def wallets(username, **kwargs):
         ts_utc = datetime.utcnow().timestamp() # float
         ts_user_local = ts_utc + float(form.tz_offset.data) # float
         user_local_time = datetime.fromtimestamp(ts_user_local).__str__()[:19]
+
+        if ts_utc >= current_user.next_report:
+            current_user.generate_report()
         
         # record new wallet
         new_wallet = Wallets(current_user.id, form.name.data, form.amount.data)
@@ -159,7 +162,7 @@ def wallets(username, **kwargs):
         record = History()
         record.user_id = current_user.id
         record.ts_utc = ts_utc
-        record.ts_local = user_local_time
+        record.local_time = user_local_time
         record.action = "Added wallet"
         if new_wallet.group:
             record.description = str(new_wallet.group) + ": " + str(new_wallet.name)
@@ -188,7 +191,7 @@ def wallets(username, **kwargs):
 @only_personal_data
 def reports(username):
     if request.args.get('newrep') == "yes":
-        current_user.create_report('date')
+        current_user.generate_report()
         return redirect(url_for('reports', username=current_user.username))
     reports = current_user.get_all_reports()
     return render_template('reports.html', reports=reports)
@@ -199,7 +202,7 @@ def reports(username):
 @only_personal_data
 def history(username):
     # add pagination or continuous load - TODO
-    return render_template('history.html', history=current_user.get_history())
+    return render_template('history.html', history=current_user.get_history_json(), wallets=current_user.get_wallets_json())
 
 
 @app.route('/u/<username>', methods=['GET', 'POST'])
