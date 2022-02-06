@@ -1,18 +1,21 @@
-# from datetime import datetime
+from datetime import datetime, timedelta
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from trkfin import db, login, app
 
 
+
 class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     username = db.Column(db.String(64), index=True, unique=True, nullable=False)
-    created = db.Column(db.Float, nullable=False) # utc-posix-timestamp
     email = db.Column(db.String(120), index=True)
-    walletcount = db.Column(db.Integer)
     password_hash = db.Column(db.String(128), nullable=False)
+    created = db.Column(db.Float, nullable=False) # utc-posix-timestamp
     tz_offset = db.Column(db.Integer) # no. of seconds to add to utc_ts to get users local time
+    report_frequency = db.Column(db.String(5), default='month') # 'month' , 'week', or no. of days (>=1)
+    next_report = db.Column(db.Float, index=True) # utc-timestamp, timezone adjusted
+    walletcount = db.Column(db.Integer)
 
 
     ###   Basics   ###
@@ -39,6 +42,21 @@ class Users(UserMixin, db.Model):
     def get_wallets(self):
         return Wallets.query.filter_by(user_id=self.id).order_by('group').order_by('name').all()
 
+    def get_wallets_json(self):
+        wallets_raw = self.get_wallets()
+        wallets = {}
+        for w in wallets_raw:
+            wallets[w.id] = {
+                'name': w.name,
+                'group': w.group,
+                'initial': w.initial,
+                'income': w.income,
+                'spendings': w.spendings,
+                'transfers': w.transfers,
+                'balance': w.balance
+            }
+        return wallets
+
     def get_wallets_status(self):
         wallets = self.get_wallets()
         report = {
@@ -47,39 +65,31 @@ class Users(UserMixin, db.Model):
             'sums': {}
         }
         for w in wallets:
-            report['wallets'][w.wallet_id] = {
+            report['wallets'][w.id] = {
                 'name': w.name,
                 'group': w.group,
-                'balance': w.balance_current
+                'balance': w.balance
             }
             if w.group not in report['groups']:
                 report['groups'][w.group] = {}
                 report['sums'][w.group] = {
-                    'balance_initial_sum': 0,
+                    'initial_sum': 0,
                     'income_sum': 0,
                     'spendings_sum': 0,
-                    'transfers_sum': 0,
-                    'transfers_from_sum': 0,
-                    'transfers_to_sum': 0,
-                    'balance_current_sum': 0
+                    'balance_sum': 0
                 }
-            report['groups'][w.group][w.wallet_id] = {
+            report['groups'][w.group][w.id] = {
                 'name': w.name,
-                'balance_initial': w.balance_initial,
+                'initial': w.initial,
                 'income': w.income,
                 'spendings': w.spendings,
-                'transfers': w.transfers_from + w.transfers_to,
-                'transfers_from': w.transfers_from,
-                'transfers_to': w.transfers_to,
-                'balance_current': w.balance_current
+                'transfers': w.transfers,
+                'balance': w.balance
             }
-            report['sums'][w.group]['balance_initial_sum'] += w.balance_initial
+            report['sums'][w.group]['initial_sum'] += w.initial
             report['sums'][w.group]['income_sum'] += w.income
             report['sums'][w.group]['spendings_sum'] += w.spendings
-            report['sums'][w.group]['transfers_sum'] += w.transfers_from + w.transfers_to
-            report['sums'][w.group]['transfers_from_sum'] += w.transfers_from
-            report['sums'][w.group]['transfers_to_sum'] += w.transfers_to
-            report['sums'][w.group]['balance_current_sum'] += w.balance_current
+            report['sums'][w.group]['balance_sum'] += w.balance
         return report
 
 
@@ -88,14 +98,16 @@ class Users(UserMixin, db.Model):
     def get_history(self):
         return History.query.filter_by(user_id=self.id).order_by(History.id.desc()).all()
 
-    def get_history_json(self):
-        history_raw = self.get_history()
+    def get_history_json(self, start=None, end=None):
+        if start and end:
+            history_raw = History.query.filter(History.user_id==self.id, History.ts_utc>=start, History.ts_utc<end).order_by(History.id.desc()).all()
+        else:
+            history_raw = self.get_history()
         history = []
         for entry in history_raw:
             history.append({
                 'id': entry.id,
-                # 'ts_utc': entry.ts_utc,
-                'ts_local': entry.ts_local,
+                'local_time': entry.local_time,
                 'action': entry.action,
                 'source': entry.source,
                 'destination': entry.destination,
@@ -105,6 +117,31 @@ class Users(UserMixin, db.Model):
         return history
     
     
+    ###   CalcTime   ###
+
+    def get_next_report_ts(self):
+        
+        freq = self.report_frequency
+        user_time = datetime.utcnow().timestamp() + self.tz_offset
+        
+        if freq == 'month':
+            nextts = (datetime.fromtimestamp(user_time).replace(day=1) + timedelta(days=35))
+            nextts = nextts.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            nextts = nextts.timestamp() - self.tz_offset
+        elif freq == 'week':
+            d = datetime.fromtimestamp(user_time)
+            nextts = d + timedelta(days=(7 - d.weekday()))
+            nextts = nextts.replace(hour=0, minute=0, second=0, microsecond=0)
+            nextts = nextts.timestamp() - self.tz_offset
+        else:
+            d = datetime.fromtimestamp(user_time)
+            nextts = d + timedelta(days=int(freq))
+            nextts = nextts.replace(hour=0, minute=0, second=0, microsecond=0)
+            nextts = nextts.timestamp() - self.tz_offset
+        
+        return nextts
+
+
     ###   Reports   ###
 
     def get_all_reports(self):
@@ -113,21 +150,37 @@ class Users(UserMixin, db.Model):
     def get_last_report(self):
         return Reports.query.filter(Reports.user_id==self.id).order_by(Reports.id.desc()).first()
     
-    def create_report(self, date):
-        # 1) [✓] get all wallets, parse into json, create Report();
-        # 2) [ ] write Report time: start = end of last report (or account creation),
-        #        end = datetime.utcnow default in db;
-        # 3) [ ] reset all user's wallets (initial balance = current; inc/spend/transf = 0);
-        
+    def generate_report(self):
+
         new_rep = Reports(self.id)
-        new_rep.time_start = 'test'
-        # new_rep.time_start = self.get_last_report()[0]['time_end'] or None
-        
+        last = self.get_last_report()
+        if last: new_rep.time_start = last.time_end
+        else: new_rep.time_start = self.created
+        new_rep.time_end = self.next_report
         data = self.get_wallets_status()
-        data['history'] = self.get_history_json()
+        data['history'] = self.get_history_json(start=new_rep.time_start, end=new_rep.time_end)
         new_rep.data = data
+        
+        # reset users wallets
+        wallets = self.get_wallets()
+        for w in wallets:
+            w.initial = w.balance
+            w.spendings = 0
+            w.income = 0
+            w.transfers = 0
+
+        # update next report time
+        self.next_report = self.get_next_report_ts()
+
+        # add history entry
+        record = History()
+        record.user_id = self.id
+        record.ts_utc = datetime.utcnow().timestamp()
+        record.local_time = datetime.fromtimestamp(record.ts_utc + self.tz_offset).__str__()[:19]
+        record.action = 'Generated report'
 
         db.session.add(new_rep)
+        db.session.add(record)
         db.session.commit()
 
 
@@ -139,30 +192,28 @@ def load_user(id):
 
 
 class Wallets(db.Model):
-    wallet_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     group = db.Column(db.String(20), nullable=False)
     name = db.Column(db.String(20), nullable=False)
-    balance_initial = db.Column(db.Float, nullable=False)
+    initial = db.Column(db.Float, nullable=False)
     income = db.Column(db.Float, nullable=False)
     spendings = db.Column(db.Float, nullable=False)
-    transfers_from = db.Column(db.Float, nullable=False)
-    transfers_to = db.Column(db.Float, nullable=False)
-    balance_current = db.Column(db.Float, nullable=False)
+    transfers = db.Column(db.Float, nullable=False)
+    balance = db.Column(db.Float, nullable=False)
     # currency = db.Column(db.String(8)) - TODO
 
     def __init__(self, user_id, name, amount):
         self.user_id = user_id
         self.name = name
-        self.balance_initial = amount or 0
+        self.initial = amount or 0
         self.income = 0
         self.spendings = 0
-        self.transfers_from = 0
-        self.transfers_to = 0
-        self.balance_current = amount or 0
+        self.transfers = 0
+        self.balance = amount or 0
 
     def __repr__(self):
-        return f'< Wallet id-{self.wallet_id} >'
+        return f'< Wallet id-{self.id} >'
 
 
 
@@ -170,10 +221,10 @@ class History(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     ts_utc = db.Column(db.Float, nullable=False) # utc-posix-timestamp
-    ts_local = db.Column(db.String(19)) # user's local time in ISO format
+    local_time = db.Column(db.String(19)) # user's local time in ISO format
     action = db.Column(db.String(20))
-    source = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))
-    destination = db.Column(db.Integer, db.ForeignKey('wallets.wallet_id'))
+    source = db.Column(db.Integer, db.ForeignKey('wallets.id'))
+    destination = db.Column(db.Integer, db.ForeignKey('wallets.id'))
     amount = db.Column(db.Float)
     description = db.Column(db.String(120))
     
@@ -185,8 +236,8 @@ class History(db.Model):
 class Reports(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    time_start = db.Column(db.String(23))
-    time_end = db.Column(db.String(23))
+    time_start = db.Column(db.Float) # utc-posix-timestamp
+    time_end = db.Column(db.Float) # utc-posix-timestamp
     data = db.Column(db.JSON)
 
     def __init__(self, user_id):
