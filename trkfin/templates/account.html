@@ -4,9 +4,24 @@
 
 {% block main %}
 
-<h3>add email</h3>
+<div>
+  <div>{{ data['form'] }}</div>
+  <h3>add email</h3>
+  <div>current email: {{ data['email'] }}</div>
+  <form name="email" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+    <input name="new_email" type="text" value="" placeholder="New email">
+    <input type="submit" value="Change">
+  </form>
+</div>
 
-<h3>change password</h3>
+<div>
+  <h3>change password</h3>
+  <form name="password" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+    <input name="old_password" type="password" value="" placeholder="Old password">
+    <input name="new_password" type="password" value="" placeholder="New password">
+    <input type="submit" value="Change">
+  </form>
+</div>
 
 <h3>change timezone</h3>
 

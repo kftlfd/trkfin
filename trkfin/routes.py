@@ -123,6 +123,24 @@ def only_personal_data(func):
 @only_personal_data
 def wallets(username, **kwargs):
 
+    if request.form.get('delete-w'):
+        w_id = request.form.get('delete-w')
+        to_del = Wallets.query.get(w_id)
+        db.session.delete(to_del)
+        current_user.walletcount -= 1
+        db.session.commit()
+        flash(f'deleted wallet with id {w_id}')
+        return redirect(url_for('wallets', username=current_user.username))
+
+    if request.form.get('rename-w'):
+        w_id = request.form.get('rename-w')
+        new_name = request.form.get('new-name')
+        to_rnm = Wallets.query.get(w_id)
+        to_rnm.name = new_name
+        db.session.commit()
+        flash(f'renamed to "{new_name}"')
+        return redirect(url_for('wallets', username=current_user.username))
+
     form = AddWalletForm()
     wallets = current_user.get_wallets_status()
 
@@ -209,7 +227,17 @@ def history(username):
 @login_required
 @only_personal_data
 def account(username):
-    return render_template('account.html')
+
+    if request.form.get("new_email"):
+        current_user.email = request.form.get("new_email")
+        db.session.commit()
+        return redirect(url_for('account', username=current_user.username))
+
+    data = {
+        'email': current_user.email,
+    }
+
+    return render_template('account.html', data=data)
 
 
 # RESET DB - FOR TESTING ONLY

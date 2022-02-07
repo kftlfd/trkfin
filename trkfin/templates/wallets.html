@@ -17,7 +17,19 @@
     <tbody>
       {% for w in wallets['groups'][group] %}
       <tr>
-        <td>{{ wallets['groups'][group][w]['name'] }}</td><td>{{ wallets['groups'][group][w]['balance'] }}</td>
+        <td>{{ wallets['groups'][group][w]['name'] }}</td>
+        <td>{{ wallets['groups'][group][w]['balance'] }}</td>
+        <td>
+          <form action="{{ url_for('wallets', username=current_user.username) }}" method="POST" onsubmit="confirm_delete()">
+            <input type="hidden" name="delete-w" value="{{ w }}">
+            <input type="submit" value="delete">
+          </form>
+          <form action="{{ url_for('wallets', username=current_user.username) }}" method="POST">
+            <input type="hidden" name="rename-w" value="{{ w }}">
+            <input type="text" name="new-name" placeholder="New name" required maxlength="30">
+            <input type="submit" value="rename">
+          </form>
+        </td>
       </tr>
       {% endfor %}
     </tbody>
@@ -25,5 +37,13 @@
   {% endfor %}
 </div>
 {% endif %}
+
+<script>
+  function confirm_delete() {
+    if (!confirm("this cannot be undone and may have unmwanted consequences\n\nyou sure?")) {
+      event.preventDefault()
+    }
+  }
+</script>
 
 {% endblock %}
