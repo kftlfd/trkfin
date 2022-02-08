@@ -15,6 +15,7 @@ class Users(UserMixin, db.Model):
     tz_offset = db.Column(db.Integer) # no. of seconds to add to utc_ts to get users local time
     report_frequency = db.Column(db.String(5), default='month') # 'month' , 'week', or no. of days (>=1)
     next_report = db.Column(db.Float, index=True) # utc-timestamp, timezone adjusted
+    email_reports = db.Column(db.Boolean, default=False)
     walletcount = db.Column(db.Integer)
 
 

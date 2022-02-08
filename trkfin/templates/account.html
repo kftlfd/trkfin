@@ -4,32 +4,124 @@
 
 {% block main %}
 
-<div>
-  <div>{{ data['form'] }}</div>
+<style>
+  .settings {
+    border: 1px solid gray;
+    border-radius: 5px;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+</style>
+
+<div class='settings'>
+  <h3>change username</h3>
+  <div>current username: {{ data['username'] }}</div>
+  <form name="username" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+    <input name="new-username" type="text" value="" placeholder="New username">
+    <input type="submit" value="Change">
+  </form>
+</div>
+
+<div class='settings'>
   <h3>add email</h3>
   <div>current email: {{ data['email'] }}</div>
   <form name="email" action="{{ url_for('account', username=current_user.username) }}" method="POST">
-    <input name="new_email" type="text" value="" placeholder="New email">
-    <input type="submit" value="Change">
+    <input disabled name="new-email" type="text" value="" placeholder="New email">
+    <input disabled type="submit" value="Change">
   </form>
 </div>
 
-<div>
+<div class='settings'>
   <h3>change password</h3>
   <form name="password" action="{{ url_for('account', username=current_user.username) }}" method="POST">
-    <input name="old_password" type="password" value="" placeholder="Old password">
-    <input name="new_password" type="password" value="" placeholder="New password">
+    <input name="old-password" type="password" value="" placeholder="Old password">
+    <input name="new-password" type="password" value="" placeholder="New password">
     <input type="submit" value="Change">
   </form>
 </div>
 
-<h3>change timezone</h3>
+<div class='settings'>
+  <h3>update timezone</h3>
+  <div data-timezone="{{ data['timezone'] }}">current time is set to <span id='user_time'></span></div>
+  <form name="timezone" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+    <input name="new-timezone" type="hidden" data-new-tz="">
+    <input type="submit" value="Update">
+  </form>
+</div> 
 
-<h3>change defaults</h3>
-<p>wallet selection: spending from, income to, transfer from to.</p>
-<p>report: month, week.</p>
-<p>send reports to email</p>
+<div class='settings'>
+  <h3>reports</h3>
+  <div>current frequency: {{ data['rep-freq'] }}</div>
+  <form name="reports" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+    <select name="new-report-frequency">
+      <option value="month">Month</option>
+      <option value="week">Week</option>
+      <option value="other">Other</option>
+    </select>
+    <input name="ndays" type="number" min="1" max="365" placeholder="Number of days">
+    <input type="submit" value="Change">
+  </form>
+</div>
 
-<h3>delete all data</h3>
+<div class='settings'>
+  <h3>send reports by email</h3>
+  <form name="email-reports" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+    <input name="email-reports-pref" type="hidden" value="true">
+    <input disabled id="email-rep" type="checkbox" name="email-reports" value="true" {% if data['email-reports'] %} checked {% endif %}>
+    <label for="email-rep">Send reports by email</label>
+    <input disabled type="submit" value="Update">
+  </form>
+</div>
+
+<div class="settings">
+  <h3>export data</h3>
+  <form name="export" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+    <input name="export-data" type="hidden" value="true">
+    <input class="btn btn-success" type="submit" value="Export data">
+  </form>
+</div>
+
+<div class="settings">
+  <h3>delete account</h3>
+  <form name="delete" action="{{ url_for('account', username=current_user.username) }}" method="POST" onsubmit="confirm_delete()">
+    <input name="delete-account" type="hidden" value="true">
+    <input class="btn btn-danger" type="submit" value="Delete account">
+  </form>
+</div>
+
+<script>
+  var tz = Number(document.querySelector('[data-timezone]').dataset.timezone) / 60
+  var ut = document.querySelector('#user_time')
+
+  function parseTimezone(offset) {
+    var direction = '+'
+    if (offset < 0) {
+      direction = '-'
+      offset *= -1
+    }
+    var hours = offset / 60
+    if (hours < 10) {hours = '0' + hours}
+    var minutes = offset % 60
+    if (minutes < 10) {minutes = '0' + minutes}
+    name = 'GMT' + direction + hours + ':' + minutes
+    return name
+  }
+
+  console.log(tz)
+  ut.innerText = parseTimezone(tz)
+
+  var newtz = document.querySelector('[data-new-tz]')
+  var d = new Date()
+  newtz.value = d.getTimezoneOffset() * -60
+
+  function confirm_delete() {
+    if (!confirm("this cannot be undone. Consider exporting all data first")) {
+      event.preventDefault()
+    }
+  }
+</script>
 
 {% endblock %}

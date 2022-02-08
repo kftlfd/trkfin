@@ -7,7 +7,7 @@ from werkzeug.urls import url_parse
 from os import remove, path
 
 from trkfin import app, db
-from trkfin.models import Users, Wallets, History
+from trkfin.models import Users, Wallets, History, Reports
 from trkfin.forms import MainForm, AddWalletForm
 
 
@@ -228,13 +228,87 @@ def history(username):
 @only_personal_data
 def account(username):
 
-    if request.form.get("new_email"):
-        current_user.email = request.form.get("new_email")
+    # kinda ugly
+
+    if request.form.get("new-username"):
+        check = Users.query.filter(Users.username==request.form.get("new-username")).all()
+        if len(check) != 0:
+            return redirect(url_for('account', username=current_user.username))
+        current_user.username = request.form.get("new-username")
+        db.session.commit()
+        flash('changed username')
+        return redirect(url_for('account', username=current_user.username))
+
+    if request.form.get("new-email"):
+        current_user.email = request.form.get("new-email")
+        db.session.commit()
+        flash('changed email')
+        return redirect(url_for('account', username=current_user.username))
+
+    if request.form.get("new-password"):
+        if not current_user.check_password(request.form.get("old-password")):
+            flash('wrong password')
+            return redirect(url_for('account', username=current_user.username))
+        current_user.set_password(request.form.get("new-password"))
+        db.session.commit()
+        flash('changed password')
+        return redirect(url_for('account', username=current_user.username))
+
+    if request.form.get("new-timezone"):
+        flash('tz upd')
+        current_user.tz_offset = request.form.get("new-timezone")
+        db.session.commit()
+        flash('updated timezone')
+        return redirect(url_for('account', username=current_user.username))
+
+    if request.form.get("new-report-frequency"):
+        new_freq = request.form.get("new-report-frequency")
+        if new_freq == 'other':
+            new_freq = request.form.get("ndays")
+        if len(new_freq) < 1:
+            return redirect(url_for('account', username=current_user.username))
+        current_user.report_frequency = new_freq
+        db.session.commit()
+        flash('set new rep freq')
+        return redirect(url_for('account', username=current_user.username))
+    
+    if request.form.get("email-reports-pref"):
+        if request.form.get("email-reports") and not current_user.email_reports:
+            current_user.email_reports = True
+            flash('emailing reports')
+        elif request.form.get("email-reports") and current_user.email_reports:
+            pass
+        elif current_user.email_reports:
+            current_user.email_reports = False
+            flash('emailing stoped')
         db.session.commit()
         return redirect(url_for('account', username=current_user.username))
 
+    if request.form.get("export-data"):
+        flash('export requested')
+        return redirect(url_for('account', username=current_user.username))
+    
+    if request.form.get("delete-account"):
+        id = current_user.id
+        logout_user()
+        u = Users.query.get(id)
+        w = Wallets.query.filter(Wallets.user_id==id).all()
+        h = History.query.filter(History.user_id==id).all()
+        r = Reports.query.filter(Reports.user_id==id).all()
+        db.session.delete(u)
+        for i in w: db.session.delete(i)
+        for i in h: db.session.delete(i)
+        for i in r: db.session.delete(i)
+        db.session.commit()
+        flash('account deleted')
+        return redirect(url_for('index'))
+
     data = {
+        'username': current_user.username,
         'email': current_user.email,
+        'timezone': current_user.tz_offset,
+        'rep-freq': current_user.report_frequency,
+        'email-reports': current_user.email_reports
     }
 
     return render_template('account.html', data=data)
