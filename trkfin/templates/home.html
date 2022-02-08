@@ -19,12 +19,12 @@
       {% for w_id in wallets['groups'][group] %}
       <tr>
         <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
-        <td>{{ wallets['groups'][group][w_id]['balance_current'] | num }}</td>
+        <td>{{ wallets['groups'][group][w_id]['balance'] | num }}</td>
       </tr>
       {% endfor %}
       <tr>
         <th>sum:</th>
-        <th>{{ wallets['sums'][group]['balance_current_sum'] | num }}</th>
+        <th>{{ wallets['sums'][group]['balance_sum'] | num }}</th>
       </tr>
     </table>
     {% endfor %}
@@ -38,12 +38,12 @@
       {% for w_id in wallets['groups'][group] %}
       <tr>
         <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
-        <td>{{ wallets['groups'][group][w_id]['balance_initial'] | num }}</td>
+        <td>{{ wallets['groups'][group][w_id]['initial'] | num }}</td> 
       </tr>
       {% endfor %}
       <tr>
         <th>sum:</th>
-        <th>{{ wallets['sums'][group]['balance_initial_sum'] | num }}</th>
+        <th>{{ wallets['sums'][group]['initial_sum'] | num }}</th>
       </tr>
     </table>
     {% endfor %}
@@ -98,10 +98,6 @@
         <td>{{ wallets['groups'][group][w_id]['transfers'] | num }}</td>
       </tr>
       {% endfor %}
-      <tr>
-        <th>sum:</th>
-        <th>{{ wallets['sums'][group]['transfers_sum'] | num }}</th>
-      </tr>
     </table>
     {% endfor %}
   </div>

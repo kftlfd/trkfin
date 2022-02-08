@@ -16,16 +16,20 @@
     </thead>
     <tbody>
       {% for row in history %}
-      <!-- <tr>
-        <td colspan="7">{{ row }}</td>
-      </tr> -->
       <tr>
-        <!-- <td>{{ row.ts_utc }}</td> -->
-        <td>{{ row.ts_local[:10] }}</td>
-        <td>{{ row.ts_local[10:16] }}</td>
+        <td>{{ row.local_time[:10] }}</td>
+        <td>{{ row.local_time[10:16] }}</td>
         <td>{{ row.action }}</td>
-        <td>{{ row.source or '' }}</td>
-        <td>{{ row.destination or '' }}</td>
+        {% if wallets[row.source] %}
+        <td>{{ wallets[row.source].name }}</td>
+        {% else %}
+        <td></td>
+        {% endif %}
+        {% if wallets[row.destination] %}
+        <td>{{ wallets[row.destination].name }}</td>
+        {% else %}
+        <td></td>
+        {% endif %}
         <td>{{ row.amount or ''}}</td>
         <td>{{ row.description or '' }}</td>
       </tr>
