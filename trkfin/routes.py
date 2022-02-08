@@ -123,13 +123,35 @@ def only_personal_data(func):
 @only_personal_data
 def wallets(username, **kwargs):
 
-    if request.form.get('delete-w'):
-        w_id = request.form.get('delete-w')
-        to_del = Wallets.query.get(w_id)
-        db.session.delete(to_del)
-        current_user.walletcount -= 1
+    # wallet controls (kinda ugly)
+
+    if request.form.get('rename-group'):
+        group = request.form.get('rename-group')
+        if group == "*empty": group = ""
+        new_name = request.form.get('new-group-name')
+        if group != new_name:
+            wallets = Wallets.query.filter(Wallets.user_id==current_user.id, Wallets.group==group).all()
+            for w in wallets:
+                w.group = new_name
+            db.session.commit()
+            flash('group renamed')
+        return redirect(url_for('wallets', username=current_user.username))
+
+    if request.form.get('delete-group'):
+        group = request.form.get('delete-group')
+        if group == "*empty": group = ""
+        wallets = Wallets.query.filter(Wallets.user_id==current_user.id, Wallets.group==group).all()
+        for w in wallets:
+            if request.form.get('delete-wallets'):
+                db.session.delete(w)
+                current_user.walletcount -= 1
+            else:
+                w.group = ""
         db.session.commit()
-        flash(f'deleted wallet with id {w_id}')
+        if request.form.get('delete-wallets'):
+            flash('group and wallets deleted')
+        else:
+            flash('group deleted, wallets moved to ungrouped')
         return redirect(url_for('wallets', username=current_user.username))
 
     if request.form.get('rename-w'):
@@ -141,6 +163,27 @@ def wallets(username, **kwargs):
         flash(f'renamed to "{new_name}"')
         return redirect(url_for('wallets', username=current_user.username))
 
+    if request.form.get('change-w-group'):
+        w_id = request.form.get('change-w-group')
+        to_change = Wallets.query.get(w_id)
+        new_group = request.form.get('user-group')
+        if new_group == "*New":
+            new_group = request.form.get('new-group')
+        if to_change.group != new_group:
+            to_change.group = new_group
+            db.session.commit()
+            flash('changed group')
+        return redirect(url_for('wallets', username=current_user.username))
+
+    if request.form.get('delete-w'):
+        w_id = request.form.get('delete-w')
+        to_del = Wallets.query.get(w_id)
+        db.session.delete(to_del)
+        current_user.walletcount -= 1
+        db.session.commit()
+        flash(f'deleted wallet with id {w_id}')
+        return redirect(url_for('wallets', username=current_user.username))
+
     form = AddWalletForm()
     wallets = current_user.get_wallets_status()
 
@@ -148,12 +191,14 @@ def wallets(username, **kwargs):
     groups = set()
     for g in wallets['groups']:
         groups.add(g)
-    if groups:
-        form.group.choices = [(g, g) for g in groups]
+    form.group.choices = [(g, g) for g in groups]
+    if groups and form.group.choices[0][0] != "":
+        form.group.choices.insert(0, ('', '-- None --'))
+    elif groups:
+        form.group.choices[0] = ('', '-- None --')
     else:
-        form.group.choices = [1]
-    form.group.choices[0] = ('', '-- None --') # change display of unnamed group
-    form.group.choices.append(('New', '-- New --'))
+        form.group.choices.append(('', '-- None --'))
+    form.group.choices.append(('*New', '-- New --'))
 
     # process add-wallet form
     if form.validate_on_submit():
@@ -168,7 +213,7 @@ def wallets(username, **kwargs):
         
         # record new wallet
         new_wallet = Wallets(current_user.id, form.name.data, form.amount.data)
-        if form.group.data == 'New':
+        if form.group.data == '*New':
             new_wallet.group = form.group_new.data
         else:
             new_wallet.group = form.group.data
@@ -201,7 +246,12 @@ def wallets(username, **kwargs):
             next_page = url_for('wallets', username=current_user.username)
         return redirect(next_page)
     
-    return render_template('wallets.html', form=form, wallets=wallets)
+    data = {
+        'groups': form.group.choices,
+        'walletcount': current_user.walletcount
+    }
+    
+    return render_template('wallets.html', form=form, wallets=wallets, data=data)
 
 
 @app.route('/u/<username>/reports')

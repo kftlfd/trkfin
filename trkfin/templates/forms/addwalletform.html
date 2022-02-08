@@ -73,7 +73,7 @@
   
   // hide group_input
   function hide_group_input() {
-    if (group_select.value == 'New') {
+    if (group_select.value == '*New') {
       group_input.style.display = 'block';
     }
     else {
@@ -84,7 +84,7 @@
 
   // grey out None and New types
   function grey_groups() {
-    if (group_select.value == "" || group_select.value == "New") {
+    if (group_select.value == "" || group_select.value == "*New") {
       group_select.style.color = '#6c757d';
       group_select.style.fontStyle = 'italic';
     }

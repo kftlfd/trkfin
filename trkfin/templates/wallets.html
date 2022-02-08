@@ -8,26 +8,64 @@
   {% include "forms/addwalletform.html" %}
 </div>
 
+<div>{{ data['walletcount'] }}</div>
+
 {% if wallets['groups'] %}
 <div name='wallets-list' class="table-responsive">
   <h3>Wallets</h3>
   {% for group in wallets['groups'] %}
   <table class='table caption-top'>
     <caption>{{ group }}</caption>
+    <div>
+      {% if group != "" %}
+      <form action="{{ url_for('wallets', username=current_user.username) }}" method="POST">
+        <input type="hidden" name="rename-group" value="{{ group }}">
+        <input type="text" name="new-group-name" placeholder="New group name" value="{{ group }}" minlength="1" required pattern="[\w\d\s()-_]{0,20}" maxlength="20" title="only letters, numbers, parentheses, spaces, -, _">
+        <input type="submit" value="rename group">
+      </form>
+      <form action="{{ url_for('wallets', username=current_user.username) }}" method="POST" onsubmit="confirm_delete()">
+        <input type="hidden" name="delete-group" value="{{ group }}">
+        <input type="checkbox" name="delete-wallets" id="del-group-{{ group }}">
+        <label for="del-group-{{ group }}">Also delete wallets</label>
+        <input type="submit" value="delete group">
+      </form>
+      {% else %}
+      <form action="{{ url_for('wallets', username=current_user.username) }}" method="POST">
+        <input type="hidden" name="rename-group" value="*empty">
+        <input type="text" name="new-group-name" placeholder="New group name" value="" minlength="1" required pattern="[\w\d\s()-_]{0,20}" maxlength="20" title="only letters, numbers, parentheses, spaces, -, _">
+        <input type="submit" value="rename group">
+      </form>
+      <form action="{{ url_for('wallets', username=current_user.username) }}" method="POST" onsubmit="confirm_delete()">
+        <input type="hidden" name="delete-group" value="*empty">
+        <input type="hidden" name="delete-wallets" value="true">
+        <input type="submit" value="delete group">
+      </form>
+      {% endif %}
+    </div>
     <tbody>
       {% for w in wallets['groups'][group] %}
       <tr>
         <td>{{ wallets['groups'][group][w]['name'] }}</td>
-        <td>{{ wallets['groups'][group][w]['balance'] }}</td>
+        <td>{{ wallets['groups'][group][w]['balance'] | num }}</td>
         <td>
+          <form action="{{ url_for('wallets', username=current_user.username) }}" method="POST">
+            <input type="hidden" name="rename-w" value="{{ w }}">
+            <input type="text" name="new-name" placeholder="New name" required pattern="[\w\d\s()-_]{0,20}" maxlength="20" title="only letters, numbers, parentheses, spaces, -, _">
+            <input type="submit" value="rename">
+          </form>
+          <form action="{{ url_for('wallets', username=current_user.username) }}" method="POST">
+            <input type="hidden" name="change-w-group" value="{{ w }}">
+            <select name="user-group">
+              {% for g in data['groups'] %}
+              <option value="{{ g[0] }}" {% if g[0]==group %} selected {% endif %}>{{ g[1] }}</option>
+              {% endfor %}
+            </select>
+            <input name="new-group" type="text" pattern="[\w\d\s()-_]{0,20}" maxlength="20" value="{{ group }}" title="only letters, numbers, parentheses, spaces, -, _">
+            <input type="submit" value="change group">
+          </form>
           <form action="{{ url_for('wallets', username=current_user.username) }}" method="POST" onsubmit="confirm_delete()">
             <input type="hidden" name="delete-w" value="{{ w }}">
             <input type="submit" value="delete">
-          </form>
-          <form action="{{ url_for('wallets', username=current_user.username) }}" method="POST">
-            <input type="hidden" name="rename-w" value="{{ w }}">
-            <input type="text" name="new-name" placeholder="New name" required maxlength="30">
-            <input type="submit" value="rename">
           </form>
         </td>
       </tr>
@@ -40,7 +78,7 @@
 
 <script>
   function confirm_delete() {
-    if (!confirm("this cannot be undone and may have unmwanted consequences\n\nyou sure?")) {
+    if (!confirm("this cannot be undone and may have unwanted consequences\n\nyou sure?")) {
       event.preventDefault()
     }
   }
