@@ -1,16 +1,17 @@
 from datetime import datetime
-from flask import flash, redirect, render_template, request, url_for, jsonify, send_file
-from flask_login import current_user, login_user, logout_user, login_required
 from functools import wraps
-from werkzeug.urls import url_parse
-from zipfile import ZipFile
 from json import dumps
+from os import path, remove
+from zipfile import ZipFile
 
-from os import remove, path
+from flask import flash, redirect, render_template, request, send_file, url_for
+from flask_login import current_user, login_required, login_user, logout_user
+from werkzeug.urls import url_parse
 
 from trkfin import app, db
-from trkfin.models import Users, Wallets, History, Reports
-from trkfin.forms import MainForm, AddWalletForm
+from trkfin.forms import AddWalletForm, MainForm
+from trkfin.models import History, Reports, Users, Wallets
+
 
 
 # decorator for generating reports
@@ -21,6 +22,8 @@ def check_if_report_due(func):
             current_user.generate_report()
         return func(*args, **kwargs)
     return wrapper
+
+
 
 # decorator to restrict user to only their own data
 # not necessary, affects only page address (adress bar)
@@ -33,12 +36,14 @@ def only_personal_data(func):
     return wrapper
 
 
+
 @app.route("/")
 def index():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     else:
         return render_template("index.html")
+
 
 
 @app.route("/home", methods=["GET", "POST"])
@@ -52,6 +57,7 @@ def home():
         return redirect(url_for('wallets', username=current_user.username, next='home'))
 
     form = MainForm()
+
     wallets = current_user.get_wallets_status()
 
     # load user's wallets to form
@@ -65,7 +71,7 @@ def home():
     form.source.choices = srcs
     form.destination.choices = srcs
 
-    # process MainForm - TODO
+    # process MainForm
     if form.validate_on_submit():
 
         # calculate time
@@ -73,15 +79,14 @@ def home():
         ts_user_local = ts_utc + float(form.tz_offset.data) # float
         user_local_time = datetime.fromtimestamp(ts_user_local).__str__()[:19]
 
-        if ts_utc >= current_user.next_report:
-            current_user.generate_report()
-
         # add history entry
-        record = History()
-        record.user_id = current_user.id
-        record.ts_utc = ts_utc
-        record.local_time = user_local_time
-        record.action = form.action.data
+        record = History(
+            user_id=current_user.id,
+            ts_utc=ts_utc,
+            local_time=user_local_time,
+            action=form.action.data,
+            amount=form.amount.data,
+            description=form.description.data)
         if record.action == 'Spending':
             record.source = form.source.data
         elif record.action == 'Income':
@@ -89,8 +94,6 @@ def home():
         else:
             record.source = form.source.data
             record.destination = form.destination.data
-        record.amount = form.amount.data
-        record.description = form.description.data
         db.session.add(record)
 
         # update wallets
@@ -98,12 +101,10 @@ def home():
             ws = Wallets.query.get(form.source.data)
             ws.balance -= float(form.amount.data)
             ws.spendings -= float(form.amount.data)
-            # db.session.add(ws)
         elif form.action.data == 'Income':
             wi = Wallets.query.get(form.destination.data)
             wi.balance += float(form.amount.data)
             wi.income += float(form.amount.data)
-            # db.session.add(wi)
         else:
             ws = Wallets.query.get(form.source.data)            
             ws.balance -= float(form.amount.data)
@@ -111,9 +112,6 @@ def home():
             wi = Wallets.query.get(form.destination.data)
             wi.balance += float(form.amount.data)
             wi.transfers += float(form.amount.data)
-            # db.session.add(ws)
-            # db.session.add(wi)
-
         db.session.commit()
 
         flash("action recorded")
@@ -122,12 +120,6 @@ def home():
 
     return render_template("home.html", form=form, wallets=wallets)
 
-@app.route('/test')
-def test():
-    report = current_user.get_wallets_status()
-    report['history'] = current_user.get_history_json()
-    # return render_template('rep.html', report=report)
-    return report
 
 
 @app.route("/u/<username>/wallets", methods=["GET", "POST"])
@@ -198,6 +190,7 @@ def wallets(username, **kwargs):
         return redirect(url_for('wallets', username=current_user.username))
 
     form = AddWalletForm()
+    
     wallets = current_user.get_wallets_status()
 
     # load wallet group names to form
@@ -232,16 +225,16 @@ def wallets(username, **kwargs):
         db.session.commit()
         
         # add history entry
-        record = History()
-        record.user_id = current_user.id
-        record.ts_utc = ts_utc
-        record.local_time = user_local_time
-        record.action = "Added wallet"
+        record = History(
+            user_id=current_user.id,
+            ts_utc=ts_utc,
+            local_time=user_local_time,
+            action="Added wallet",
+            amount=form.amount.data)
         if new_wallet.group:
             record.description = str(new_wallet.group) + ": " + str(new_wallet.name)
         else:
             record.description = str(new_wallet.name)
-        record.amount = form.amount.data
         db.session.add(record)
         db.session.commit()
 
@@ -264,16 +257,18 @@ def wallets(username, **kwargs):
     return render_template('wallets.html', form=form, wallets=wallets, data=data)
 
 
+
 @app.route('/u/<username>/reports')
 @login_required
 @only_personal_data
 @check_if_report_due
 def reports(username):
-    if request.args.get('newrep') == "yes":
-        current_user.generate_report()
-        return redirect(url_for('reports', username=current_user.username))
+    # if request.args.get('newrep') == "yes":
+    #     current_user.generate_report()
+    #     return redirect(url_for('reports', username=current_user.username))
     reports = current_user.get_all_reports()
     return render_template('reports.html', reports=reports)
+
 
 
 @app.route("/u/<username>/history")
@@ -281,8 +276,10 @@ def reports(username):
 @only_personal_data
 @check_if_report_due
 def history(username):
-    # add pagination or continuous load - TODO
-    return render_template('history.html', history=current_user.get_history_json(), wallets=current_user.get_wallets_json())
+    history = current_user.get_history_json()
+    wallets = current_user.get_wallets_json()
+    return render_template('history.html', history=history, wallets=wallets)
+
 
 
 @app.route('/u/<username>', methods=['GET', 'POST'])
@@ -382,6 +379,9 @@ def account(username):
     return render_template('account.html', data=data)
 
 
+
+############### TESTING ###############
+
 # RESET DB - FOR TESTING ONLY
 @app.route('/resetdb')
 def resetdb():
@@ -391,3 +391,10 @@ def resetdb():
     f.close()
     db.create_all()
     return redirect('/')
+
+@app.route('/test')
+def test():
+    report = current_user.get_wallets_status()
+    report['history'] = current_user.get_history_json()
+    # return render_template('rep.html', report=report)
+    return report

@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
+
 from flask_login import UserMixin
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
-from trkfin import db, login, app
-
+from trkfin import app, db, login
 
 
 class Users(UserMixin, db.Model):
@@ -47,7 +47,7 @@ class Users(UserMixin, db.Model):
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
-    
+
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
@@ -135,10 +135,8 @@ class Users(UserMixin, db.Model):
     ###   CalcTime   ###
 
     def get_next_report_ts(self):
-        
         freq = self.report_frequency
         user_time = datetime.utcnow().timestamp() + self.tz_offset
-        
         if freq == "month":
             nextts = (datetime.fromtimestamp(user_time).replace(day=1) + timedelta(days=35))
             nextts = nextts.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -153,7 +151,6 @@ class Users(UserMixin, db.Model):
             nextts = d + timedelta(days=int(freq))
             nextts = nextts.replace(hour=0, minute=0, second=0, microsecond=0)
             nextts = nextts.timestamp() - self.tz_offset
-        
         return nextts
 
 
@@ -175,7 +172,7 @@ class Users(UserMixin, db.Model):
         data = self.get_wallets_status()
         data["history"] = self.get_history_json(start=new_rep.time_start, end=new_rep.time_end)
         new_rep.data = data
-        
+
         # reset users wallets
         wallets = self.get_wallets()
         for w in wallets:
@@ -194,24 +191,24 @@ class Users(UserMixin, db.Model):
         record.local_time = datetime.fromtimestamp(record.ts_utc + self.tz_offset).__str__()[:19]
         record.action = "Generated report"
 
+        # write to db
         db.session.add(new_rep)
         db.session.add(record)
         db.session.commit()
 
 
-    ###   Exports
+    ###   Exports   ###
 
     def get_export_data(self):
-        id = self.id
-        u = Users.query.get(id)
-        w = Wallets.query.filter(Wallets.user_id==id).all()
-        h = History.query.filter(History.user_id==id).all()
-        r = Reports.query.filter(Reports.user_id==id).all()
+        u = Users.query.get(self.id)
+        w = Wallets.query.filter(Wallets.user_id==self.id).all()
+        h = History.query.filter(History.user_id==self.id).all()
+        r = Reports.query.filter(Reports.user_id==self.id).all()
         data = {}
         data["user"] = u.export()
-        data["wallets"] = [i.export() for i in w]
-        data["history"] = [i.export() for i in h]
-        data["reports"] = [i.export() for i in r]
+        data["wallets"] = [item.export() for item in w]
+        data["history"] = [item.export() for item in h]
+        data["reports"] = [item.export() for item in r]
         return data
 
 
@@ -232,7 +229,6 @@ class Wallets(db.Model):
     spendings = db.Column(db.Float, nullable=False)
     transfers = db.Column(db.Float, nullable=False)
     balance = db.Column(db.Float, nullable=False)
-    # currency = db.Column(db.String(8)) - TODO
 
     def __init__(self, user_id, name, amount):
         self.user_id = user_id
