@@ -21,6 +21,7 @@ def index():
 
 @app.route("/home", methods=["GET", "POST"])
 @login_required
+@check_if_report_due
 def home():
 
     if current_user.walletcount < 1:
@@ -107,6 +108,15 @@ def test():
     return report
 
 
+# decorator for generating reports
+def check_if_report_due(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if datetime.utcnow().timestamp() >= current_user.next_report:
+            current_user.generate_report()
+        return func(*args, **kwargs)
+    return wrapper
+
 # decorator to restrict user to only their own data
 # not necessary, affects only page address (adress bar)
 def only_personal_data(func):
@@ -121,6 +131,7 @@ def only_personal_data(func):
 @app.route("/u/<username>/wallets", methods=["GET", "POST"])
 @login_required
 @only_personal_data
+@check_if_report_due
 def wallets(username, **kwargs):
 
     # wallet controls (kinda ugly)
@@ -208,9 +219,6 @@ def wallets(username, **kwargs):
         ts_user_local = ts_utc + float(form.tz_offset.data) # float
         user_local_time = datetime.fromtimestamp(ts_user_local).__str__()[:19]
 
-        if ts_utc >= current_user.next_report:
-            current_user.generate_report()
-        
         # record new wallet
         new_wallet = Wallets(current_user.id, form.name.data, form.amount.data)
         if form.group.data == '*New':
@@ -257,6 +265,7 @@ def wallets(username, **kwargs):
 @app.route('/u/<username>/reports')
 @login_required
 @only_personal_data
+@check_if_report_due
 def reports(username):
     if request.args.get('newrep') == "yes":
         current_user.generate_report()
@@ -268,6 +277,7 @@ def reports(username):
 @app.route("/u/<username>/history")
 @login_required
 @only_personal_data
+@check_if_report_due
 def history(username):
     # add pagination or continuous load - TODO
     return render_template('history.html', history=current_user.get_history_json(), wallets=current_user.get_wallets_json())
@@ -276,6 +286,7 @@ def history(username):
 @app.route('/u/<username>', methods=['GET', 'POST'])
 @login_required
 @only_personal_data
+@check_if_report_due
 def account(username):
 
     # kinda ugly
