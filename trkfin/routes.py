@@ -1,14 +1,36 @@
 from datetime import datetime
-from flask import flash, redirect, render_template, request, url_for, jsonify
+from flask import flash, redirect, render_template, request, url_for, jsonify, send_file
 from flask_login import current_user, login_user, logout_user, login_required
 from functools import wraps
 from werkzeug.urls import url_parse
+from zipfile import ZipFile
+from json import dumps
 
 from os import remove, path
 
 from trkfin import app, db
 from trkfin.models import Users, Wallets, History, Reports
 from trkfin.forms import MainForm, AddWalletForm
+
+
+# decorator for generating reports
+def check_if_report_due(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if datetime.utcnow().timestamp() >= current_user.next_report:
+            current_user.generate_report()
+        return func(*args, **kwargs)
+    return wrapper
+
+# decorator to restrict user to only their own data
+# not necessary, affects only page address (adress bar)
+def only_personal_data(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if kwargs['username'] is not current_user.username:
+            return redirect(url_for(func.__name__, username=current_user.username))
+        return func(*args, **kwargs)
+    return wrapper
 
 
 @app.route("/")
@@ -106,26 +128,6 @@ def test():
     report['history'] = current_user.get_history_json()
     # return render_template('rep.html', report=report)
     return report
-
-
-# decorator for generating reports
-def check_if_report_due(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        if datetime.utcnow().timestamp() >= current_user.next_report:
-            current_user.generate_report()
-        return func(*args, **kwargs)
-    return wrapper
-
-# decorator to restrict user to only their own data
-# not necessary, affects only page address (adress bar)
-def only_personal_data(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        if kwargs['username'] is not current_user.username:
-            return redirect(url_for(func.__name__, username=current_user.username))
-        return func(*args, **kwargs)
-    return wrapper
 
 
 @app.route("/u/<username>/wallets", methods=["GET", "POST"])
@@ -347,7 +349,12 @@ def account(username):
 
     if request.form.get("export-data"):
         flash('export requested')
-        return redirect(url_for('account', username=current_user.username))
+        data = current_user.get_export_data()
+        with ZipFile('trkfin/exports/export.zip', 'w') as zip:
+            with open('trkfin/exports/raw.json', 'w') as file:
+                file.write(dumps(data))
+            zip.write('trkfin/exports/raw.json', arcname="raw.json")
+        return send_file('exports/export.zip')
     
     if request.form.get("delete-account"):
         id = current_user.id
