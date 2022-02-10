@@ -76,7 +76,7 @@ def home():
 
         # calculate time
         ts_utc = datetime.utcnow().timestamp() # float
-        ts_user_local = ts_utc + float(form.tz_offset.data) # float
+        ts_user_local = ts_utc + current_user.tz_offset # float
         user_local_time = datetime.fromtimestamp(ts_user_local).__str__()[:19]
 
         # add history entry
@@ -211,7 +211,7 @@ def wallets(username, **kwargs):
         
         # calculate time
         ts_utc = datetime.utcnow().timestamp() # float
-        ts_user_local = ts_utc + float(form.tz_offset.data) # float
+        ts_user_local = ts_utc + current_user.tz_offset # float
         user_local_time = datetime.fromtimestamp(ts_user_local).__str__()[:19]
 
         # record new wallet
