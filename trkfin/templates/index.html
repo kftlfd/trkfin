@@ -1,17 +1,147 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
 
-{% block title %} | Welcome{% endblock %}
+<html lang="en">
 
-{% block main %}
+	<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, width=device-width">
+    <title>Welcome to TrkFin</title>
+    <!-- https://favicon.io/emoji-favicons/abacus/ -->
+    <link href="/static/favicon.png" rel="icon">
+    <link href="/static/landing.css" rel="stylesheet">
+    <script src="/static/landing.js" defer></script>
+  </head>
 
-  <h1>Welcome to TrkFin</h1>
+	<body>
 
-  <div>
-    <a href="{{ url_for('auth.login') }}"><button class="btn btn-primary">Log-In</button></a>
-  </div>
+		<nav class="navbar reveal" data-navbar>
 
-  <div>
-    <a href="{{ url_for('auth.register') }}"><button class="btn btn-primary">Sign-Up</button></a>
-  </div>
+      <!-- Navbar brand -->
+      <a class="nav-brand" href="#">TrkFin</a>
+      
+      <!-- Navbar toggler -->
+      <div class="nav-sidebar-toggle-open" data-nav-sidebar-toggle>
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
 
-{% endblock %}
+      <div class="navbar-sidebar-bg" data-nav-sidebar-bg data-nav-sidebar-toggle></div>
+      
+      <!-- Navbar links -->
+      <div class="nav-sidebar" data-nav-sidebar>
+        
+        <!-- close -->
+        <div class="nav-sidebar-toggle-close" data-nav-sidebar-toggle>
+          <span>&times;</span>
+        </div>
+        
+        <!-- left -->
+        <ul class="navbar-links">
+          <li>
+            <a class="nav-link" href="#features" data-nav-sidebar-toggle>Features</a>
+          </li>
+          <li>
+            <a class="nav-link" href="#about" data-nav-sidebar-toggle>About</a>
+          </li>
+          <li>
+            <a class="nav-link" href="#contact" data-nav-sidebar-toggle>Contact</a>
+          </li>
+        </ul>
+
+        <!-- right -->
+        <ul class="navbar-bttns">
+          <li>
+            <a class="bttn" href="{{ url_for('auth.login') }}">Log-In</a>
+          </li>
+          <li>
+            <a class="bttn" href="{{ url_for('auth.register') }}">Sign-Up</a>
+          </li>
+        </ul>
+
+      </div>
+
+    </nav>
+
+		{% if get_flashed_messages() %}
+    <div class="">
+      {% with messages = get_flashed_messages() %}                    
+        <ul>
+          {% for message in messages %}
+          <li>{{ message }}</li>
+          {% endfor %}
+        </ul>                    
+      {% endwith %}
+    </div>
+		{% endif %}
+
+    <main class="main reveal">
+      
+      <div class="section hero" name="hero">
+        <h1>TrkFin is an app to help you track your finances</h1>
+        <p>here is some more info as a subtitle</p><br>
+        <a href="#features" class="bttn">Features</a><br>
+        <a href="#" class="bttn">Sign Up</a><br>
+        <img src="https://picsum.photos/seed/1/300/200" alt="hero image">
+      </div>
+
+      <div class="section" name="features" id="features">
+        <h2>Features</h2>
+        <ul>
+          <li>free</li>
+          <li>fast</li>
+          <li>track unlimited number of things</li>
+          <li>generate reports</li>
+          <li>control your data</li>
+        </ul>
+        <img src="https://picsum.photos/seed/1/200" alt="features">
+      </div>
+
+      <div class="section" name="step-1">
+        <h2>Step 1</h2>
+        <p>add wallets</p>
+        <img src="https://picsum.photos/seed/1/200" alt="features">
+      </div>
+
+      <div class="section" name="step-2">
+        <h2>Step 2</h2>
+        <p>record your income, spendings, or transfers between wallets</p>
+        <img src="https://picsum.photos/seed/1/200" alt="features">
+      </div>
+
+      <div class="section" name="step-3">
+        <h2>Step 3</h2>
+        <p>get regular reports about your spending</p>
+        <img src="https://picsum.photos/seed/1/200" alt="features">
+      </div>
+
+      <div class="section" name="quote">
+        <p>it's super easy and convenient, very useful, much cool</p>
+        <p>- You, after signing up, probably</p>
+      </div>
+
+      <div class="section" name="sign-up">
+        <p>don't hesitate, sign up now!</p>
+        <a href="#">
+          <button class="">Sign Up</button>
+        </a>
+      </div>
+
+    </main>
+      
+    <footer class="">
+      
+      <div class="" name="about" id="about">
+        <h3>About</h3>
+        <p>it's a personal learning project, don't input any important data</p>
+      </div>
+
+      <div class="" name="contact" id="contact">
+        <p>source code at Github: ...</p>
+      </div>
+      
+    </footer>
+
+	</body>
+
+</html>
