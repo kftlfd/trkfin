@@ -13,7 +13,7 @@ app.config.from_object(Config)
 
 db = SQLAlchemy(app)
 login = LoginManager(app)
-login.login_view = 'login'
+login.login_view = 'auth.login'
 
 def num(value):
     return f'{value:,.2f}'
