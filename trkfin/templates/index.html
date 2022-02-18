@@ -14,12 +14,14 @@
 
 	<body>
 
-		<nav class="navbar reveal" data-navbar>
+		<nav class="navbar scroll reveal" data-navbar data-reveal>
 
-      <!-- Navbar brand -->
       <a class="nav-brand" href="#">TrkFin</a>
+
+      <div class="nav-sign-up">
+        <a class="bttn" href="{{ url_for('auth.register') }}">Sign-Up</a>
+      </div>
       
-      <!-- Navbar toggler -->
       <div class="nav-sidebar-toggle-open" data-nav-sidebar-toggle>
         <span class="bar"></span>
         <span class="bar"></span>
@@ -28,15 +30,12 @@
 
       <div class="navbar-sidebar-bg" data-nav-sidebar-bg data-nav-sidebar-toggle></div>
       
-      <!-- Navbar links -->
       <div class="nav-sidebar" data-nav-sidebar>
         
-        <!-- close -->
         <div class="nav-sidebar-toggle-close" data-nav-sidebar-toggle>
           <span>&times;</span>
         </div>
         
-        <!-- left -->
         <ul class="navbar-links">
           <li>
             <a class="nav-link" href="#features" data-nav-sidebar-toggle>Features</a>
@@ -49,10 +48,9 @@
           </li>
         </ul>
 
-        <!-- right -->
         <ul class="navbar-bttns">
           <li>
-            <a class="bttn" href="{{ url_for('auth.login') }}">Log-In</a>
+            <a class="bttn bttn-outline" href="{{ url_for('auth.login') }}">Log-In</a>
           </li>
           <li>
             <a class="bttn" href="{{ url_for('auth.register') }}">Sign-Up</a>
@@ -75,7 +73,7 @@
     </div>
 		{% endif %}
 
-    <main class="main reveal">
+    <main class="main reveal" data-reveal>
       
       <div class="section hero" name="hero">
         <h1>TrkFin is an app to help you track your finances</h1>
@@ -94,25 +92,25 @@
           <li>generate reports</li>
           <li>control your data</li>
         </ul>
-        <img src="https://picsum.photos/seed/1/200" alt="features">
+        <img src="static/tmp.jpg" alt="features">
       </div>
 
       <div class="section" name="step-1">
         <h2>Step 1</h2>
         <p>add wallets</p>
-        <img src="https://picsum.photos/seed/1/200" alt="features">
+        <img src="static/tmp.jpg" alt="features">
       </div>
 
       <div class="section" name="step-2">
         <h2>Step 2</h2>
         <p>record your income, spendings, or transfers between wallets</p>
-        <img src="https://picsum.photos/seed/1/200" alt="features">
+        <img src="static/tmp.jpg" alt="features">
       </div>
 
       <div class="section" name="step-3">
         <h2>Step 3</h2>
         <p>get regular reports about your spending</p>
-        <img src="https://picsum.photos/seed/1/200" alt="features">
+        <img src="static/tmp.jpg" alt="features">
       </div>
 
       <div class="section" name="quote">

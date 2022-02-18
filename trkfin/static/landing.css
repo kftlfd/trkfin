@@ -7,9 +7,13 @@
 :root {
   --navbar-bg: #f8f9fa;
   --navbar-bg-none: white;
+  --nav-sidebar-bg: hsla(0, 0%, 50%, 0.9);
   --border-color: #dee2e6;
   --nav-link: #707071;
   --nav-link-hover: rgba(0,0,0,0.7);
+  --animation-quick: 0.2s;
+  --animation-med: 0.6s;
+  --animation-slow: 1s;
 }
 
 html {
@@ -43,14 +47,21 @@ a.bttn {
 .bttn {
   display: inline-block;
   padding: 0.5em 1.5em;
-  border: none;
-  border-radius: 5px;
+  border: 2px solid lightgray;
+  border-radius: 10px;
   background: lightgray;
   color: black;
 }
+.bttn.bttn-outline {
+  background: none;
+}
 .bttn:hover {
   background: gray;
+  border: 2px solid gray;
   color: white;
+}
+.bttn.bttn-outline:hover {
+  background: gray;
 }
 
 
@@ -71,19 +82,16 @@ a.bttn {
   padding: 0 1rem;
 
   background: var(--navbar-bg-none);
-  border-bottom: 1px solid var(--navbar-bg-none);
-
-  transition:
-    0.6s background-color ease,
-    0.2s box-shadow ease,
-    0.2s border-bottom ease;
 }
 .navbar.scroll {
   background: var(--navbar-bg);
-  border-bottom: 1px solid var(--border-color);
-  box-shadow: 0 1px 1px var(--border-color);
+  box-shadow: 0 3px 2px var(--border-color);
+  transition:
+    background-color var(--animation-med) ease-out,
+    box-shadow var(--animation-quick) ease-out;
 }
 
+.nav-sign-up,
 .nav-sidebar-toggle-open,
 .nav-sidebar-toggle-close,
 .navbar-sidebar-bg {
@@ -158,16 +166,20 @@ a.bttn {
     width: 100vw;
     position: fixed;
     top: 0;
-    right: -100vw;
+    left: 0;
     z-index: 50;
   
-    background: hsla(0, 0%, 50%, 0.9);
+    background: var(--nav-sidebar-bg);
     opacity: 0;
-    transition: opacity 0.5s;
+    visibility: hidden;
+
+    transition:
+      opacity var(--animation-quick),
+      visibility var(--animation-quick);
   }
   .navbar-sidebar-bg.open {
     opacity: 1;
-    transform: translate(-100vw);
+    visibility: visible;
   }
 
   .nav-sidebar {
@@ -182,11 +194,11 @@ a.bttn {
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
-    gap: 1rem;
-    padding: 0 1rem 1rem;
+    gap: 3rem;
+    padding: 0 0 1rem;
     
     background: var(--navbar-bg);
-    transition: transform ease 0.3s;
+    transition: transform var(--animation-quick) ease;
   }
   .nav-sidebar.open {
     transform: translate(-100vw);
@@ -194,6 +206,7 @@ a.bttn {
 
   .nav-sidebar-toggle-close {
     align-self: flex-end;
+    margin-right: 1rem;
     
     display: flex;
     height: 3rem;
@@ -209,16 +222,22 @@ a.bttn {
   .nav-sidebar ul {
     flex-direction: column;
     align-items: stretch;
+    gap: 3rem;
   }
 
   .navbar-links {
     flex-grow: 1;
+  }
+  .nav-sidebar ul.navbar-bttns {
+    padding: 0 1rem;
+    gap: 1rem;
   }
   
   .nav-link {
     display: inline-block;
     width: 100%;
     padding: 1rem;
+    padding-right: 2rem;
     text-align: right;
     
     color: var(--nav-link);
@@ -234,25 +253,42 @@ a.bttn {
   }
 }
 
+@media screen and (min-width: 400px) and (max-width: 640px) {
+  .nav-sign-up {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  .nav-sign-up .bttn {
+    display: inline-block;
+    padding: 0.2rem 1rem;
+    
+  }
+}
+
 
 
 /*****   REVEALS   *****/
 
 .navbar.reveal {
   opacity: 0;
-  transition: 1s opacity ease-in;
-}
-.reveal {
-  opacity: 0;
-  transform: translateY(150px);
   transition:
-    1s transform ease,
-    1s opacity ease-in;
+    opacity var(--animation-med) ease-in,
+    background-color var(--animation-med) ease-out,
+    box-shadow var(--animation-quick) ease-out;
 }
 .navbar.reveal-done {
   opacity: 1;
 }
-.reveal-done {
+.main.reveal {
+  opacity: 0;
+  transform: translateY(150px);
+  transition:
+    opacity var(--animation-slow) ease,
+    transform var(--animation-slow) ease;
+}
+.main.reveal-done {
   opacity: 1;
   transform: translateY(0);
 }
