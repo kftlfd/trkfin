@@ -4,8 +4,33 @@
 
 {% block main %}
 <div>
+  {% for report in reports %}
+  <div name='rep-{{ report.id}}' style='border: 1px solid gray;'>
+    
+    <button class='btn btn-secondary' style='width: 100%;' data-bs-toggle='collapse' data-bs-target='#rep-{{ report.id }}'>
+      Show Report {{ report.id }}
+    </button>
+    
+    <div id='rep-{{ report.id }}' class='collapse'>
+      <p>{{ report.data['wallets'] }}</p>
+      <p>{{ report.data['groups'] }}</p>
+      <p>{{ report.data['sums'] }}</p>
+      <p>{{ report.data['history'] }}</p>
+    </div>
+
+  </div>
+  {% endfor %}
+</div>
+
+<div>
+  <a href="{{ url_for('reports', username=current_user.username, newrep='yes') }}"">
+    <button class='btn btn-outline-primary'>Create new report</button>
+  </a>
+</div>
+
+<div>
   <button id='nrbtn' class='btn btn-outline-primary'>
-    New report
+    New report AJAX
   </button>
 </div>
 
