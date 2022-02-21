@@ -77,6 +77,7 @@ class Users(UserMixin, db.Model):
         report = {
             "wallets": {},
             "groups": {},
+            "groupsize": {},
             "sums": {}
         }
         for w in wallets:
@@ -87,6 +88,7 @@ class Users(UserMixin, db.Model):
             }
             if w.group not in report["groups"]:
                 report["groups"][w.group] = {}
+                report["groupsize"][w.group] = 0
                 report["sums"][w.group] = {
                     "initial_sum": 0,
                     "income_sum": 0,
@@ -101,6 +103,7 @@ class Users(UserMixin, db.Model):
                 "transfers": w.transfers,
                 "balance": w.balance
             }
+            report["groupsize"][w.group] += 1
             report["sums"][w.group]["initial_sum"] += w.initial
             report["sums"][w.group]["income_sum"] += w.income
             report["sums"][w.group]["spendings_sum"] += w.spendings

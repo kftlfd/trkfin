@@ -22,10 +22,12 @@
         <td>{{ wallets['groups'][group][w_id]['balance'] | num }}</td>
       </tr>
       {% endfor %}
+      {% if wallets['groupsize'][group] > 1 %}
       <tr>
         <th>sum:</th>
         <th>{{ wallets['sums'][group]['balance_sum'] | num }}</th>
       </tr>
+      {% endif %}
     </table>
     {% endfor %}
   </div>
@@ -41,10 +43,12 @@
         <td>{{ wallets['groups'][group][w_id]['initial'] | num }}</td> 
       </tr>
       {% endfor %}
+      {% if wallets['groupsize'][group] > 1 %}
       <tr>
         <th>sum:</th>
         <th>{{ wallets['sums'][group]['initial_sum'] | num }}</th>
       </tr>
+      {% endif %}
     </table>
     {% endfor %}
   </div>
@@ -60,10 +64,12 @@
         <td>{{ wallets['groups'][group][w_id]['income'] | num }}</td>
       </tr>
       {% endfor %}
+      {% if wallets['groupsize'][group] > 1 %}
       <tr>
         <th>sum:</th>
         <th>{{ wallets['sums'][group]['income_sum'] | num }}</th>
       </tr>
+      {% endif %}
     </table>
     {% endfor %}
   </div>
@@ -79,10 +85,12 @@
         <td>{{ wallets['groups'][group][w_id]['spendings'] | num}}</td>
       </tr>
       {% endfor %}
+      {% if wallets['groupsize'][group] > 1 %}
       <tr>
         <th>sum:</th>
         <th>{{ wallets['sums'][group]['spendings_sum'] | num }}</th>
       </tr>
+      {% endif %}
     </table>
     {% endfor %}
   </div>
