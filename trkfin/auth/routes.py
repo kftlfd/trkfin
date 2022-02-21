@@ -60,12 +60,12 @@ def login():
         user = Users.query.filter_by(username=form.username.data).first()        
         if user is None:
             flash('username not found')
-            return redirect(url_for('login'))
+            return redirect(url_for('auth.login'))
         
         # check password
         if not user.check_password(form.password.data):
             flash('wrong password')
-            return redirect((url_for('login')))
+            return redirect((url_for('auth.login')))
 
         # log user in
         login_user(user, remember=form.remember_me.data)

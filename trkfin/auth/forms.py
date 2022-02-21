@@ -8,9 +8,9 @@ from trkfin.models import Users
 
 class RegistrationForm(FlaskForm):
     tz_offset = HiddenField('timezone offset')
-    username = StringField('Username', validators=[DataRequired()])    
-    password = PasswordField('Password', validators=[DataRequired()])    
-    confirm = PasswordField('Repeat password', validators=[DataRequired(), EqualTo('password', message="must match")])    
+    username = StringField('Username', validators=[DataRequired()], render_kw={'placeholder': 'Username'})
+    password = PasswordField('Password', validators=[DataRequired()], render_kw={'placeholder': 'Password'})
+    confirm = PasswordField('Repeat password', validators=[DataRequired(), EqualTo('password', message="must match")], render_kw={'placeholder': 'Repeat Password'})
     submit = SubmitField('Sign Up')
 
     def validate_username(self, username):
@@ -20,8 +20,8 @@ class RegistrationForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
+    username = StringField('Username', validators=[DataRequired()], render_kw={'placeholder': 'Username'})
     email = StringField('E-Mail', validators=[Optional()])    
-    password = PasswordField('Password', validators=[DataRequired()])    
+    password = PasswordField('Password', validators=[DataRequired()], render_kw={'placeholder': 'Password'})
     remember_me = BooleanField('Remember Me')    
     submit = SubmitField('Sign In')

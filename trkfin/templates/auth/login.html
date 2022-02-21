@@ -19,7 +19,7 @@
     <div class="form">
           
       <div class="form-vert">
-        {{ form.username.label(class_="form-label") }}<br>
+        <!-- {{ form.username.label(class_="form-label") }}<br> -->
         {{ form.username(class_="form-control") }}
         {% for error in form.username.errors %}
           <span style="color: red;">[{{ error }}]</span>
@@ -27,7 +27,7 @@
       </div>
       
       <div class="form-vert">
-        {{ form.password.label(class_="form-label") }}<br>
+        <!-- {{ form.password.label(class_="form-label") }}<br> -->
         {{ form.password(class_="form-control") }}
         {% for error in form.password.errors %}
           <span style="color: red;">[{{ error }}]</span>
