@@ -5,82 +5,70 @@
 	<head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, width=device-width">
-    <title>Welcome to TrkFin</title>
+    <title>TrkFin | Welcome!</title>
     <!-- https://favicon.io/emoji-favicons/abacus/ -->
     <link href="/static/favicon.png" rel="icon">
-    <link href="/static/landing.css" rel="stylesheet">
+    <link href="/static/styles.css" rel="stylesheet">
     <script src="/static/landing.js" defer></script>
+    <script src="/static/scripts.js" defer></script>
   </head>
 
-	<body>
+	<body class="hide">
 
-		<nav class="navbar scroll reveal" data-navbar data-reveal>
+    <script>let fixFOUC;</script>
 
+		<nav class="navbar" data-navbar>
       <a class="nav-brand" href="#">TrkFin</a>
-
       <div class="nav-sign-up">
         <a class="bttn" href="{{ url_for('auth.register') }}">Sign-Up</a>
       </div>
-      
       <div class="nav-sidebar-toggle-open" data-nav-sidebar-toggle>
         <span class="bar"></span>
         <span class="bar"></span>
         <span class="bar"></span>
       </div>
-
-      <div class="navbar-sidebar-bg" data-nav-sidebar-bg data-nav-sidebar-toggle></div>
-      
+      <div class="nav-sidebar-bg" data-nav-sidebar-bg data-nav-sidebar-toggle></div>
       <div class="nav-sidebar" data-nav-sidebar>
-        
         <div class="nav-sidebar-toggle-close" data-nav-sidebar-toggle>
           <span>&times;</span>
         </div>
-        
-        <ul class="navbar-links">
-          <li>
-            <a class="nav-link" href="#features" data-nav-sidebar-toggle>Features</a>
-          </li>
-          <li>
-            <a class="nav-link" href="#about" data-nav-sidebar-toggle>About</a>
-          </li>
-          <li>
-            <a class="nav-link" href="#contact" data-nav-sidebar-toggle>Contact</a>
-          </li>
+        <ul class="nav-links">
+          <li><a class="nav-link" href="#features" data-nav-sidebar-toggle>Features</a></li>
+          <li><a class="nav-link" href="#about" data-nav-sidebar-toggle>About</a></li>
+          <li><a class="nav-link" href="#contact" data-nav-sidebar-toggle>Contact</a></li>
         </ul>
-
-        <ul class="navbar-bttns">
-          <li>
-            <a class="bttn bttn-outline" href="{{ url_for('auth.login') }}">Log-In</a>
-          </li>
-          <li>
-            <a class="bttn" href="{{ url_for('auth.register') }}">Sign-Up</a>
-          </li>
+        <ul class="nav-bttns">
+          <li><a class="bttn bttn-outline" href="{{ url_for('auth.login') }}">Log-In</a></li>
+          <li><a class="bttn" href="{{ url_for('auth.register') }}">Sign-Up</a></li>
         </ul>
-
       </div>
-
     </nav>
 
 		{% if get_flashed_messages() %}
-    <div class="">
-      {% with messages = get_flashed_messages() %}                    
+    <div name="alert" class="alert" data-alert>
+      <div class="alert-content">
         <ul>
+          {% with messages = get_flashed_messages() %}                    
           {% for message in messages %}
           <li>{{ message }}</li>
           {% endfor %}
+          {% endwith %}
         </ul>                    
-      {% endwith %}
+        <div class="alert-close" data-alert-close>&times;</div>
+      </div>
     </div>
 		{% endif %}
 
-    <main class="main reveal" data-reveal>
+    <main class="main">
       
-      <div class="section hero" name="hero">
+      <div class="section slide-reveal hero" name="hero">
         <h1>TrkFin is an app to help you track your finances</h1>
         <p>here is some more info as a subtitle</p><br>
         <a href="#features" class="bttn">Features</a><br>
         <a href="#" class="bttn">Sign Up</a><br>
-        <img src="https://picsum.photos/seed/1/300/200" alt="hero image">
+        <div class="img-placeholder">
+          <img src="https://picsum.photos/seed/1/300/200" alt="hero image">
+        </div>
       </div>
 
       <div class="section" name="features" id="features">
@@ -92,25 +80,33 @@
           <li>generate reports</li>
           <li>control your data</li>
         </ul>
-        <img src="static/tmp.jpg" alt="features">
+        <div class="img-placeholder">
+          <img src="static/tmp.jpg" alt="features">
+        </div>
       </div>
 
-      <div class="section" name="step-1">
+      <div class="section slide-reveal" name="step-1">
         <h2>Step 1</h2>
         <p>add wallets</p>
-        <img src="static/tmp.jpg" alt="features">
+        <div class="img-placeholder">
+          <img src="static/tmp.jpg" alt="step 1">
+        </div>
       </div>
 
-      <div class="section" name="step-2">
+      <div class="section slide-reveal" name="step-2">
         <h2>Step 2</h2>
         <p>record your income, spendings, or transfers between wallets</p>
-        <img src="static/tmp.jpg" alt="features">
+        <div class="img-placeholder">
+          <img src="static/tmp.jpg" alt="step 2">
+        </div>
       </div>
 
-      <div class="section" name="step-3">
+      <div class="section slide-reveal" name="step-3">
         <h2>Step 3</h2>
         <p>get regular reports about your spending</p>
-        <img src="static/tmp.jpg" alt="features">
+        <div class="img-placeholder">
+          <img src="static/tmp.jpg" alt="step 3">
+        </div> 
       </div>
 
       <div class="section" name="quote">
@@ -120,21 +116,19 @@
 
       <div class="section" name="sign-up">
         <p>don't hesitate, sign up now!</p>
-        <a href="#">
-          <button class="">Sign Up</button>
-        </a>
+        <a href="#" class="bttn">Sign Up</a>
       </div>
 
     </main>
       
-    <footer class="">
+    <footer class="footer">
       
-      <div class="" name="about" id="about">
+      <div class="section" name="about" id="about">
         <h3>About</h3>
         <p>it's a personal learning project, don't input any important data</p>
       </div>
 
-      <div class="" name="contact" id="contact">
+      <div class="section" name="contact" id="contact">
         <p>source code at Github: ...</p>
       </div>
       

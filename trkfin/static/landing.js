@@ -1,31 +1,18 @@
-const navbar = document.querySelector("[data-navbar]");
-const navSidebar = document.querySelector("[data-nav-sidebar]")
-const navSidebarBg = document.querySelector("[data-nav-sidebar-bg]")
-
-// reveals (only if page is not scrolled down)
-let toReveal = document.querySelectorAll("[data-reveal]");
-let body = document.querySelector('body')
-if (body.getBoundingClientRect().y >= 0) {
-  toReveal.forEach(x => x.classList.add("reveal-done"));
-} else {
-  toReveal.forEach(x => x.classList.remove("reveal"));
-}
-
-// navbar open-close
-function toggleNavSidebar() {
-  navSidebar.classList.toggle('open');
-  navSidebarBg.classList.toggle('open');
-}
-let toggles = document.querySelectorAll("[data-nav-sidebar-toggle]")
-toggles.forEach(x => x.addEventListener("click", toggleNavSidebar));
-
-// navbar change style on scroll
-function navbarScroll() {
-  if (window.scrollY === 0) {
-    navbar.classList.remove('scroll')
-  } else {
-    navbar.classList.add('scroll')
+// reveal (only if page is not scrolled down)
+const body = document.querySelector('body');
+let slideSections = document.querySelectorAll(".slide-reveal");
+if (body.getBoundingClientRect().y == 0) {
+  body.classList.add("reveal");
+  function slideReveal() {
+    slideSections.forEach(x => {
+      if (x.getBoundingClientRect().y < window.screen.height * 0.95) {
+        x.classList.add("done")
+      }
+    });
   }
+  slideReveal()
+  window.addEventListener("scroll", slideReveal);
+} else {
+  slideSections.forEach(x => x.classList.remove("slide-reveal"));
 }
-navbarScroll()
-window.addEventListener("scroll", navbarScroll);
+body.classList.remove("hide");
