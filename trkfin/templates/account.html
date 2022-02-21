@@ -20,7 +20,7 @@
   <h3>change username</h3>
   <div>current username: {{ data['username'] }}</div>
   <form name="username" action="{{ url_for('account', username=current_user.username) }}" method="POST">
-    <input name="new-username" type="text" value="" placeholder="New username">
+    <input name="new-username" type="text" value="" placeholder="New username" pattern="[\w\d-_]{1,64}" title="letters, numbers, '-', '_'">
     <input type="submit" value="Change">
   </form>
 </div>
