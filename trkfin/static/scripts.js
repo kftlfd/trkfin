@@ -9,19 +9,6 @@ let toggles = document.querySelectorAll("[data-nav-sidebar-toggle]")
 toggles.forEach(x => x.addEventListener("click", toggleNavSidebar));
 
 
-// navbar change style on scroll
-const navbar = document.querySelector("[data-navbar]");
-function navbarScroll() {
-  if (window.scrollY != 0) {
-    navbar.classList.add('scroll')
-  } else {
-    navbar.classList.remove('scroll')
-  }
-}
-navbarScroll()
-window.addEventListener("scroll", navbarScroll);
-
-
 // show and hide alert
 const alert = document.querySelector("[data-alert]")
 if (alert) {
