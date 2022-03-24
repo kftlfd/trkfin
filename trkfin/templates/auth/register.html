@@ -1,25 +1,27 @@
 {% extends "base.html" %}
 
-
 {% block title %}
 	| Sign-Up
 {% endblock %}
 
+{% block head %}
+<link href="/static/auth.css" rel="stylesheet">
+{% endblock %}
 
 {% block main %}
 
-<div>
+<div class="section">
 
-  <h3>Sign-Up</h3>
+  <form class="form-wrap" name="registerform" action="" method="POST" novalidate>
 
-  <form name="registerform" action="" method="POST" novalidate>
-
+    <h3>Sign-Up</h3>
+    
     {{ form.hidden_tag() }}
 
-    <div class="form">
+    <div class="form auth">
           
       <div class="form-vert">
-        {{ form.username.label(class_="form-label") }}
+        <!-- {{ form.username.label(class_="form-label") }} -->
         {{ form.username(class_="form-control") }}
         {% for error in form.username.errors %}
           <span style="color: red;">[{{ error }}]</span>
@@ -27,7 +29,7 @@
       </div>
           
       <div class="form-vert">
-        {{ form.password.label(class_="form-label") }}
+        <!-- {{ form.password.label(class_="form-label") }} -->
         {{ form.password(class_="form-control") }}
         {% for error in form.password.errors %}
           <span style="color: red;">[{{ error }}]</span>
@@ -35,7 +37,7 @@
       </div>
           
       <div class="form-vert">
-        {{ form.confirm.label(class_="form-label") }}
+        <!-- {{ form.confirm.label(class_="form-label") }} -->
         {{ form.confirm(class_="form-control") }}
         {% for error in form.confirm.errors %}
           <span style="color: red;">[{{ error }}]</span>
@@ -45,11 +47,16 @@
       <div class="form-vert">
         {{ form.submit(class_="btn btn-primary") }}
       </div>
-    
+
     </div>
 
   </form>
 
 </div>
+
+<script>
+  let d = new Date();
+  document.querySelector("#tz_offset").value = d.getTimezoneOffset() * (-60)
+</script>
 
 {% endblock %}
