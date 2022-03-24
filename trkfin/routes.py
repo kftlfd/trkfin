@@ -2,6 +2,7 @@ from datetime import datetime
 from functools import wraps
 from json import dumps
 from os import path, remove
+from shutil import rmtree
 from zipfile import ZipFile
 
 from flask import flash, redirect, render_template, request, send_file, url_for
@@ -377,6 +378,12 @@ def account(username):
     }
 
     return render_template('account.html', data=data)
+
+@app.after_request
+def delete_user_export(response):
+    if request.endpoint == "account" and request.form.get("export-data"):
+        rmtree("trkfin/exports/")
+    return response
 
 
 
