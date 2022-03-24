@@ -2,7 +2,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField, SelectField, HiddenField, RadioField
 from wtforms.validators import ValidationError, DataRequired, Optional, EqualTo
-from wtforms.widgets.html5 import NumberInput
+from wtforms.widgets import NumberInput
 
 from trkfin.models import Users, Wallets
 
