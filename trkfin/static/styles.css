@@ -23,7 +23,7 @@ body {
 
   margin: 3rem 0 0;
   padding: 0;
-  min-height: 100vh;
+  min-height: calc(100vh - 3rem);
   width: 100%;
 
   display: flex;
@@ -48,7 +48,11 @@ body {
 
 
 
-/*****   BUTTONS   *****/
+/*************************************************************************
+ 
+      BUTTONS
+ 
+*************************************************************************/
 
 a.bttn {
   text-decoration: none;
@@ -56,8 +60,8 @@ a.bttn {
 .bttn {
   display: inline-block;
   padding: 0.5em 1.5em;
-  border: 2px solid lightgray;
-  border-radius: 10px;
+  border: 1px solid lightgray;
+  border-radius: 5px;
   background: lightgray;
   color: black;
 }
@@ -66,13 +70,17 @@ a.bttn {
 }
 .bttn:hover {
   background: gray;
-  border: 2px solid gray;
+  border: 1px solid gray;
   color: white;
 }
 
 
 
-/*****   NAVBAR   *****/
+/*************************************************************************
+ 
+      NAVBAR
+ 
+*************************************************************************/
 
 .navbar {
   position: fixed;
@@ -87,7 +95,7 @@ a.bttn {
   flex-wrap: nowrap;
   padding: 0 1rem;
 
-  background: var(--navbar-bg);
+  background: var(--navbar-bg-none);
   box-shadow: 0 3px 2px var(--border-color);
   transition:
     background-color var(--animation-med) ease-out,
@@ -107,6 +115,7 @@ a.bttn {
 
 .navbar a {
   text-decoration: none;
+  color: black;
 }
 .nav-links a {
   color: var(--nav-link);
@@ -122,6 +131,9 @@ a.bttn {
   font-weight: 700;
   color: black;
   padding-right: 1rem;
+}
+.nav-brand:hover {
+  color: rgb(48, 48, 48);
 }
 
 .nav-sidebar {
@@ -290,7 +302,11 @@ a.bttn {
 
 
 
-/*****   REVEALS   *****/
+/*************************************************************************
+
+      REVEALS
+
+*************************************************************************/
 
 .hide {
   opacity: 0;
@@ -313,7 +329,12 @@ a.bttn {
 
 
 
-/*****   ALERT   *****/
+/*************************************************************************
+
+      ALERTS
+
+*************************************************************************/
+
 .alert {
   position: fixed;
   top: 0;
@@ -339,11 +360,12 @@ a.bttn {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-width: 30rem;
   padding: 0.5rem 0 0.5rem 1.5rem;
   gap: 1rem;
 
   background: var(--alert-bg);
-  border-radius: 10px;
+  border-radius: 5px;
 }
 
 .alert ul {
@@ -366,13 +388,18 @@ a.bttn {
 
 @media screen and (max-width: 640px) {
   .alert-content {
+    min-width: 1rem;
     width: 100%;
   }
 }
 
 
 
-/*****   SECTIONS   *****/
+/*************************************************************************
+
+      SECTIONS
+
+*************************************************************************/
 
 .section {
   width: 100%;
@@ -390,5 +417,139 @@ a.bttn {
   }
   .section {
     padding: 1rem calc((100vw - 900px)/2  + 1rem);
+  }
+}
+
+
+
+/*************************************************************************
+
+      FORMS
+
+*************************************************************************/
+
+.form, .form-vert, .form-horiz {
+  display: flex;
+  /* width: 100%; */
+}
+.form, .form-vert {
+  flex-direction: column;
+}
+.form-horiz {
+  flex-direction: row;
+}
+.form {
+  gap: 5px;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #f8f9fa;
+}  
+.form-horiz + .form-horiz, .form-horiz + .form-vert {
+  margin-top: 5px;
+}
+input + input, .input-group + input {
+  margin-left: 5px;
+}
+label>label {
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+
+
+
+/*************************************************************************
+
+      DROPDOWN
+
+*************************************************************************/
+
+.drpdwn~.nav-bttns {
+  display: none;
+}
+
+.nav-sidebar .no-display {
+  display: none;
+}
+
+.nav-links {
+  z-index: 50;
+}
+.drpdwn {
+  padding-left: 1rem;
+  flex-grow: 1;
+  flex-basis: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 40;
+}
+.drpdwn::before {
+  content: "";
+  display: block;
+  width: 12rem;
+  height: 3rem;
+  background: var(--navbar-bg-none);
+  position: absolute;
+  top: 0;
+  right: -1rem;
+  z-index: 30;
+}
+.drpdwn-close {
+  content: "";
+  display: block;
+  visibility: hidden;
+  height: 100vh;
+  width: 100vw;
+  position: absolute;
+  top: 0;
+  right: -1rem;
+  z-index: 15;
+  opacity: 0;
+}
+.drpdwn .bttn {
+  cursor: pointer;
+  max-width: fit-content;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 50;
+  user-select: none;
+}
+.drpdwn-menu {
+  background: var(--navbar-bg-none);
+  text-align: center;
+  display: block;
+  width: 10rem;
+  position: absolute;
+  top: 3rem;
+  right: 0;
+  z-index: 20;
+
+  box-shadow: 0 0 2px 3px var(--border-color);
+
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.border-rad {
+  border-radius: 0 0 10px 10px;
+}
+.drpdwn-item {
+  display: block;
+  padding: 1rem 1rem;
+  /* margin: 0.5rem; */
+}
+.drpdwn-item:hover {
+  background: lightgray;
+}
+
+@media screen and (max-width: 640px) {
+  .drpdwn~.nav-bttns {
+    display: flex;
+  }
+  .drpdwn {
+    display: none;
   }
 }
