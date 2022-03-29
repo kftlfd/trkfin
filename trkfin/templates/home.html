@@ -4,113 +4,226 @@
 
 {% block main %}
 
-<div name='form'>
-  {% include "forms/mainform.html" %}
+<style>
+  .main {
+    gap: 0;
+  }
+.group-title {
+  cursor: pointer;
+}
+.group-name {
+  height: 2.5rem;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  border-radius: 3px;
+  margin-bottom: 3px;
+  padding: 0.5rem;
+}
+.group-unnamed {
+  color: #888;
+}
+.group-border {
+  border-bottom: 1px solid #555;
+}
+.wallet {
+  border-top: 1px solid white;
+}
+.wallet + .wallet {
+  border-color: #aaa;
+}
+.wallet-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  height: 2rem;
+  border-radius: 3px;
+  margin: 3px;
+  padding: 0.5rem;
+}
+.wallet-info {
+  font-size: 0.9rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 0.5rem;
+  justify-content: end;
+  padding-left: 40%;
+  margin-bottom: 1.5rem;
+  margin-right: 3px;
+  padding-right: 0.5rem;
+}
+.wallet-amount {
+  text-align: right;
+}
+.wallet-amount.income {
+  color: green;
+}
+.wallet-amount.income::before {
+  content: "+";
+}
+.wallet-amount.spending {
+  color: red;
+}
+.wallet-total {
+  border-top: 1px solid #aaa;
+}
+.group-name:hover,
+.wallet-title:hover {
+  background-color: #eee;
+}
+.group-name.active,
+.wallet-title.active {
+  background-color: #ddd;
+}
+</style>
+
+<div class="section" name="padding-top"></div>
+
+<div class="section" name='form'>
+
+  <form name="mainform" action="" method="POST">
+
+    {{ form.hidden_tag() }}
+  
+    <div class="form">
+  
+      <div class="form-horiz btn-group" role="group" aria-label="Select action">
+        {% for subfield in form.action %}
+          {{ subfield(class_="btn-check") }}
+          {{ subfield.label(class_="btn btn-secondary shadow-none") }}
+        {% endfor %}
+      </div>
+      
+      <div class="form-horiz">
+  
+        <span id="mainform-source" class="input-group">
+          {{ form.source.label(class_="input-group-text") }}
+          {{ form.source(class_="form-control") }}
+        </span>
+  
+        <span id="mainform-destination" class="input-group">
+          {{ form.destination.label(class_="input-group-text") }}
+          {{ form.destination(class_="form-control") }}
+        </span>
+      
+      </div>
+  
+      <div class="form-horiz">
+        {{ form.amount(class_="form-control") }}
+        {{ form.description(class_="form-control") }}
+        {{ form.submit(class_="btn btn-secondary") }}
+      </div>
+  
+    </div>
+  
+    <div>
+      {% for error in form.hidden_tag.errors %}
+        hidden: <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+      {% for error in form.source.errors %}
+        source: <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+      {% for error in form.destination.errors %}
+        dest: <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+      {% for error in form.amount.errors %}
+        amount: <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+      {% for error in form.description.errors %}
+        descr: <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+    </div>
+      
+  </form>
+  
+  <script>
+  
+    // show/hide form fields
+    document.forms['mainform'].addEventListener('click', function() {
+      let select = document.forms['mainform'].action;
+      if (select.value == 'Spending') {
+        document.querySelector('#mainform-source').hidden = false;
+        document.querySelector('#mainform-source').style.marginRight = '0';
+        document.querySelector('#mainform-destination').hidden = true;
+      }
+      else if (select.value == 'Income') {
+        document.querySelector('#mainform-source').hidden = true;
+        document.querySelector('#mainform-source').style.marginRight = '0';
+        document.querySelector('#mainform-destination').hidden = false;
+      }
+      else { // 'transfer'
+        document.querySelector('#mainform-source').hidden = false;
+        document.querySelector('#mainform-source').style.marginRight = '5px';
+        document.querySelector('#mainform-destination').hidden = false;
+      }
+    });
+  
+    // select 'spending' as default
+    document.forms['mainform'].action.item(0).click();
+  
+  </script>
+  
 </div>
 
 {% if wallets %}
-<div name='wallets'>
-
-  <div name='balance' class='report'>
-    <h6>Balance</h6>
-    {% for group in wallets['groups'] %}
-    <table class='report-tb'>
-      <caption>{{ group or ' ' }}</caption>
-      {% for w_id in wallets['groups'][group] %}
-      <tr>
-        <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
-        <td>{{ wallets['groups'][group][w_id]['balance'] | num }}</td>
-      </tr>
-      {% endfor %}
-      {% if wallets['groupsize'][group] > 1 %}
-      <tr>
-        <th>sum:</th>
-        <th>{{ wallets['sums'][group]['balance_sum'] | num }}</th>
-      </tr>
-      {% endif %}
-    </table>
-    {% endfor %}
+{% for group in wallets['groups'] %}
+<div class="section">
+  <div class="group">
+    <div class="group-title" data-bs-toggle="collapse" data-bs-target="#group-{{ group }}" aria-expanded="false" aria-controls="group-{{ group }}">
+      {% if group == "" %}<div class="group-name group-unnamed" data-wallet-title>Ungroupped</div>
+      {% else %}<div class="group-name" data-wallet-title>{{ group }}</div>{% endif %}
+    </div>
+    {% if wallets['groupsize'][group] > 1 %}
+    <div class="collapse" id="group-{{ group }}">
+      <div class="wallet-info">
+        <div>Initial</div>
+        <div class="wallet-amount">{{ wallets['sums'][group]['initial_sum'] | num }}</div>
+        <div>Income</div>
+        <div class="wallet-amount income">{{ wallets['sums'][group]['income_sum'] | num }}</div>
+        <div>Spending</div>
+        <div class="wallet-amount spending">{{ wallets['sums'][group]['spendings_sum'] | num }}</div>
+        <div class="wallet-total">Total</div>
+        <div class="wallet-amount wallet-total">{{ wallets['sums'][group]['balance_sum'] | num }}</div>
+      </div>
+    </div>
+    {% endif %}
   </div>
-
-  <div name='initial' class='report'>
-    <h6>Initial</h6>
-    {% for group in wallets['groups'] %}
-    <table class='report-tb'>
-      <caption>{{ group or ' ' }}</caption>
-      {% for w_id in wallets['groups'][group] %}
-      <tr>
-        <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
-        <td>{{ wallets['groups'][group][w_id]['initial'] | num }}</td> 
-      </tr>
-      {% endfor %}
-      {% if wallets['groupsize'][group] > 1 %}
-      <tr>
-        <th>sum:</th>
-        <th>{{ wallets['sums'][group]['initial_sum'] | num }}</th>
-      </tr>
-      {% endif %}
-    </table>
-    {% endfor %}
+  <div class="group-border"></div>
+  {% for w_id in wallets['groups'][group] %}
+  <div class="wallet">
+    <div class="wallet-title" data-bs-toggle="collapse" data-bs-target="#wallet-body-{{ w_id }}" aria-expanded="false" aria-controls="wallet-body-{{ w_id }}"  data-wallet-title>
+      <div>{{ wallets['groups'][group][w_id]['name'] }}</div>
+      <div>{{ wallets['groups'][group][w_id]['balance'] | num }}</div>
+    </div>
+    <div class="collapse" id="wallet-body-{{ w_id }}">
+      <div class="wallet-info">
+        <div>Initial</div>
+        <div class="wallet-amount">{{ wallets['groups'][group][w_id]['initial'] | num }}</div>
+        <div>Income</div>
+        <div class="wallet-amount income">{{ wallets['groups'][group][w_id]['income'] | num }}</div>
+        <div>Spending</div>
+        <div class="wallet-amount spending">{{ wallets['groups'][group][w_id]['spendings'] | num}}</div>
+        <div>Transfers</div>
+        <div class="wallet-amount">{{ wallets['groups'][group][w_id]['transfers'] | num }}</div>
+        <div class="wallet-total">Balance</div>
+        <div class="wallet-amount wallet-total">{{ wallets['groups'][group][w_id]['balance'] | num }}</div>
+      </div>
+    </div>
   </div>
-
-  <div name='income' class='report'>
-    <h6>Income</h6>
-    {% for group in wallets['groups'] %}
-    <table class='report-tb'>
-      <caption>{{ group or ' ' }}</caption>
-      {% for w_id in wallets['groups'][group] %}
-      <tr>
-        <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
-        <td>{{ wallets['groups'][group][w_id]['income'] | num }}</td>
-      </tr>
-      {% endfor %}
-      {% if wallets['groupsize'][group] > 1 %}
-      <tr>
-        <th>sum:</th>
-        <th>{{ wallets['sums'][group]['income_sum'] | num }}</th>
-      </tr>
-      {% endif %}
-    </table>
-    {% endfor %}
-  </div>
-  
-  <div name='spendings' class='report'>
-    <h6>Spendings</h6>
-    {% for group in wallets['groups'] %}
-    <table class='report-tb'>
-      <caption>{{ group or ' ' }}</caption>
-      {% for w_id in wallets['groups'][group] %}
-      <tr>
-        <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
-        <td>{{ wallets['groups'][group][w_id]['spendings'] | num}}</td>
-      </tr>
-      {% endfor %}
-      {% if wallets['groupsize'][group] > 1 %}
-      <tr>
-        <th>sum:</th>
-        <th>{{ wallets['sums'][group]['spendings_sum'] | num }}</th>
-      </tr>
-      {% endif %}
-    </table>
-    {% endfor %}
-  </div>
-
-  <div name='transfers' class='report'>
-    <h6>Transfers</h6>
-    {% for group in wallets['groups'] %}
-    <table class='report-tb'>
-      <caption>{{ group or ' ' }}</caption>
-      {% for w_id in wallets['groups'][group] %}
-      <tr>
-        <td>{{ wallets['groups'][group][w_id]['name'] }}:</td>
-        <td>{{ wallets['groups'][group][w_id]['transfers'] | num }}</td>
-      </tr>
-      {% endfor %}
-    </table>
-    {% endfor %}
-  </div>
-
+  {% endfor %}
 </div>
+{% endfor %}
 {% endif %}
+
+<div class="section" name="padding-bottom"></div>
+
+<script>
+document.querySelectorAll('[data-wallet-title]').forEach(x => {
+  x.addEventListener('click', () => {
+    x.classList.toggle('active');
+  });
+});
+</script>
 
 {% endblock %}
