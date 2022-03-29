@@ -428,32 +428,31 @@ a.bttn {
 
 *************************************************************************/
 
-.form, .form-vert, .form-horiz {
-  display: flex;
-  /* width: 100%; */
-}
-.form, .form-vert {
-  flex-direction: column;
-}
-.form-horiz {
-  flex-direction: row;
-}
 .form {
-  gap: 5px;
-  padding: 5px;
-  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
   background-color: #f8f9fa;
-}  
-.form-horiz + .form-horiz, .form-horiz + .form-vert {
-  margin-top: 5px;
+  border-radius: 5px;
+  padding: 0.3rem;
 }
-input + input, .input-group + input {
-  margin-left: 5px;
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
 }
-label>label {
-  margin-bottom: 0;
-  cursor: pointer;
+.form-field {
+  width: auto;
+  flex-grow: 1;
 }
+.form-nowrap {
+  flex-grow: 10;
+  flex-wrap: nowrap;
+}
+.form-hide {
+  display: none;
+}
+
 
 
 

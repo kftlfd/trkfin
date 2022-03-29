@@ -52,10 +52,9 @@
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
   }
 
-
-
-  #group_input {
-    display: none;
+  .group-greyed-out {
+    color: #6c757d;
+    font-style: italic;
   }
 
 
@@ -212,22 +211,9 @@
     max-width: 30rem;
   }
 
-
-
-  .group-input {
-    display: none;
-  }
-  .group-input.group-input-show {
-    display: block;
-  }
-
 </style>
 
 <header class="section title">Wallets</header>
-
-
-
-<!-- Add Wallet Form -->
 
 {% with hideForm = data['walletcount'] %}
 {% if hideForm %}
@@ -243,64 +229,54 @@
     </h2>
 {% endif %}
     <div {% if hideForm %}class="accordion-collapse collapse" aria-labelledby="wrapperHeading" data-bs-parent="#formWrapper" id="addWalletForm" {% else %} class="section" {% endif %}name='form'>
-      <form name='addwalletform' action="" method="POST">    
+      <form class='form' name='addwalletform' action="" method="POST">    
+        <div class='form-row'>
+          <div class='form-field input-group'>
+            {{ form.group.label(class_="input-group-text") }}
+            {{ form.group(class_="form-select") }}
+          </div>
+          <div class='form-field form-hide' id='group_input'>
+            {{ form.group_new(class_="form-control") }}
+          </div>
+        </div>
+        <div class='form-row'>
+          <div class='form-field input-group'>
+            {{ form.name.label(class_="input-group-text") }}
+            {{ form.name(class_="form-control") }}
+          </div>
+        </div>
+        <div class="form-row form-nowrap">
+          <div class='form-field input-group'>
+            {{ form.amount.label(class_="input-group-text") }}
+            {{ form.amount(class_="form-control") }}
+          </div>
+          {{ form.submit(class_="btn btn-secondary") }}
+        </div>
         {{ form.hidden_tag() }}
-        <div class='form'>
-          <div class='form-vert'>
-            <div class='form-horiz'>
-              <span class='input-group'>
-                {{ form.group.label(class_="input-group-text") }}
-                {{ form.group(class_="form-select") }}
-              </span>
-            </div>
-            <div class='form-horiz' id='group_input'>
-              {{ form.group_new(class_="form-control") }}
-            </div>
-          </div>
-          <div class='form-vert'>
-            <div class='form-horiz'>
-              <span class='input-group'>
-                {{ form.name.label(class_="input-group-text") }}
-                {{ form.name(class_="form-control") }}
-              </span>
-            </div>
-            <div class='form-horiz'>
-              <span class='input-group'>
-                {{ form.amount.label(class_="input-group-text") }}
-                {{ form.amount(class_="form-control") }}
-              </span>
-              {{ form.submit(class_="btn btn-secondary") }}
-            </div>
-          </div>
-        </div>
-        <div>
-          {% for error in form.hidden_tag.errors %}
-            hidden: <span style="color: red;">[{{ error }}]</span>
-          {% endfor %}
-          {% for error in form.group.errors %}
-          group: <span style="color: red;">[{{ error }}]</span>
-          {% endfor %}
-          {% for error in form.group_new.errors %}
-            group_input: <span style="color: red;">[{{ error }}]</span>
-          {% endfor %}
-          {% for error in form.name.errors %}
-            name: <span style="color: red;">[{{ error }}]</span>
-          {% endfor %}
-          {% for error in form.amount.errors %}
-            amount: <span style="color: red;">[{{ error }}]</span>
-          {% endfor %}
-        </div>
       </form>
+      <div name="form-errors">
+        {% for error in form.hidden_tag.errors %}
+          hidden: <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+        {% for error in form.group.errors %}
+        group: <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+        {% for error in form.group_new.errors %}
+          group_input: <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+        {% for error in form.name.errors %}
+          name: <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+        {% for error in form.amount.errors %}
+          amount: <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+      </div>
     </div>
 {% if hideForm %}
   </div>
 </div>
 {% endif %}
 {% endwith %}
-
-
-
-<!-- Wallets display -->
 
 {% if wallets['groups'] %}
 {% for group in wallets['groups'] %}
@@ -370,7 +346,7 @@
               <option value="{{ g[0] }}" {% if g[0]==group %} selected {% endif %}>{{ g[1] }}</option>
               {% endfor %}
             </select>
-            <input class="form-control group-input" name="new-group" type="text" pattern="[\w\d\s()-_]{0,20}" maxlength="20" {% if group != "" %}value="{{ group }}" {% else %} placeholder="New group name" {% endif %} title="only letters, numbers, parentheses, spaces, -, _" data-w-group-input="{{ w }}">
+            <input class="form-control" name="new-group" type="text" pattern="[\w\d\s()-_]{0,20}" maxlength="20" {% if group != "" %}value="{{ group }}" {% else %} placeholder="New group name" {% endif %} title="only letters, numbers, parentheses, spaces, -, _" data-w-group-input="{{ w }}">
             <input class="btn btn-primary" type="submit" value="Change group">
             <input type="hidden" name="change-w-group" value="{{ w }}">
           </form>
@@ -392,41 +368,25 @@
 
 <script>
 
-  // ***** AddWalletForm *****
-
-  const group_select = document.querySelector('#group');
-  const group_input = document.querySelector('#group_input');
+  // ***** helpers *****
 
   // hide group_input
-  function hide_group_input() {
-    if (group_select.value == '*New') {
-      group_input.style.display = 'block';
-    }
-    else {
-      group_input.style.display = 'none';
+  function hide_group_input(select, input) {
+    if (select.value == '*New') {
+      input.classList.remove('form-hide');
+    } else {
+      input.classList.add('form-hide');
     }
   }
-  hide_group_input();
 
   // grey out None and New types
-  function grey_groups() {
-    if (group_select.value == "" || group_select.value == "*New") {
-      group_select.style.color = '#6c757d';
-      group_select.style.fontStyle = 'italic';
-    }
-    else {
-      group_select.style.color = 'black';
-      group_select.style.fontStyle = 'normal';
+  function grey_out_groups(select) {
+    if (select.value == "" || select.value == "*New") {
+      select.classList.add('group-greyed-out');
+    } else {
+      select.classList.remove('group-greyed-out');
     }
   }
-  grey_groups();
-
-  group_select.addEventListener('change', function() {
-    hide_group_input();
-    grey_groups();
-  });
-
-  // ***** wallet controls *****
 
   function confirm_delete() {
     if (!confirm("this cannot be undone and may have unwanted consequences\n\nyou sure?")) {
@@ -434,13 +394,32 @@
     }
   }
 
-  // highlight accordion buttons on activation
+
+
+  // ***** AddWalletForm *****
+
+  const group_select = document.querySelector('#group');
+  const group_input = document.querySelector('#group_input');
+
+  hide_group_input(group_select, group_input);
+  grey_out_groups(group_select);
+
+  group_select.addEventListener('change', function() {
+    hide_group_input(group_select, group_input);
+    grey_out_groups(group_select);
+  });
+
+  // highlight accordion buttons ("Add new" and "Edit") on activation
   const accordionBtns = document.querySelectorAll('[data-accordion-btn]')
   accordionBtns.forEach(x => {
     x.addEventListener('click', () => {
-      x.classList.toggle('accordion-button-active')
-    })
-  })
+      x.classList.toggle('accordion-button-active');
+    });
+  });
+
+
+
+  // ***** Wallet controls Modals *****
 
   // show controls
   const editSwitch = document.querySelector('[data-edit-switch]')
@@ -472,17 +451,18 @@
     });
   });
 
-  // toggle new group input in modal
+  // hide group input and grey out None and New in modals
   const modalGroupSelectors = document.querySelectorAll('[data-w-group-select]')
   modalGroupSelectors.forEach(x => {
-    let w = x.dataset.wGroupSelect
+    let input_tag = '[data-w-group-input="' + x.dataset.wGroupSelect + '"]'
+    let input = document.querySelector(input_tag)
+
+    hide_group_input(x, input);
+    grey_out_groups(x);
+
     x.addEventListener('change', () => {
-      let select = '[data-w-group-input="' + w + '"]'
-      if (x.value == "*New") {
-        document.querySelector(select).classList.add('group-input-show')
-      } else {
-        document.querySelector(select).classList.remove('group-input-show')
-      }
+      hide_group_input(x, input);
+      grey_out_groups(x);
     });
   });
 

@@ -82,85 +82,80 @@
 
 <div class="section" name='form'>
 
-  <form name="mainform" action="" method="POST">
-
-    {{ form.hidden_tag() }}
-  
-    <div class="form">
-  
-      <div class="form-horiz btn-group" role="group" aria-label="Select action">
-        {% for subfield in form.action %}
-          {{ subfield(class_="btn-check") }}
-          {{ subfield.label(class_="btn btn-secondary shadow-none") }}
-        {% endfor %}
+  <form class="form" action="" method="POST" data-form>
+    <div class="btn-group" role="group" aria-label="Select action">
+      {% for subfield in form.action %}
+      {{ subfield(class_="btn-check") }}
+      {{ subfield.label(class_="btn btn-secondary shadow-none") }}
+      {% endfor %}
+    </div>
+    <div class="form-row">
+      <div class="form-field input-group" data-form-field="source">
+        {{ form.source.label(class_="input-group-text") }}
+        {{ form.source(class_="form-control") }}
       </div>
-      
-      <div class="form-horiz">
-  
-        <span id="mainform-source" class="input-group">
-          {{ form.source.label(class_="input-group-text") }}
-          {{ form.source(class_="form-control") }}
-        </span>
-  
-        <span id="mainform-destination" class="input-group">
-          {{ form.destination.label(class_="input-group-text") }}
-          {{ form.destination(class_="form-control") }}
-        </span>
-      
-      </div>
-  
-      <div class="form-horiz">
+      <div class="form-field input-group" data-form-field="destination">
+        {{ form.destination.label(class_="input-group-text") }}
+        {{ form.destination(class_="form-control") }}
+      </div>    
+    </div>
+    <div class="form-row form-nowrap">
+      <div class="form-field">
         {{ form.amount(class_="form-control") }}
+      </div>
+      <div class="form-field">
         {{ form.description(class_="form-control") }}
+      </div>
+      <div class="form-field">
         {{ form.submit(class_="btn btn-secondary") }}
       </div>
-  
     </div>
-  
-    <div>
-      {% for error in form.hidden_tag.errors %}
-        hidden: <span style="color: red;">[{{ error }}]</span>
-      {% endfor %}
-      {% for error in form.source.errors %}
-        source: <span style="color: red;">[{{ error }}]</span>
-      {% endfor %}
-      {% for error in form.destination.errors %}
-        dest: <span style="color: red;">[{{ error }}]</span>
-      {% endfor %}
-      {% for error in form.amount.errors %}
-        amount: <span style="color: red;">[{{ error }}]</span>
-      {% endfor %}
-      {% for error in form.description.errors %}
-        descr: <span style="color: red;">[{{ error }}]</span>
-      {% endfor %}
-    </div>
-      
+    {{ form.hidden_tag() }}
   </form>
+  
+  <div name="form-errors">
+    {% for error in form.hidden_tag.errors %}
+      hidden: <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+    {% for error in form.source.errors %}
+      source: <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+    {% for error in form.destination.errors %}
+      dest: <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+    {% for error in form.amount.errors %}
+      amount: <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+    {% for error in form.description.errors %}
+      descr: <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </div>
+      
   
   <script>
   
     // show/hide form fields
-    document.forms['mainform'].addEventListener('click', function() {
-      let select = document.forms['mainform'].action;
-      if (select.value == 'Spending') {
-        document.querySelector('#mainform-source').hidden = false;
-        document.querySelector('#mainform-source').style.marginRight = '0';
-        document.querySelector('#mainform-destination').hidden = true;
+    const form = document.querySelector('[data-form]');
+    const src  = document.querySelector('[data-form-field="source"');
+    const dest = document.querySelector('[data-form-field="destination"');
+    form.addEventListener('click', function() {
+      let select = form.action.value;
+      if (select == 'Spending') {
+        src.classList.remove('form-hide');
+        dest.classList.add('form-hide');
       }
-      else if (select.value == 'Income') {
-        document.querySelector('#mainform-source').hidden = true;
-        document.querySelector('#mainform-source').style.marginRight = '0';
-        document.querySelector('#mainform-destination').hidden = false;
+      else if (select == 'Income') {
+        src.classList.add('form-hide');
+        dest.classList.remove('form-hide');
       }
       else { // 'transfer'
-        document.querySelector('#mainform-source').hidden = false;
-        document.querySelector('#mainform-source').style.marginRight = '5px';
-        document.querySelector('#mainform-destination').hidden = false;
+        src.classList.remove('form-hide');
+        dest.classList.remove('form-hide');
       }
     });
   
     // select 'spending' as default
-    document.forms['mainform'].action.item(0).click();
+    form.action.item(0).click();
   
   </script>
   
