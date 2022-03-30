@@ -3,38 +3,103 @@
 {% block title %} | History{% endblock %}
 
 {% block main %}
-<div class="table-responsive">
-  <table class="table">
-    <thead>
-      <th>Date</th>
-      <th>Time</th>
-      <th>Action</th>
-      <th>From</th>
-      <th>To</th>
-      <th>Amount</th>
-      <th>Description</th>
-    </thead>
-    <tbody>
-      {% for row in history %}
-      <tr>
-        <td>{{ row.local_time[:10] }}</td>
-        <td>{{ row.local_time[10:16] }}</td>
-        <td>{{ row.action }}</td>
-        {% if wallets[row.source] %}
-        <td>{{ wallets[row.source].name }}</td>
-        {% else %}
-        <td></td>
-        {% endif %}
-        {% if wallets[row.destination] %}
-        <td>{{ wallets[row.destination].name }}</td>
-        {% else %}
-        <td></td>
-        {% endif %}
-        <td>{{ row.amount or ''}}</td>
-        <td>{{ row.description or '' }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>    
-  </table>
+
+<style>
+  .history-entry {
+    display: grid;
+    row-gap: 0.5rem;
+    padding: 1rem 0.5rem;
+  }
+  .history-entry:not(:first-of-type) {
+    border-top: 1px solid #ccc;
+  }
+
+  .history-body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    width: fit-content;
+  }
+  
+  .history-time {
+    gap: 1rem;
+  }
+  
+  .history-data {
+    display: inline-block;
+    padding: 0 0.5rem;
+    border-radius: 3px;
+  }
+
+  .action-info     {background-color: #eef;}
+  .action-spending {background-color: #fdd;}
+  .action-income   {background-color: #dfd;}
+  .action-transfer {background-color: #eee;}
+
+  .action-spending-amount {color: red;}
+  .action-spending-amount::before {content: "-";}
+
+  .action-income-amount {color: green;}
+  .action-income-amount::before {content: "+";}
+
+  .history-wallet {border: 1px solid #eee;}
+  .history-group {
+    color: #888;
+    font-size: 0.8rem;
+    margin-left: 0.3rem;
+  }
+
+  @media screen and (min-width: 600px) {
+    .history-entry {
+      grid-template-columns: 3fr 5fr;
+      justify-content: center;
+      column-gap: 2rem;
+    }
+    .history-time {
+      justify-self: center;
+    }
+  }
+</style>
+
+<div class="section title">History</div>
+
+<div class="section">
+  {% for entry in history %}
+  <div class="history-entry">
+
+    <div class="history-body history-time">
+      <div>{{ entry.local_time[:10] }}</div>
+      <div>{{ entry.local_time[10:16] }}</div>
+    </div>
+
+    <div class="history-body">
+
+      <div {% if entry.action == "Spending" %} class="history-data action-spending" {% elif entry.action == "Income" %} class="history-data action-income" {% elif entry.action == "Transfer" %} class="history-data action-transfer" {% else %} class="history-data action-info" {% endif %}>{{ entry.action }}</div>
+      
+      {% if entry.source %}
+      <div class="history-data history-wallet">{{ wallets[entry.source].name }} <span class="history-group">{% if wallets[entry.source].group != "" %}{{ wallets[entry.source].group }}{% endif %}</span></div>
+      {% endif %}
+      
+      {% if entry.source and entry.destination %}
+      <div>&rarr;</div>
+      {% endif %}
+      
+      {% if entry.destination %}
+      <div class="history-data history-wallet">{{ wallets[entry.destination].name }} <span class="history-group">{% if wallets[entry.destination].group != "" %}{{ wallets[entry.destination].group }}{% endif %}</span></div>
+      {% endif %}
+      
+      {% if entry.amount %}
+      <div {% if entry.action == "Spending" %} class="history-data action-spending-amount" {% elif entry.action == "Income" %} class="history-data action-income-amount"{% else %}class="history-data"{% endif %}>{{ entry.amount | num }}</div>
+      {% endif %}
+      
+      {% if entry.description %}
+      <div class="history-data">{{ entry.description }}</div>
+      {% endif %}
+
+    </div>
+    
+  </div>
+  {% endfor %}
 </div>
+
 {% endblock %}
