@@ -5,9 +5,7 @@
 {% block main %}
 
 <style>
-  .main {
-    gap: 0;
-  }
+
 .group-title {
   cursor: pointer;
 }
@@ -78,8 +76,6 @@
 }
 </style>
 
-<div class="section" name="padding-top"></div>
-
 <div class="section" name='form'>
 
   <form class="form" action="" method="POST" data-form>
@@ -99,14 +95,12 @@
         {{ form.destination(class_="form-control") }}
       </div>    
     </div>
-    <div class="form-row form-nowrap">
+    <div class="form-row">
       <div class="form-field">
         {{ form.amount(class_="form-control") }}
       </div>
-      <div class="form-field">
+      <div class="form-row form-nowrap">
         {{ form.description(class_="form-control") }}
-      </div>
-      <div class="form-field">
         {{ form.submit(class_="btn btn-secondary") }}
       </div>
     </div>
@@ -210,8 +204,6 @@
 </div>
 {% endfor %}
 {% endif %}
-
-<div class="section" name="padding-bottom"></div>
 
 <script>
 document.querySelectorAll('[data-wallet-title]').forEach(x => {

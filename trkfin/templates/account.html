@@ -5,22 +5,19 @@
 {% block main %}
 
 <style>
-  .main {
-    /* align-items: stretch; */
-    gap: 0;
-    margin-bottom: 5rem;
+  .setting {
+    padding: 2rem 1rem;
+    width: min(95%, 700px);
   }
-  .title {
-    font-size: 2rem;
-    margin-top: 3rem;
-    margin-bottom: 2rem;
-    text-align: center;
+  .setting + .setting {
+    border-top: 1px solid #ccc;
   }
-  .section-title {
+  .setting-title {
     font-size: 1.5rem;
     color: #555;
     margin-bottom: 1rem;
   }
+
   .mx-b {
     margin-bottom: 0.5rem;
   }
@@ -36,16 +33,13 @@
     font-weight: 100;
     background-color: rgb(216, 231, 253);
   }
-  .settings {
-    box-sizing: border-box;
-    border-bottom: 1px solid gray;
-    margin: 0 1rem;
-    padding: 2rem 1rem;
-    width: min(95%, 800px);
+  .change-btn:hover {
+    background-color: rgb(239, 245, 253);
   }
-  .settings:first-of-type {
-    border-top: 1px solid gray;
-  }
+  .change-btn:active {
+    background-color: rgb(194, 218, 253);
+  }  
+  
   .col-auto {
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
@@ -57,20 +51,20 @@
   }
 
   @media screen and (min-width: 620px) {
-    .settings {
+    .setting {
       display: grid;
       grid-template-columns: 3fr 4fr;
     }
-    .section-title {
+    .setting-title {
       margin-bottom: 0rem;
     }
   }
 </style>
 
-<header class="title">Account</header>
+<header class="section title">Account</header>
 
-<div class='settings'>
-  <div class="section-title">Username</div>
+<div class='section setting'>
+  <div class="setting-title">Username</div>
   <div>
     <div class="mx-b"><span class="username">{{ data['username'] }}</span></div>
     <button class="change-btn" type="button" data-bs-toggle="collapse" data-bs-target="#changeUsername" aria-expanded="false" aria-controls="changeUsername">
@@ -89,8 +83,8 @@
   </div>
 </div>
 
-<div class='settings'>
-  <div class="section-title">E-mail</div>
+<div class='section setting'>
+  <div class="setting-title">E-mail</div>
   <div>
     <div class="mx-b"><span class="username">{{ data['email'] or "—" }}</span></div>
     <button class="change-btn" type="button" data-bs-toggle="collapse" data-bs-target="#changeEmail" aria-expanded="false" aria-controls="changeEmail">
@@ -109,8 +103,8 @@
   </div>
 </div>
 
-<div class='settings'>
-  <div class="section-title">Password</div>
+<div class='section setting'>
+  <div class="setting-title">Password</div>
   <div>
     <button class="change-btn" type="button" data-bs-toggle="collapse" data-bs-target="#changePassword" aria-expanded="false" aria-controls="changePassword">
       Change
@@ -131,19 +125,19 @@
   </div>
 </div>
 
-<div class='settings'>
-  <div class="section-title">Timezone</div>
+<div class='section setting'>
+  <div class="setting-title">Timezone</div>
   <div>
-    <div data-timezone="{{ data['timezone'] }}"><span id='user_time'></span></div>
+    <div data-timezone="{{ data['timezone'] }}"><span data-user-time></span></div>
     <form name="timezone" action="{{ url_for('account', username=current_user.username) }}" method="POST">
-      <input name="new-timezone" type="hidden" data-new-tz="">
+      <input name="new-timezone" type="hidden" data-new-tz>
       <input class="change-btn" type="submit" value="Update">
     </form>
   </div>
 </div> 
 
-<div class='settings'>
-  <div class="section-title">Reports</div>
+<div class='section setting'>
+  <div class="setting-title">Reports</div>
   <div>
     <form name="reports" action="{{ url_for('account', username=current_user.username) }}" method="POST">
       <div class="mx-b">
@@ -168,8 +162,8 @@
   </div>
 </div>
 
-<div class="settings">
-  <div class="section-title">Privacy</div>
+<div class="section setting">
+  <div class="setting-title">Privacy</div>
   <div>
     <form class="mx-b" name="export" action="{{ url_for('account', username=current_user.username) }}" method="POST">
       <input class="btn btn-success" type="submit" value="Export data">
@@ -185,26 +179,24 @@
 <script>
 
   // display user timezone
-  var tz = Number(document.querySelector('[data-timezone]').dataset.timezone) / 60
-  var ut = document.querySelector('#user_time')
   function parseTimezone(offset) {
-    var direction = '+'
+    let direction = '+'
     if (offset < 0) {
       direction = '-'
       offset *= -1
     }
-    var hours = offset / 60
+    let hours = offset / 60
     if (hours < 10) {hours = '0' + hours}
-    var minutes = offset % 60
+    let minutes = offset % 60
     if (minutes < 10) {minutes = '0' + minutes}
-    name = 'GMT' + direction + hours + ':' + minutes
-    return name
+    return ('GMT' + direction + hours + ':' + minutes)
   }
-  ut.innerText = parseTimezone(tz)
+  let userTime = document.querySelector('[data-timezone]')
+  userTime.innerText = parseTimezone(Number(userTime.dataset.timezone) / 60)
 
   // update timezone
-  var newtz = document.querySelector('[data-new-tz]')
-  var d = new Date()
+  let newtz = document.querySelector('[data-new-tz]')
+  let d = new Date()
   newtz.value = d.getTimezoneOffset() * -60
 
   // reports frequency

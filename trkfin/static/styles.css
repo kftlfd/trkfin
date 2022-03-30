@@ -38,7 +38,12 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0;
+  padding: 2rem 0 4rem;
+}
+.title {
+  font-size: 2rem;
+  text-align: center;
 }
 
 .footer {
@@ -403,6 +408,7 @@ a.bttn {
 
 .section {
   width: 100%;
+  max-width: 700px;
   padding: 1rem;
 }
 
@@ -415,9 +421,9 @@ a.bttn {
   .navbar {
     padding: 0 calc((100vw - 900px)/2 + 1rem)
   }
-  .section {
+  /* .section {
     padding: 1rem calc((100vw - 900px)/2  + 1rem);
-  }
+  } */
 }
 
 

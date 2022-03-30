@@ -6,14 +6,8 @@
 
 <style>
 
-  .main {
-    gap: 0;
-  }
-  .title {
-    font-size: 2rem;
-    /* margin-top: 1rem; */
-    /* margin-bottom: 2rem; */
-    text-align: center;
+  .mx-top {
+    margin-top: 0.5rem;
   }
 
 
@@ -29,7 +23,7 @@
     padding: 0px;
   }
   .accordion-header {
-    margin-bottom: 0.5rem;
+    /* margin-bottom: 0.5rem; */
     display: flex;
     justify-content: space-between;
   }
@@ -229,13 +223,13 @@
     </h2>
 {% endif %}
     <div {% if hideForm %}class="accordion-collapse collapse" aria-labelledby="wrapperHeading" data-bs-parent="#formWrapper" id="addWalletForm" {% else %} class="section" {% endif %}name='form'>
-      <form class='form' name='addwalletform' action="" method="POST">    
+      <form class='form mx-top' name='addwalletform' action="" method="POST">    
         <div class='form-row'>
           <div class='form-field input-group'>
             {{ form.group.label(class_="input-group-text") }}
-            {{ form.group(class_="form-select") }}
+            {{ form.group(class_="form-select", data_group_select="add-new") }}
           </div>
-          <div class='form-field form-hide' id='group_input'>
+          <div class='form-field form-hide' data-group-input="add-new">
             {{ form.group_new(class_="form-control") }}
           </div>
         </div>
@@ -341,12 +335,12 @@
           </form>          
           <div>Group</div>
           <form class="modal-row" action="{{ url_for('wallets', username=current_user.username) }}" method="POST">
-            <select class="form-select" name="user-group" data-w-group-select="{{ w }}">
+            <select class="form-select" name="user-group" data-group-select="{{ w }}">
               {% for g in data['groups'] %}
               <option value="{{ g[0] }}" {% if g[0]==group %} selected {% endif %}>{{ g[1] }}</option>
               {% endfor %}
             </select>
-            <input class="form-control" name="new-group" type="text" pattern="[\w\d\s()-_]{0,20}" maxlength="20" {% if group != "" %}value="{{ group }}" {% else %} placeholder="New group name" {% endif %} title="only letters, numbers, parentheses, spaces, -, _" data-w-group-input="{{ w }}">
+            <input class="form-control" name="new-group" type="text" pattern="[\w\d\s()-_]{0,20}" maxlength="20" {% if group != "" %}value="{{ group }}" {% else %} placeholder="New group name" {% endif %} title="only letters, numbers, parentheses, spaces, -, _" data-group-input="{{ w }}">
             <input class="btn btn-primary" type="submit" value="Change group">
             <input type="hidden" name="change-w-group" value="{{ w }}">
           </form>
@@ -363,8 +357,6 @@
 </div>
 {% endfor %}
 {% endif %}
-
-
 
 <script>
 
@@ -396,24 +388,27 @@
 
 
 
-  // ***** AddWalletForm *****
-
-  const group_select = document.querySelector('#group');
-  const group_input = document.querySelector('#group_input');
-
-  hide_group_input(group_select, group_input);
-  grey_out_groups(group_select);
-
-  group_select.addEventListener('change', function() {
-    hide_group_input(group_select, group_input);
-    grey_out_groups(group_select);
-  });
+  // ***** Forms *****
 
   // highlight accordion buttons ("Add new" and "Edit") on activation
   const accordionBtns = document.querySelectorAll('[data-accordion-btn]')
   accordionBtns.forEach(x => {
     x.addEventListener('click', () => {
       x.classList.toggle('accordion-button-active');
+    });
+  });
+
+  // hide group input and grey out None and New in forms
+  const groupSelectors = document.querySelectorAll('[data-group-select]')
+  groupSelectors.forEach(s => {
+    let i = document.querySelector('[data-group-input="' + s.dataset.groupSelect + '"]')
+
+    hide_group_input(s, i);
+    grey_out_groups(s);
+
+    s.addEventListener('change', () => {
+      hide_group_input(s, i);
+      grey_out_groups(s);
     });
   });
 
@@ -443,28 +438,14 @@
       });
     });
   });
+
   // prevent closing modal by clicking on content
   const modalContents = document.querySelectorAll('[data-modal-content]')
   modalContents.forEach(x => {
     x.addEventListener('click', () => {
       event.cancelBubble = true;
     });
-  });
-
-  // hide group input and grey out None and New in modals
-  const modalGroupSelectors = document.querySelectorAll('[data-w-group-select]')
-  modalGroupSelectors.forEach(x => {
-    let input_tag = '[data-w-group-input="' + x.dataset.wGroupSelect + '"]'
-    let input = document.querySelector(input_tag)
-
-    hide_group_input(x, input);
-    grey_out_groups(x);
-
-    x.addEventListener('change', () => {
-      hide_group_input(x, input);
-      grey_out_groups(x);
-    });
-  });
+  });  
 
 </script>
 
