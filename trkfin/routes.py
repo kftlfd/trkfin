@@ -231,11 +231,8 @@ def wallets(username, **kwargs):
             ts_utc=ts_utc,
             local_time=user_local_time,
             action="Added wallet",
+            destination=new_wallet.id,
             amount=form.amount.data)
-        if new_wallet.group:
-            record.description = str(new_wallet.group) + ": " + str(new_wallet.name)
-        else:
-            record.description = str(new_wallet.name)
         db.session.add(record)
         db.session.commit()
 

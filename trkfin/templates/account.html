@@ -6,10 +6,9 @@
 
 <style>
   .setting {
-    padding: 2rem 1rem;
-    width: min(95%, 700px);
+    padding: 2rem 1rem 0rem;
   }
-  .setting + .setting {
+  .setting:not(.noborder) {
     border-top: 1px solid #ccc;
   }
   .setting-title {
@@ -63,116 +62,128 @@
 
 <header class="section title">Account</header>
 
-<div class='section setting'>
-  <div class="setting-title">Username</div>
-  <div>
-    <div class="mx-b"><span class="username">{{ data['username'] }}</span></div>
-    <button class="change-btn" type="button" data-bs-toggle="collapse" data-bs-target="#changeUsername" aria-expanded="false" aria-controls="changeUsername">
-      Change
-    </button>
-    <div class="collapse" id="changeUsername">
-      <form class="row" name="username" action="{{ url_for('account', username=current_user.username) }}" method="POST">
-        <div class="col-auto">
-          <input class="form-control" name="new-username" type="text" value="" placeholder="New username" pattern="[\w\d-_]{1,64}" title="letters, numbers, '-', '_'">
-        </div>
-        <div class="col-auto">
-          <input class="btn btn-primary" type="submit" value="Change">
-        </div>
-      </form>
+<div class='section'>
+  <div class="setting noborder">
+    <div class="setting-title">Username</div>
+    <div>
+      <div class="mx-b"><span class="username">{{ data['username'] }}</span></div>
+      <button class="change-btn" type="button" data-bs-toggle="collapse" data-bs-target="#changeUsername" aria-expanded="false" aria-controls="changeUsername">
+        Change
+      </button>
+      <div class="collapse" id="changeUsername">
+        <form class="row" name="username" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+          <div class="col-auto">
+            <input class="form-control" name="new-username" type="text" value="" placeholder="New username" pattern="[\w\d-_]{1,64}" title="letters, numbers, '-', '_'">
+          </div>
+          <div class="col-auto">
+            <input class="btn btn-primary" type="submit" value="Change">
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>
 
-<div class='section setting'>
-  <div class="setting-title">E-mail</div>
-  <div>
-    <div class="mx-b"><span class="username">{{ data['email'] or "—" }}</span></div>
-    <button class="change-btn" type="button" data-bs-toggle="collapse" data-bs-target="#changeEmail" aria-expanded="false" aria-controls="changeEmail">
-      Change
-    </button>
-    <div class="collapse" id="changeEmail">
-      <form class="row" name="email" action="{{ url_for('account', username=current_user.username) }}" method="POST">
-        <div class="col-auto">
-          <input class="form-control" disabled name="new-email" type="text" value="" placeholder="New email">
-        </div>
-        <div class="col-auto">
-          <input class="btn btn-primary" disabled type="submit" value="Change">
-        </div>
-      </form>
+<div class='section'>
+  <div class="setting">
+    <div class="setting-title">E-mail</div>
+    <div>
+      <div class="mx-b"><span class="username">{{ data['email'] or "—" }}</span></div>
+      <button class="change-btn" type="button" data-bs-toggle="collapse" data-bs-target="#changeEmail" aria-expanded="false" aria-controls="changeEmail">
+        Change
+      </button>
+      <div class="collapse" id="changeEmail">
+        <form class="row" name="email" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+          <div class="col-auto">
+            <input class="form-control" disabled name="new-email" type="text" value="" placeholder="New email">
+          </div>
+          <div class="col-auto">
+            <input class="btn btn-primary" disabled type="submit" value="Change">
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>
 
-<div class='section setting'>
-  <div class="setting-title">Password</div>
-  <div>
-    <button class="change-btn" type="button" data-bs-toggle="collapse" data-bs-target="#changePassword" aria-expanded="false" aria-controls="changePassword">
-      Change
-    </button>
-    <div class="collapse" id="changePassword">
-      <form name="password" action="{{ url_for('account', username=current_user.username) }}" method="POST">
-        <div class="col-auto">
-          <input class="form-control" name="old-password" type="password" value="" placeholder="Old password">
-        </div>
-        <div class="col-auto">
-          <input class="form-control" name="new-password" type="password" value="" placeholder="New password">
-        </div>
-        <div class="col-auto">
-          <input class="btn btn-primary" type="submit" value="Change">
-        </div>
-      </form>
+<div class='section'>
+  <div class="setting">
+    <div class="setting-title">Password</div>
+    <div>
+      <button class="change-btn" type="button" data-bs-toggle="collapse" data-bs-target="#changePassword" aria-expanded="false" aria-controls="changePassword">
+        Change
+      </button>
+      <div class="collapse" id="changePassword">
+        <form name="password" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+          <div class="col-auto">
+            <input class="form-control" name="old-password" type="password" value="" placeholder="Old password">
+          </div>
+          <div class="col-auto">
+            <input class="form-control" name="new-password" type="password" value="" placeholder="New password">
+          </div>
+          <div class="col-auto">
+            <input class="btn btn-primary" type="submit" value="Change">
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>
 
-<div class='section setting'>
-  <div class="setting-title">Timezone</div>
-  <div>
-    <div data-timezone="{{ data['timezone'] }}"><span data-user-time></span></div>
-    <form name="timezone" action="{{ url_for('account', username=current_user.username) }}" method="POST">
-      <input name="new-timezone" type="hidden" data-new-tz>
-      <input class="change-btn" type="submit" value="Update">
-    </form>
+<div class='section'>
+  <div class="setting">
+    <div class="setting-title">Timezone</div>
+    <div>
+      <div data-timezone="{{ data['timezone'] }}"><span data-user-time></span></div>
+      <form name="timezone" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+        <input name="new-timezone" type="hidden" data-new-tz>
+        <input class="change-btn" type="submit" value="Update">
+      </form>
+    </div>
   </div>
 </div> 
 
-<div class='section setting'>
-  <div class="setting-title">Reports</div>
-  <div>
-    <form name="reports" action="{{ url_for('account', username=current_user.username) }}" method="POST">
-      <div class="mx-b">
-        <span>Frequency:</span>
-        <select class="form-select form-select-sm" name="new-report-frequency" data-rep-freq-select>
-          <option value="month" {% if data['rep-freq'] == "month" %}selected data-rep-fq{% endif %}>Month</option>
-          <option value="week" {% if data['rep-freq'] == "week" %}selected data-rep-fq{% endif %}>Week</option>
-          {% if data['rep-freq'] != "month" and data['rep-freq'] != "week" %}<option value="custom" selected data-rep-fq>Custom</option>{% endif %}
-          <option value="other">Other</option>
-        </select>
-        {% if data['rep-freq'] != "month" and data['rep-freq'] != "week" %}<span>every {{ data['rep-freq'] }} days</span>{% endif %}
-      </div>
-      <div class="mx-b" data-rep-freq-input>
-        <input class="form-control form-control-sm" name="ndays" type="number" min="1" max="365" placeholder="Number of days">
-      </div>
-      <div>
-        <input disabled id="email-rep" type="checkbox" name="email-reports" value="true" {% if data['email-reports'] %} checked {% endif %}>
-        <label for="email-rep">Send reports to e-mail</label>
-      </div>
-      <input class="change-btn" type="submit" value="Update">
-    </form>
+<div class='section'>
+  <div class="setting">
+    <div class="setting-title">Reports</div>
+    <div>
+      <form name="reports" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+        <div class="mx-b">
+          <span>Frequency:</span>
+          <select class="form-select form-select-sm" name="new-report-frequency" data-rep-freq-select>
+            <option value="month" {% if data['rep-freq'] == "month" %}selected data-rep-fq{% endif %}>Month</option>
+            <option value="week" {% if data['rep-freq'] == "week" %}selected data-rep-fq{% endif %}>Week</option>
+            {% if data['rep-freq'] != "month" and data['rep-freq'] != "week" %}<option value="custom" selected data-rep-fq>Custom</option>{% endif %}
+            <option value="other">Other</option>
+          </select>
+          {% if data['rep-freq'] != "month" and data['rep-freq'] != "week" %}<span>every {{ data['rep-freq'] }} days</span>{% endif %}
+        </div>
+        <div class="mx-b" data-rep-freq-input>
+          <input class="form-control form-control-sm" name="ndays" type="number" min="1" max="365" placeholder="Number of days">
+        </div>
+        <div>
+          <input class="form-check-input" disabled id="email-rep" type="checkbox" name="email-reports" value="true" {% if data['email-reports'] %} checked {% endif %}>
+          <label class="form-check-label" for="email-rep">Send reports to e-mail</label>
+        </div>
+        <input class="change-btn" type="submit" value="Update">
+      </form>
+    </div>
   </div>
 </div>
 
-<div class="section setting">
-  <div class="setting-title">Privacy</div>
-  <div>
-    <form class="mx-b" name="export" action="{{ url_for('account', username=current_user.username) }}" method="POST">
-      <input class="btn btn-success" type="submit" value="Export data">
-      <input name="export-data" type="hidden" value="true">
-    </form>
-    <form name="delete" action="{{ url_for('account', username=current_user.username) }}" method="POST" onsubmit="confirm_delete()">
-      <input class="btn btn-danger" type="submit" value="Delete account">
-      <input name="delete-account" type="hidden" value="true">
-    </form>
+<div class="section">
+  <div class="setting">
+    <div class="setting-title">Privacy</div>
+    <div>
+      <form class="mx-b" name="export" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+        <input class="btn btn-success" type="submit" value="Export data">
+        <input name="export-data" type="hidden" value="true">
+      </form>
+      <form name="delete" action="{{ url_for('account', username=current_user.username) }}" method="POST" onsubmit="confirm_delete()">
+        <input class="btn btn-danger" type="submit" value="Delete account">
+        <input name="delete-account" type="hidden" value="true">
+      </form>
+    </div>
   </div>
 </div>
 
