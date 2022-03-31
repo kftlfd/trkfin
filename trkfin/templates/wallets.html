@@ -6,7 +6,7 @@
 
 <style>
 
-  .mx-top {
+  #addWalletForm .form {
     margin-top: 0.5rem;
   }
   .group-greyed-out {
@@ -15,41 +15,42 @@
   }
 
 
-  .accordion {
-    width: 100%;
-  }
-  .accordion-item {
-    border: none;
-    padding: 0px;
-  }
-  .accordion-header {
+  .w-header-bttns {
     display: flex;
+    align-items: center;
     justify-content: space-between;
   }
-  .accordion-button,
-  .accordion-button:focus,
-  .accordion-button:not(.collapsed) {
+  .w-header-bttn {
+    display: flex;
+    align-items: center;
     color: #555;
     background-color: white;
+    border: none;
     box-shadow: none;
-  }
-  .accordion-button {
     padding: 0.5rem 1rem;
-    width: auto;
     border-radius: 3px;
   }
-  .accordion-button::after {
+  .w-header-bttn.active {background-color: #ddd;}
+  .w-header-bttn:hover {background-color: #eee;}
+  .w-header-bttn:active {background-color: #ddd;}
+
+  .w-header-bttn::after {
+    display: inline-block;
+    content: "";
+    width: 1.25rem;
+    height: 1.25rem;
     margin-left: 0.5rem;
+    transition: all 0.3s ease;
   }
-  .accordion-button:not(.collapsed)::after {
+  .w-header-bttn.add-new::after {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
   }
-
-
-  .edit-switch::after {
-  	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%23212529' %3E%3C!--! Font Awesome Pro 6.1.1 by %40fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons  Inc. --%3E%3Cpath d='M490.3 40.4C512.2 62.27 512.2 97.73 490.3 119.6L460.3 149.7L362.3 51.72L392.4 21.66C414.3-.2135 449.7-.2135 471.6 21.66L490.3 40.4zM172.4 241.7L339.7 74.34L437.7 172.3L270.3 339.6C264.2 345.8 256.7 350.4 248.4 353.2L159.6 382.8C150.1 385.6 141.5 383.4 135 376.1C128.6 370.5 126.4 361 129.2 352.4L158.8 263.6C161.6 255.3 166.2 247.8 172.4 241.7V241.7zM192 63.1C209.7 63.1 224 78.33 224 95.1C224 113.7 209.7 127.1 192 127.1H96C78.33 127.1 64 142.3 64 159.1V416C64 433.7 78.33 448 96 448H352C369.7 448 384 433.7 384 416V319.1C384 302.3 398.3 287.1 416 287.1C433.7 287.1 448 302.3 448 319.1V416C448 469 405 512 352 512H96C42.98 512 0 469 0 416V159.1C0 106.1 42.98 63.1 96 63.1H192z'/%3E%3C/svg%3E") !important;
-    transform: rotate(0) !important;
+  .w-header-bttn.add-new.active::after {transform: rotate(-180deg);}
+  .w-header-bttn.edit-switch::after {
+  	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%23212529' %3E%3C!--! Font Awesome Pro 6.1.1 by %40fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons  Inc. --%3E%3Cpath d='M490.3 40.4C512.2 62.27 512.2 97.73 490.3 119.6L460.3 149.7L362.3 51.72L392.4 21.66C414.3-.2135 449.7-.2135 471.6 21.66L490.3 40.4zM172.4 241.7L339.7 74.34L437.7 172.3L270.3 339.6C264.2 345.8 256.7 350.4 248.4 353.2L159.6 382.8C150.1 385.6 141.5 383.4 135 376.1C128.6 370.5 126.4 361 129.2 352.4L158.8 263.6C161.6 255.3 166.2 247.8 172.4 241.7V241.7zM192 63.1C209.7 63.1 224 78.33 224 95.1C224 113.7 209.7 127.1 192 127.1H96C78.33 127.1 64 142.3 64 159.1V416C64 433.7 78.33 448 96 448H352C369.7 448 384 433.7 384 416V319.1C384 302.3 398.3 287.1 416 287.1C433.7 287.1 448 302.3 448 319.1V416C448 469 405 512 352 512H96C42.98 512 0 469 0 416V159.1C0 106.1 42.98 63.1 96 63.1H192z'/%3E%3C/svg%3E");
   }
+
+
   .edit-btn {
     display: block;
     height: 2rem;
@@ -63,7 +64,7 @@
 
     visibility: hidden;
     opacity: 0;
-    transition: all 0.5s ease;
+    transition: all 0.3s ease;
   }
   .wallet-table .edit-btn:not(.show-btn) {
     width: 0;
@@ -73,14 +74,11 @@
     opacity: 1;    
   }
   .edit-btn:hover,
-  .modal-close-btn:hover,
-  .accordion-button:hover {
+  .modal-close-btn:hover {
     background-color: #eee;
   }
   .edit-btn:active,
-  .modal-close-btn:active,
-  .accordion-button:active,
-  .accordion-button.accordion-button-active {
+  .modal-close-btn:active {
     background-color: #ddd;
   }
 
@@ -181,63 +179,57 @@
 
 {% with hideForm = data['walletcount'] %}
 {% if hideForm %}
-<div class="section accordion" id="formWrapper">
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="wrapperHeading">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#addWalletForm" aria-expanded="false" aria-controls="addWalletForm" data-accordion-btn>
-        Add new
-      </button>
-      <button class="accordion-button edit-switch" type="button" data-edit-switch data-accordion-btn>
-        Edit
-      </button>
-    </h2>
-{% endif %}
-    <div {% if hideForm %}class="accordion-collapse collapse" aria-labelledby="wrapperHeading" data-bs-parent="#formWrapper" id="addWalletForm" {% else %} class="section" {% endif %}name='form'>
-      <form class='form mx-top' name='addwalletform' action="" method="POST">    
-        <div class='form-row'>
-          <div class='form-field input-group'>
-            {{ form.group.label(class_="input-group-text") }}
-            {{ form.group(class_="form-select", data_group_select="add-new") }}
-          </div>
-          <div class='form-field form-hide' data-group-input="add-new">
-            {{ form.group_new(class_="form-control") }}
-          </div>
-        </div>
-        <div class='form-row'>
-          <div class='form-field input-group'>
-            {{ form.name.label(class_="input-group-text") }}
-            {{ form.name(class_="form-control") }}
-          </div>
-        </div>
-        <div class="form-row form-nowrap">
-          <div class='form-field input-group'>
-            {{ form.amount.label(class_="input-group-text") }}
-            {{ form.amount(class_="form-control") }}
-          </div>
-          {{ form.submit(class_="btn btn-secondary") }}
-        </div>
-        {{ form.hidden_tag() }}
-      </form>
-      <div name="form-errors">
-        {% for error in form.hidden_tag.errors %}
-          hidden: <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-        {% for error in form.group.errors %}
-        group: <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-        {% for error in form.group_new.errors %}
-          group_input: <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-        {% for error in form.name.errors %}
-          name: <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-        {% for error in form.amount.errors %}
-          amount: <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-      </div>
-    </div>
-{% if hideForm %}
+<div class="section">
+  <div class="w-header-bttns">
+    <button class="w-header-bttn add-new" type="button" data-bs-toggle="collapse" data-bs-target="#addWalletForm" aria-expanded="false" aria-controls="addWalletForm"  data-header-bttn>Add new</button>
+    <button class="w-header-bttn edit-switch" type="button" data-header-bttn data-edit-switch>Edit</button>
   </div>
+{% endif %}
+  <div {% if hideForm %} class="collapse" id="addWalletForm" {% else %} class="section" {% endif %} name="form">
+    <form class='form' name='addwalletform' action="" method="POST">    
+      <div class='form-row'>
+        <div class='form-field input-group'>
+          {{ form.group.label(class_="input-group-text") }}
+          {{ form.group(class_="form-select", data_group_select="add-new") }}
+        </div>
+        <div class='form-field form-hide' data-group-input="add-new">
+          {{ form.group_new(class_="form-control") }}
+        </div>
+      </div>
+      <div class='form-row'>
+        <div class='form-field input-group'>
+          {{ form.name.label(class_="input-group-text") }}
+          {{ form.name(class_="form-control") }}
+        </div>
+      </div>
+      <div class="form-row form-nowrap">
+        <div class='form-field input-group'>
+          {{ form.amount.label(class_="input-group-text") }}
+          {{ form.amount(class_="form-control") }}
+        </div>
+        {{ form.submit(class_="btn btn-secondary") }}
+      </div>
+      {{ form.hidden_tag() }}
+    </form>
+    <div name="form-errors">
+      {% for error in form.hidden_tag.errors %}
+        hidden: <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+      {% for error in form.group.errors %}
+      group: <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+      {% for error in form.group_new.errors %}
+        group_input: <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+      {% for error in form.name.errors %}
+        name: <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+      {% for error in form.amount.errors %}
+        amount: <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+    </div>
+  </div>
+{% if hideForm %}
 </div>
 {% endif %}
 {% endwith %}
@@ -353,11 +345,11 @@
 
   // ***** Forms *****
 
-  // highlight accordion buttons ("Add new" and "Edit") on activation
-  const accordionBtns = document.querySelectorAll('[data-accordion-btn]')
-  accordionBtns.forEach(x => {
+  // highlight header buttons ("Add new" and "Edit") on activation
+  const headerBttns = document.querySelectorAll('[data-header-bttn]')
+  headerBttns.forEach(x => {
     x.addEventListener('click', () => {
-      x.classList.toggle('accordion-button-active');
+      x.classList.toggle('active');
     });
   });
 
