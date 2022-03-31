@@ -7,6 +7,7 @@
 <style>
   .history-entry {
     display: grid;
+    align-items: center;
     row-gap: 0.5rem;
     padding: 1rem 0.5rem;
   }
@@ -25,10 +26,13 @@
     gap: 1rem;
   }
   
-  .history-body:not(.history-time) div:not(.rarr) {
+  .history-body div {
     display: inline-block;
     padding: 0 0.5rem;
     border-radius: 3px;
+  }
+  .history-body div.nosidepad {
+    padding: 0;
   }
 
   .action-info     {background-color: #eef;}
@@ -46,7 +50,12 @@
   .history-group {
     color: #888;
     font-size: 0.8rem;
-    margin-left: 0.3rem;
+    margin-right: 0.5rem;
+  }
+
+  .history-description {
+    font-style: italic;
+    color: #444;
   }
 
   @media screen and (min-width: 600px) {
@@ -55,7 +64,7 @@
       justify-content: center;
       column-gap: 2rem;
     }
-    .history-time {
+    .grid-center {
       justify-self: center;
     }
   }
@@ -67,9 +76,9 @@
   {% for entry in history %}
   <div class="history-entry">
 
-    <div class="history-body history-time">
-      <div>{{ entry.local_time[:10] }}</div>
-      <div>{{ entry.local_time[10:16] }}</div>
+    <div class="history-body grid-center">
+      <div class="nosidepad">{{ entry.local_time[:10] }}</div>
+      <div class="nosidepad">{{ entry.local_time[10:16] }}</div>
     </div>
 
     <div class="history-body">
@@ -77,23 +86,23 @@
       <div {% if entry.action == "Spending" %} class="action-spending" {% elif entry.action == "Income" %} class="action-income" {% elif entry.action == "Transfer" %} class="action-transfer" {% else %} class="action-info" {% endif %}>{{ entry.action }}</div>
       
       {% if entry.source %}
-      <div class="history-wallet">{{ wallets[entry.source].name }} <span class="history-group">{% if wallets[entry.source].group != "" %}{{ wallets[entry.source].group }}{% endif %}</span></div>
+      <div class="history-wallet">{% if wallets[entry.source].group != "" %}<span class="history-group">{{ wallets[entry.source].group }}</span>{% endif %}{{ wallets[entry.source].name }}</div>
       {% endif %}
       
       {% if entry.source and entry.destination %}
-      <div class="rarr">&rarr;</div>
+      <div class="nosidepad">&rarr;</div>
       {% endif %}
       
       {% if entry.destination %}
-      <div class="history-wallet">{{ wallets[entry.destination].name }} <span class="history-group">{% if wallets[entry.destination].group != "" %}{{ wallets[entry.destination].group }}{% endif %}</span></div>
+      <div class="history-wallet">{% if wallets[entry.destination].group != "" %}<span class="history-group">{{ wallets[entry.destination].group }}</span>{% endif %}{{ wallets[entry.destination].name }}</div>
       {% endif %}
       
       {% if entry.amount %}
-      <div {% if entry.action == "Spending" %} class="action-spending-amount" {% elif entry.action == "Income" %} class="action-income-amount"{% endif %}>{{ entry.amount | num }}</div>
+      <div {% if entry.action == "Spending" %} class="nosidepad action-spending-amount" {% elif entry.action == "Income" %} class="nosidepad action-income-amount"{% else %} class="nosidepad"{% endif %}>{{ entry.amount | num }}</div>
       {% endif %}
       
       {% if entry.description %}
-      <div>{{ entry.description }}</div>
+      <div class="nosidepad history-description">{{ entry.description }}</div>
       {% endif %}
 
     </div>

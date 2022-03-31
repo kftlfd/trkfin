@@ -5,75 +5,75 @@
 {% block main %}
 
 <style>
-
-.group-title {
-  cursor: pointer;
+  
+.group {
+  border-bottom: 1px solid #555;
+  color: #444;
 }
-.group-name {
-  height: 2.5rem;
-  font-size: 1.1rem;
+.group-unnamed:not(.active) {
+  color: #ccc;
+  border-color: #eee;
+  transition: all 0.5s ease;
+}
+
+.group-title,
+.wallet-title {
+  cursor: pointer;
   display: flex;
   align-items: center;
   border-radius: 3px;
-  margin-bottom: 3px;
   padding: 0.5rem;
 }
-.group-unnamed {
-  color: #888;
+.group-title {  
+  height: 2.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 3px;
+  transition: all 0.5s ease;
 }
-.group-border {
-  border-bottom: 1px solid #555;
+.wallet-title {
+  height: 2rem;
+  margin: 3px;
+  justify-content: space-between;
 }
+.group-title:hover,
+.wallet-title:hover {
+  background-color: #eee;
+}
+.group.active .group-title,
+.wallet-title.active {
+  background-color: #ddd;
+}
+
 .wallet {
   border-top: 1px solid white;
 }
 .wallet + .wallet {
   border-color: #aaa;
 }
-.wallet-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  height: 2rem;
-  border-radius: 3px;
-  margin: 3px;
-  padding: 0.5rem;
-}
+
 .wallet-info {
   font-size: 0.9rem;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  row-gap: 0.5rem;
+  grid-template-columns: max-content max-content;
   justify-content: end;
-  padding-left: 40%;
+  row-gap: 0.5rem;
   margin-bottom: 1.5rem;
   margin-right: 3px;
   padding-right: 0.5rem;
 }
+
 .wallet-amount {
   text-align: right;
+  padding-left: 3rem;
 }
-.wallet-amount.income {
-  color: green;
-}
-.wallet-amount.income::before {
-  content: "+";
-}
-.wallet-amount.spending {
-  color: red;
-}
+.wallet-amount.income {color: green;}
+.wallet-amount.spending {color: red;}
 .wallet-total {
   border-top: 1px solid #aaa;
+  padding-top: 0.3rem;
 }
-.group-name:hover,
-.wallet-title:hover {
-  background-color: #eee;
-}
-.group-name.active,
-.wallet-title.active {
-  background-color: #ddd;
-}
+
 </style>
 
 <div class="section" name='form'>
@@ -158,11 +158,9 @@
 {% if wallets %}
 {% for group in wallets['groups'] %}
 <div class="section">
-  <div class="group">
-    <div class="group-title" data-bs-toggle="collapse" data-bs-target="#group-{{ group }}" aria-expanded="false" aria-controls="group-{{ group }}">
-      {% if group == "" %}<div class="group-name group-unnamed" data-wallet-title>Ungroupped</div>
-      {% else %}<div class="group-name" data-wallet-title>{{ group }}</div>{% endif %}
-    </div>
+  
+  <div {% if group == "" %}class="group group-unnamed"{% else %}class="group"{% endif %} data-bs-toggle="collapse" data-bs-target="#group-{{ group }}" aria-expanded="false" aria-controls="group-{{ group }}" data-wallet-title>
+    <div class="group-title">{{ group or "Ungroupped" }}</div>
     {% if wallets['groupsize'][group] > 1 %}
     <div class="collapse" id="group-{{ group }}">
       <div class="wallet-info">
@@ -178,7 +176,7 @@
     </div>
     {% endif %}
   </div>
-  <div class="group-border"></div>
+    
   {% for w_id in wallets['groups'][group] %}
   <div class="wallet">
     <div class="wallet-title" data-bs-toggle="collapse" data-bs-target="#wallet-body-{{ w_id }}" aria-expanded="false" aria-controls="wallet-body-{{ w_id }}"  data-wallet-title>
@@ -201,6 +199,7 @@
     </div>
   </div>
   {% endfor %}
+
 </div>
 {% endfor %}
 {% endif %}
