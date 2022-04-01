@@ -11,52 +11,23 @@
 {% block main %}
 
 <div class="section">
-
-  <form class="form-wrap" name="registerform" action="" method="POST" novalidate>
-
-    <h3>Sign-Up</h3>
-    
-    {{ form.hidden_tag() }}
-
-    <div class="form auth">
-          
-      <div class="form-vert">
-        <!-- {{ form.username.label(class_="form-label") }} -->
-        {{ form.username(class_="form-control") }}
-        {% for error in form.username.errors %}
-          <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-      </div>
-          
-      <div class="form-vert">
-        <!-- {{ form.password.label(class_="form-label") }} -->
-        {{ form.password(class_="form-control") }}
-        {% for error in form.password.errors %}
-          <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-      </div>
-          
-      <div class="form-vert">
-        <!-- {{ form.confirm.label(class_="form-label") }} -->
-        {{ form.confirm(class_="form-control") }}
-        {% for error in form.confirm.errors %}
-          <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-      </div>
-          
-      <div class="form-vert">
-        {{ form.submit(class_="btn btn-primary") }}
-      </div>
-
+  <h3>Sign-Up</h3>
+  <form class="form" name="registerform" action="" method="POST" novalidate>
+    <div>
+      {{ form.username(class_="form-control") }}
+      {% for error in form.username.errors %}<div style="color: red;">[{{ error }}]</div>{% endfor %}
     </div>
-
+    <div>
+      {{ form.password(class_="form-control") }}
+      {% for error in form.password.errors %}<div style="color: red;">[{{ error }}]</div>{% endfor %}
+    </div>
+    <div>
+      {{ form.confirm(class_="form-control") }}
+      {% for error in form.confirm.errors %}<div style="color: red;">[{{ error }}]</div>{% endfor %}
+    </div>
+    {{ form.submit(class_="btn btn-primary") }}
+    {{ form.hidden_tag() }}
   </form>
-
 </div>
-
-<script>
-  let d = new Date();
-  document.querySelector("#tz_offset").value = d.getTimezoneOffset() * (-60)
-</script>
 
 {% endblock %}

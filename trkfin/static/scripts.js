@@ -38,3 +38,14 @@ if (alert) {
   alertClose.addEventListener("click", alertHide);
   setTimeout(alertHide, 10000)
 }
+
+
+
+// ********** REGISTRATION **********
+
+// get user timezone
+const tzInput = document.forms["registerform"]?.tz_offset;
+if (tzInput) {
+  let d = new Date();
+  tzInput.value = d.getTimezoneOffset() * (-60)
+}
