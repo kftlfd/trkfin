@@ -4,81 +4,8 @@
 
 {% block main %}
 
-<style>
-  
-.group {
-  border-bottom: 1px solid #555;
-  color: #444;
-}
-.group-unnamed:not(.active) {
-  color: #ccc;
-  border-color: #eee;
-  transition: all 0.5s ease;
-}
-
-.group-title,
-.wallet-title {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  border-radius: 3px;
-  padding: 0.5rem;
-}
-.group-title {  
-  height: 2.5rem;
-  font-size: 1.1rem;
-  font-weight: bold;
-  margin-bottom: 3px;
-  transition: all 0.5s ease;
-}
-.wallet-title {
-  height: 2rem;
-  margin: 3px;
-  justify-content: space-between;
-}
-.group-title:hover,
-.wallet-title:hover {
-  background-color: #eee;
-}
-.group.active .group-title,
-.wallet-title.active {
-  background-color: #ddd;
-}
-
-.wallet {
-  border-top: 1px solid white;
-}
-.wallet + .wallet {
-  border-color: #aaa;
-}
-
-.wallet-info {
-  font-size: 0.9rem;
-  display: grid;
-  grid-template-columns: max-content max-content;
-  justify-content: end;
-  row-gap: 0.5rem;
-  margin-bottom: 1.5rem;
-  margin-right: 3px;
-  padding-right: 0.5rem;
-}
-
-.wallet-amount {
-  text-align: right;
-  padding-left: 3rem;
-}
-.wallet-amount.income {color: green;}
-.wallet-amount.spending {color: red;}
-.wallet-total {
-  border-top: 1px solid #aaa;
-  padding-top: 0.3rem;
-}
-
-</style>
-
 <div class="section" name='form'>
-
-  <form class="form" action="" method="POST" data-form>
+  <form class="form" name="MainForm" action="" method="POST" data-form>
     <div class="btn-group" role="group" aria-label="Select action">
       {% for subfield in form.action %}
       {{ subfield(class_="btn-check") }}
@@ -106,53 +33,13 @@
     </div>
     {{ form.hidden_tag() }}
   </form>
-  
   <div name="form-errors">
-    {% for error in form.hidden_tag.errors %}
-      hidden: <span style="color: red;">[{{ error }}]</span>
-    {% endfor %}
-    {% for error in form.source.errors %}
-      source: <span style="color: red;">[{{ error }}]</span>
-    {% endfor %}
-    {% for error in form.destination.errors %}
-      dest: <span style="color: red;">[{{ error }}]</span>
-    {% endfor %}
-    {% for error in form.amount.errors %}
-      amount: <span style="color: red;">[{{ error }}]</span>
-    {% endfor %}
-    {% for error in form.description.errors %}
-      descr: <span style="color: red;">[{{ error }}]</span>
-    {% endfor %}
+    {% for error in form.hidden_tag.errors %}<div style="color: red;">hidden: [{{ error }}]</div>{% endfor %}
+    {% for error in form.source.errors %}<div style="color: red;">source: [{{ error }}]</div>{% endfor %}
+    {% for error in form.destination.errors %}<div style="color: red;">dest: [{{ error }}]</div>{% endfor %}
+    {% for error in form.amount.errors %}<div style="color: red;">amount: [{{ error }}]</div>{% endfor %}
+    {% for error in form.description.errors %}<div style="color: red;">descr: [{{ error }}]</div>{% endfor %}
   </div>
-      
-  
-  <script>
-  
-    // show/hide form fields
-    const form = document.querySelector('[data-form]');
-    const src  = document.querySelector('[data-form-field="source"');
-    const dest = document.querySelector('[data-form-field="destination"');
-    form.addEventListener('click', function() {
-      let select = form.action.value;
-      if (select == 'Spending') {
-        src.classList.remove('form-hide');
-        dest.classList.add('form-hide');
-      }
-      else if (select == 'Income') {
-        src.classList.add('form-hide');
-        dest.classList.remove('form-hide');
-      }
-      else { // 'transfer'
-        src.classList.remove('form-hide');
-        dest.classList.remove('form-hide');
-      }
-    });
-  
-    // select 'spending' as default
-    form.action.item(0).click();
-  
-  </script>
-  
 </div>
 
 {% if wallets %}
@@ -203,13 +90,5 @@
 </div>
 {% endfor %}
 {% endif %}
-
-<script>
-document.querySelectorAll('[data-wallet-title]').forEach(x => {
-  x.addEventListener('click', () => {
-    x.classList.toggle('active');
-  });
-});
-</script>
 
 {% endblock %}

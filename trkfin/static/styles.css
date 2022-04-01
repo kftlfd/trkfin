@@ -156,3 +156,79 @@ body {
 .form-hide {
   display: none;
 }
+
+
+
+/*************************************************************************
+
+      HOME
+
+*************************************************************************/
+
+.group {
+  border-bottom: 1px solid #555;
+  color: #444;
+}
+.group-unnamed:not(.active) {
+  color: #ccc;
+  border-color: #eee;
+  transition: all 0.5s ease;
+}
+
+.group-title,
+.wallet-title {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border-radius: 3px;
+  padding: 0.5rem;
+  transition: all 0.2s ease;
+}
+.group-title {  
+  height: 2.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 3px;
+}
+.wallet-title {
+  height: 2rem;
+  margin: 3px;
+  justify-content: space-between;
+}
+.group-title:hover,
+.wallet-title:hover {
+  background-color: #eee;
+}
+.group.active .group-title,
+.wallet-title.active {
+  background-color: #ddd;
+}
+
+.wallet {
+  border-top: 1px solid white;
+}
+.wallet + .wallet {
+  border-color: #aaa;
+}
+
+.wallet-info {
+  font-size: 0.9rem;
+  display: grid;
+  grid-template-columns: max-content max-content;
+  justify-content: end;
+  row-gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  margin-right: 3px;
+  padding-right: 0.5rem;
+}
+
+.wallet-amount {
+  text-align: right;
+  padding-left: 3rem;
+}
+.wallet-amount.income {color: green;}
+.wallet-amount.spending {color: red;}
+.wallet-total {
+  border-top: 1px solid #aaa;
+  padding-top: 0.3rem;
+}

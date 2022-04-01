@@ -49,3 +49,37 @@ if (tzInput) {
   let d = new Date();
   tzInput.value = d.getTimezoneOffset() * (-60)
 }
+
+
+
+// ********** HOME **********
+
+const mainForm = document.forms["MainForm"];
+if (mainForm) {
+  let src = document.querySelector('[data-form-field="source"');
+  let dest = document.querySelector('[data-form-field="destination"');
+  mainForm.addEventListener('click', function() {
+    let select = mainForm.action.value;
+    if (select == 'Spending') {
+      src.classList.remove('form-hide');
+      dest.classList.add('form-hide');
+    }
+    else if (select == 'Income') {
+      src.classList.add('form-hide');
+      dest.classList.remove('form-hide');
+    }
+    else { // 'transfer'
+      src.classList.remove('form-hide');
+      dest.classList.remove('form-hide');
+    }
+  });
+  // select 'spending' as default
+  mainForm.action.item(0).click();
+}
+
+// wallet title active on click
+document.querySelectorAll('[data-wallet-title]').forEach(x => {
+  x.addEventListener('click', () => {
+    x.classList.toggle('active');
+  });
+});
