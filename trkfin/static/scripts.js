@@ -56,8 +56,10 @@ if (tzInput) {
 
 const mainForm = document.forms["MainForm"];
 if (mainForm) {
+
   let src = document.querySelector('[data-form-field="source"');
   let dest = document.querySelector('[data-form-field="destination"');
+
   mainForm.addEventListener('click', function() {
     let select = mainForm.action.value;
     if (select == 'Spending') {
@@ -73,8 +75,10 @@ if (mainForm) {
       dest.classList.remove('form-hide');
     }
   });
+
   // select 'spending' as default
   mainForm.action.item(0).click();
+  
 }
 
 // wallet title active on click
@@ -83,3 +87,103 @@ document.querySelectorAll('[data-wallet-title]').forEach(x => {
     x.classList.toggle('active');
   });
 });
+
+
+
+// ********** WALLETS **********
+
+const addWalletForm = document.forms["AddWalletform"];
+if (addWalletForm) {
+
+  // ***** helper functions *****
+
+  function hide_group_input(select, input) {
+    if (select.value == '*New') {
+      input.classList.remove('form-hide');
+    } else {
+      input.classList.add('form-hide');
+    }
+  }
+
+  function grey_out_groups(select) {
+    if (select.value == "" || select.value == "*New") {
+      select.classList.add('group-greyed-out');
+    } else {
+      select.classList.remove('group-greyed-out');
+    }
+  }
+
+  // ***** Forms *****
+
+  // highlight header buttons ("Add new" and "Edit") on activation
+  const headerBttns = document.querySelectorAll('[data-header-bttn]')
+  headerBttns.forEach(x => {
+    x.addEventListener('click', () => {
+      x.classList.toggle('active');
+    });
+  });
+
+  // hide group input and grey out None and New in forms
+  const groupSelectors = document.querySelectorAll('[data-group-select]')
+  groupSelectors.forEach(s => {
+    let i = document.querySelector('[data-group-input="' + s.dataset.groupSelect + '"]')
+
+    hide_group_input(s, i);
+    grey_out_groups(s);
+
+    s.addEventListener('change', () => {
+      hide_group_input(s, i);
+      grey_out_groups(s);
+    });
+  });
+
+  // ***** Wallet controls Modals *****
+
+  // show controls
+  const editSwitch = document.querySelector('[data-edit-switch]')
+  const editBtns = document.querySelectorAll('[data-edit-btn]')
+  editSwitch.addEventListener('click', function() {
+    document.querySelectorAll('[data-unnamed-group]').forEach(x => {
+      x.classList.toggle('group-unnamed')
+    });
+    editBtns.forEach(x => {
+      x.classList.toggle('show-btn');
+    });
+  });
+
+  // open and close modals
+  const modalToggles = document.querySelectorAll('[data-modal-toggle]')
+  modalToggles.forEach(x => {
+    x.addEventListener('click', function() {
+      let select = '[data-modal = "' + x.dataset.modalToggle + '"]'
+      document.querySelectorAll(select).forEach(m => {
+        m.classList.toggle('modal-show')
+      });
+    });
+  });
+
+  // prevent closing modal by clicking on content
+  const modalContents = document.querySelectorAll('[data-modal-content]')
+  modalContents.forEach(x => {
+    x.addEventListener('click', (y) => {
+      y.cancelBubble = true;
+    });
+  });
+
+  // confirm deletion of wallet/group
+  const toConfirm = document.querySelectorAll('[data-confirm-action]');
+  toConfirm.forEach(x => {
+    x.addEventListener('submit', (event) => {
+      let message = x.dataset.confirmAction;
+      if (message == "delete group") {
+        message = "Are you sure you want to delete this group?\n\nDoing so will move all its wallets to Ungrouped, or if they are ungroupped, they will be deleted.";
+      } else if (message == "delete wallet") {
+        message = "If you delete wallet, it will still be visible in History as deleted in your next report, previous tranfers to/from other wallets will also remain.\n\nAre you sure?";
+      }
+      if (!confirm(message)) {
+        event.preventDefault();
+      }
+    });
+  });
+
+}
