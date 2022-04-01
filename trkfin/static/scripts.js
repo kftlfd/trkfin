@@ -1,13 +1,31 @@
-// nav-sidebar open-close
-const navSidebar = document.querySelector("[data-nav-sidebar]")
-const navSidebarBg = document.querySelector("[data-nav-sidebar-bg]")
-function toggleNavSidebar() {
-  navSidebar.classList.toggle('open');
-  navSidebarBg.classList.toggle('open');
-}
-let toggles = document.querySelectorAll("[data-nav-sidebar-toggle]")
-toggles.forEach(x => x.addEventListener("click", toggleNavSidebar));
 
+// ********** NAVBAR **********
+
+// dropdown
+const navDropdown = document.querySelectorAll('[data-nav-dropdown]');
+const navDropdownToggle = document.querySelectorAll('[data-nav-dropdown-toggle]');
+navDropdownToggle.forEach(x => {
+  x.addEventListener('click', () => {
+    navDropdown.forEach(y => {
+      y.classList.toggle('nav-dropdown-show');
+    });
+  });
+}); 
+
+// sidebar
+const navSidebar = document.querySelectorAll("[data-nav-sidebar]")
+const navSidebarToggles = document.querySelectorAll("[data-nav-sidebar-toggle]")
+navSidebarToggles.forEach(x => {
+  x.addEventListener('click', () => {
+    navSidebar.forEach(y => {
+      y.classList.toggle('nav-sidebar-open');
+    });
+  });
+});
+
+
+
+// ********** ALERTS **********
 
 // show and hide alert
 const alert = document.querySelector("[data-alert]")

@@ -13,6 +13,7 @@
     
     <link href="/static/favicon.png" rel="icon">
     <link href="/static/styles.css" rel="stylesheet">
+    <link href="/static/navbar.css" rel="stylesheet">
     <script src="/static/scripts.js" defer></script>
 
     {% block head %}{% endblock %}
@@ -27,69 +28,36 @@
         <span class="bar"></span>
         <span class="bar"></span>
       </div>
-      <div class="nav-sidebar-bg" data-nav-sidebar-bg data-nav-sidebar-toggle></div>
+      <div class="nav-sidebar-bg" data-nav-sidebar data-nav-sidebar-toggle></div>
       <div class="nav-sidebar" data-nav-sidebar>
         <div class="nav-sidebar-toggle-close" data-nav-sidebar-toggle>
           <span>&times;</span>
         </div>
-
         {% if current_user.is_authenticated %}
         <ul class="nav-links">
-          <li><a class="" href="{{ url_for('home') }}" data-nav-sidebar-toggle>Home</a></li>
-          <li><a class="" href="{{ url_for('wallets', username=current_user.username) }}" data-nav-sidebar-toggle>Wallets</a></li>
-          <li><a class="" href="{{ url_for('reports', username=current_user.username) }}" data-nav-sidebar-toggle>Reports</a></li>
-          <li><a class="" href="{{ url_for('history', username=current_user.username) }}" data-nav-sidebar-toggle>History</a></li>
+          <li><a class="nav-link" href="{{ url_for('home') }}">Home</a></li>
+          <li><a class="nav-link" href="{{ url_for('wallets', username=current_user.username) }}">Wallets</a></li>
+          <li><a class="nav-link" href="{{ url_for('reports', username=current_user.username) }}">Reports</a></li>
+          <li><a class="nav-link" href="{{ url_for('history', username=current_user.username) }}">History</a></li>
         </ul>
-
-        <div class="drpdwn" data-drpdwn>
-          
-          <div class="bttn bttn-outline" href="#" data-drpdwn-toggle>
-            {{ current_user.username }}
-          </div>
-          
-          <ul class="drpdwn-menu border-rad no-display" data-drpdwn-menu>
-            <li><a class="drpdwn-item" href="{{ url_for('account', username=current_user.username) }}">Account</a></li>
+        <div class="nav-dropdown">
+          <div class="nav-bttn nav-bttn-outline nav-dropdown-toggle" href="#" data-nav-dropdown-toggle>{{ current_user.username }}</div>
+          <ul class="nav-dropdown-menu" data-nav-dropdown>
+            <li><a class="nav-link" href="{{ url_for('account', username=current_user.username) }}">Account</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="drpdwn-item border-rad" href="{{ url_for('auth.logout') }}">Log Out</a></li>
+            <li><a class="nav-link" href="{{ url_for('auth.logout') }}">Log Out</a></li>
           </ul>
-
-          <div class="drpdwn-close" data-drpdwn-close></div>
-
-          <script>
-            const drpdwnMenu = document.querySelector("[data-drpdwn-menu]");
-            const drpdwnToggle = document.querySelector("[data-drpdwn-toggle]");
-            const drpdwnClose = document.querySelector("[data-drpdwn-close]");
-            
-            drpdwnToggle.addEventListener("click", function() {
-              if (drpdwnMenu.classList.contains("no-display")) {
-                drpdwnMenu.classList.remove("no-display");
-                drpdwnClose.style.visibility = "visible"
-              } else {
-                drpdwnMenu.classList.add("no-display");
-              }
-            });
-
-            drpdwnClose.addEventListener("click", function() {
-              drpdwnMenu.classList.add("no-display");
-              drpdwnClose.style.visibility = "hidden"
-            });
-          </script>
-
+          <div class="nav-dropdown-menu-bg" data-nav-dropdown data-nav-dropdown-toggle></div>
         </div>
-
         <ul class="nav-bttns">
-          <li><a class="bttn bttn-outline" href="{{ url_for('account', username=current_user.username) }}"><strong>{{ current_user.username }}</strong></a></li>
-          <li><a class="bttn" href="{{ url_for('auth.logout') }}">Log Out</a></li>
+          <li><a class="nav-bttn nav-bttn-outline" href="{{ url_for('account', username=current_user.username) }}"><strong>{{ current_user.username }}</strong></a></li>
+          <li><a class="nav-bttn" href="{{ url_for('auth.logout') }}">Log Out</a></li>
         </ul>
-        
         {% else %}
         <ul class="nav-links">
+          <a class="nav-bttn nav-bttn-outline" href="{{ url_for('auth.login') }}">Log In</a>
+          <a class="nav-bttn" href="{{ url_for('auth.register') }}">Register</a>
         </ul>
-        <ul class="nav-bttns">
-          <li><a class="bttn bttn-outline" href="{{ url_for('auth.login') }}">Log In</a></li>
-          <li><a class="bttn" href="{{ url_for('auth.register') }}">Register</a></li>
-        </ul>
-        
         {% endif %}
       </div>        
     </nav>
