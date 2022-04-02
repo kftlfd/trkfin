@@ -170,20 +170,71 @@ if (addWalletForm) {
     });
   });
 
-  // confirm deletion of wallet/group
-  const toConfirm = document.querySelectorAll('[data-confirm-action]');
-  toConfirm.forEach(x => {
-    x.addEventListener('submit', (event) => {
-      let message = x.dataset.confirmAction;
-      if (message == "delete group") {
-        message = "Are you sure you want to delete this group?\n\nDoing so will move all its wallets to Ungrouped, or if they are ungroupped, they will be deleted.";
-      } else if (message == "delete wallet") {
-        message = "If you delete wallet, it will still be visible in History as deleted in your next report, previous tranfers to/from other wallets will also remain.\n\nAre you sure?";
-      }
-      if (!confirm(message)) {
-        event.preventDefault();
-      }
-    });
-  });
+}
+
+
+
+// ********** ACCOUNT **********
+
+const updTimezone = document.forms["change-timezone"];
+if (updTimezone) {
+  
+  // display user's saved timezone
+  function parseTimezone(offset) {
+    let direction = '+';
+    if (offset < 0) {
+      direction = '-';
+      offset *= -1;
+    }
+    let hours = offset / 60;
+    if (hours < 10) {hours = '0' + hours;}
+    let minutes = offset % 60;
+    if (minutes < 10) {minutes = '0' + minutes;}
+    return ('GMT' + direction + hours + ':' + minutes);
+  }
+  let userTz = document.querySelector('[data-timezone]');
+  userTz.innerText = parseTimezone(Number(userTz.dataset.timezone) / 60);
+
+  // record user's current timezone
+  let currentTz = new Date();
+  document.querySelector('[data-new-tz]').value = currentTz.getTimezoneOffset() * -60;
 
 }
+
+const chgReports = document.forms["change-reports"];
+if (chgReports) {
+  
+  let repFqSelect = document.querySelector('[data-rep-freq-select]')
+  let repFqInput = document.querySelector('[data-rep-freq-input]')
+  let repFq = document.querySelector('[data-rep-freq]')
+  
+  repFqSelect.addEventListener("change", () => {
+    if (repFqSelect.value == "other") {
+      repFqInput.classList.remove('form-hide');
+    } else {
+      repFqInput.classList.add('form-hide');
+    }
+  });
+
+  repFq.selected = true;
+
+}
+
+
+
+// ********** CONFIRM **********
+
+const toConfirm = document.querySelectorAll('[data-confirm-action]');
+toConfirm.forEach(x => {
+  x.addEventListener('submit', (event) => {
+    let message = x.dataset.confirmAction;
+    if (message == "delete group") {
+      message = "Are you sure you want to delete this group?\n\nDoing so will move all its wallets to Ungrouped, or if they are ungroupped, they will be deleted.";
+    } else if (message == "delete wallet") {
+      message = "If you delete wallet, it will still be visible in History as deleted in your next report, previous tranfers to/from other wallets will also remain.\n\nAre you sure?";
+    }
+    if (!confirm(message)) {
+      event.preventDefault();
+    }
+  });
+});

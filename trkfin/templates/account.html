@@ -4,234 +4,101 @@
 
 {% block main %}
 
-<style>
-  .setting {
-    padding: 2rem 1rem 0rem;
-  }
-  .setting:not(.noborder) {
-    border-top: 1px solid #ccc;
-  }
-  .setting-title {
-    font-size: 1.3rem;
-    color: #555;
-    margin-bottom: 1rem;
-  }
-
-  .mx-b {
-    margin-bottom: 0.5rem;
-  }
-  .username {
-    font-size: 1.2rem;
-    font-weight: 700;
-  }
-  .change-btn {
-    color: rgb(60, 60, 255);
-    border: none;
-    border-radius: 5px;
-    margin: 0.5rem 0;
-    font-weight: 100;
-    background-color: #ddf;
-  }
-  .change-btn:hover {
-    background-color: #eef;
-  }
-  .change-btn:active {
-    background-color: #bbf;
-  }  
-  
-  .col-auto {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-  .form-select,
-  .form-control {
-    display: inline-block;
-    width: auto;
-  }
-
-  @media screen and (min-width: 620px) {
-    .setting {
-      display: grid;
-      grid-template-columns: 3fr 4fr;
-    }
-    .setting-title {
-      margin-bottom: 0rem;
-    }
-  }
-</style>
-
 <header class="section title">Account</header>
 
 <div class='section'>
-  <div class="setting noborder">
+
+  <div class="setting">
     <div class="setting-title">Username</div>
-    <div>
-      <div class="mx-b"><span class="username">{{ data['username'] }}</span></div>
-      <button class="change-btn" type="button" data-bs-toggle="collapse" data-bs-target="#changeUsername" aria-expanded="false" aria-controls="changeUsername">
-        Change
-      </button>
+    <div class="setting-body">
+      <div class="acc-info">{{ data['username'] }}</div>
+      <button class="change-btn margin-top" type="button" data-bs-toggle="collapse" data-bs-target="#changeUsername" aria-expanded="false" aria-controls="changeUsername">Change</button>
       <div class="collapse" id="changeUsername">
-        <form class="row" name="username" action="{{ url_for('account', username=current_user.username) }}" method="POST">
-          <div class="col-auto">
-            <input class="form-control" name="new-username" type="text" value="" placeholder="New username" pattern="[\w\d-_]{1,64}" title="letters, numbers, '-', '_'">
-          </div>
-          <div class="col-auto">
-            <input class="btn btn-primary" type="submit" value="Change">
-          </div>
+        <form class="form-row margin-top" name="change-username" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+          <input class="form-control width-auto" name="new-username" type="text" value="" placeholder="New username" pattern="[\w\d-_]{1,64}" title="letters, numbers, '-', '_'">
+          <input class="btn btn-primary" type="submit" value="Change">
         </form>
       </div>
     </div>
   </div>
-</div>
 
-<div class='section'>
   <div class="setting">
     <div class="setting-title">E-mail</div>
-    <div>
-      <div class="mx-b"><span class="username">{{ data['email'] or "—" }}</span></div>
-      <button class="change-btn" type="button" data-bs-toggle="collapse" data-bs-target="#changeEmail" aria-expanded="false" aria-controls="changeEmail">
-        Change
-      </button>
+    <div class="setting-body">
+      <div class="acc-info">{{ data['email'] or "—" }}</div>
+      <button class="change-btn margin-top" type="button" data-bs-toggle="collapse" data-bs-target="#changeEmail" aria-expanded="false" aria-controls="changeEmail">Change</button>
       <div class="collapse" id="changeEmail">
-        <form class="row" name="email" action="{{ url_for('account', username=current_user.username) }}" method="POST">
-          <div class="col-auto">
-            <input class="form-control" disabled name="new-email" type="text" value="" placeholder="New email">
-          </div>
-          <div class="col-auto">
-            <input class="btn btn-primary" disabled type="submit" value="Change">
-          </div>
+        <form class="form-row margin-top" name="change-email" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+          <input class="form-control width-auto" disabled name="new-email" type="text" value="" placeholder="New email">
+          <input class="btn btn-primary" disabled type="submit" value="Change">
         </form>
       </div>
     </div>
   </div>
-</div>
 
-<div class='section'>
   <div class="setting">
     <div class="setting-title">Password</div>
-    <div>
-      <button class="change-btn" type="button" data-bs-toggle="collapse" data-bs-target="#changePassword" aria-expanded="false" aria-controls="changePassword">
-        Change
-      </button>
+    <div class="setting-body">
+      <button class="change-btn" type="button" data-bs-toggle="collapse" data-bs-target="#changePassword" aria-expanded="false" aria-controls="changePassword">Change</button>
       <div class="collapse" id="changePassword">
-        <form name="password" action="{{ url_for('account', username=current_user.username) }}" method="POST">
-          <div class="col-auto">
-            <input class="form-control" name="old-password" type="password" value="" placeholder="Old password">
-          </div>
-          <div class="col-auto">
-            <input class="form-control" name="new-password" type="password" value="" placeholder="New password">
-          </div>
-          <div class="col-auto">
-            <input class="btn btn-primary" type="submit" value="Change">
-          </div>
+        <form class="form-col margin-top" name="change-password" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+          <input class="form-control" name="old-password" type="password" value="" placeholder="Old password">
+          <input class="form-control" name="new-password" type="password" value="" placeholder="New password">
+          <input class="btn btn-primary" type="submit" value="Change">
         </form>
       </div>
     </div>
   </div>
-</div>
 
-<div class='section'>
   <div class="setting">
     <div class="setting-title">Timezone</div>
-    <div>
-      <div data-timezone="{{ data['timezone'] }}"><span data-user-time></span></div>
-      <form name="timezone" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+    <div class="setting-body">
+      <div data-timezone="{{ data['timezone'] }}"></div>
+      <form class="margin-top" name="change-timezone" action="{{ url_for('account', username=current_user.username) }}" method="POST">
         <input name="new-timezone" type="hidden" data-new-tz>
         <input class="change-btn" type="submit" value="Update">
       </form>
     </div>
   </div>
-</div> 
 
-<div class='section'>
   <div class="setting">
     <div class="setting-title">Reports</div>
-    <div>
-      <form name="reports" action="{{ url_for('account', username=current_user.username) }}" method="POST">
-        <div class="mx-b">
-          <span>Frequency:</span>
-          <select class="form-select form-select-sm" name="new-report-frequency" data-rep-freq-select>
-            <option value="month" {% if data['rep-freq'] == "month" %}selected data-rep-fq{% endif %}>Month</option>
-            <option value="week" {% if data['rep-freq'] == "week" %}selected data-rep-fq{% endif %}>Week</option>
-            {% if data['rep-freq'] != "month" and data['rep-freq'] != "week" %}<option value="custom" selected data-rep-fq>Custom</option>{% endif %}
+    <div class="setting-body">
+      <form name="change-reports" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+        <div class="form-row">
+          <div>Frequency:</div>
+          <select class="form-select form-select-sm width-auto" name="new-report-frequency" data-rep-freq-select>
+            <option value="month" {% if data['rep-freq'] == "month" %}data-rep-freq{% endif %}>Month</option>
+            <option value="week" {% if data['rep-freq'] == "week" %}data-rep-freq{% endif %}>Week</option>
+            {% if data['rep-freq'] != "month" and data['rep-freq'] != "week" %}<option value="custom" data-rep-freq>Custom</option>{% endif %}
             <option value="other">Other</option>
           </select>
           {% if data['rep-freq'] != "month" and data['rep-freq'] != "week" %}<span>every {{ data['rep-freq'] }} days</span>{% endif %}
+          <input class="form-control form-control-sm form-hide width-auto" name="ndays" type="number" min="1" max="365" placeholder="Number of days" data-rep-freq-input>
         </div>
-        <div class="mx-b" data-rep-freq-input>
-          <input class="form-control form-control-sm" name="ndays" type="number" min="1" max="365" placeholder="Number of days">
-        </div>
-        <div>
+        <div class="form-row margin-top">
           <input class="form-check-input" disabled id="email-rep" type="checkbox" name="email-reports" value="true" {% if data['email-reports'] %} checked {% endif %}>
           <label class="form-check-label" for="email-rep">Send reports to e-mail</label>
         </div>
-        <input class="change-btn" type="submit" value="Update">
+        <input class="change-btn margin-top" type="submit" value="Update">
       </form>
     </div>
   </div>
-</div>
 
-<div class="section">
   <div class="setting">
     <div class="setting-title">Privacy</div>
-    <div>
-      <form class="mx-b" name="export" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+    <div class="setting-body">
+      <form name="export-data" action="{{ url_for('account', username=current_user.username) }}" method="POST">
         <input class="btn btn-success" type="submit" value="Export data">
         <input name="export-data" type="hidden" value="true">
       </form>
-      <form name="delete" action="{{ url_for('account', username=current_user.username) }}" method="POST" onsubmit="confirm_delete()">
+      <form class="margin-top" name="delete-account" action="{{ url_for('account', username=current_user.username) }}" method="POST" data-confirm-action="All your data will be deleted. Consider exporting your data first. This action cannot be undone.\n\nDelete account?">
         <input class="btn btn-danger" type="submit" value="Delete account">
         <input name="delete-account" type="hidden" value="true">
       </form>
     </div>
   </div>
+
 </div>
-
-<script>
-
-  // display user timezone
-  function parseTimezone(offset) {
-    let direction = '+'
-    if (offset < 0) {
-      direction = '-'
-      offset *= -1
-    }
-    let hours = offset / 60
-    if (hours < 10) {hours = '0' + hours}
-    let minutes = offset % 60
-    if (minutes < 10) {minutes = '0' + minutes}
-    return ('GMT' + direction + hours + ':' + minutes)
-  }
-  let userTime = document.querySelector('[data-timezone]')
-  userTime.innerText = parseTimezone(Number(userTime.dataset.timezone) / 60)
-
-  // update timezone
-  let newtz = document.querySelector('[data-new-tz]')
-  let d = new Date()
-  newtz.value = d.getTimezoneOffset() * -60
-
-  // reports frequency
-  let repFqSelect = document.querySelector('[data-rep-freq-select]')
-  let repFq = document.querySelector('[data-rep-fq]')
-  repFq.selected = true;
-  let repFqInput = document.querySelector('[data-rep-freq-input]')
-  repFqInput.style.display = "none";
-  repFqSelect.addEventListener("change", function() {
-    if (repFqSelect.value == "other") {
-      repFqInput.style.display = "inline-block";
-    } else {
-      repFqInput.style.display = "none";
-    }
-    console.log("change")
-  });
-
-  // privacy
-  function confirm_delete() {
-    if (!confirm("this cannot be undone. Consider exporting all data first")) {
-      event.preventDefault()
-    }
-  }
-  
-</script>
 
 {% endblock %}

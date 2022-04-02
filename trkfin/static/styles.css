@@ -132,18 +132,25 @@ body {
 
 *************************************************************************/
 
-.form {
+.form,
+.form-row,
+.form-col {
   display: flex;
-  flex-direction: column;
   gap: 0.3rem;
+}
+.form {
+  flex-direction: column;
   background-color: #f8f9fa;
   border-radius: 5px;
   padding: 0.3rem;
 }
 .form-row {
-  display: flex;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 0.3rem;
+}
+.form-col {
+  flex-direction: column;
+  align-items: flex-start;
 }
 .form-field {
   width: auto;
@@ -460,5 +467,62 @@ body {
   }
   .grid-center {
     justify-self: center;
+  }
+}
+
+
+
+/*************************************************************************
+
+      ACCOUNT
+
+*************************************************************************/
+
+.setting {
+  display: grid;
+  row-gap: 1rem;
+  column-gap: 2rem;
+  padding: 2rem 1rem;
+}
+.setting:not(:first-child) {
+  border-top: 1px solid #ccc;
+}
+
+.setting-title {
+  font-size: 1.3rem;
+  color: #555;
+}
+
+.setting-body {
+  display: grid;
+  align-items: center;
+  justify-items: start;
+}
+
+.change-btn {
+  background-color: #ddf;
+  color: rgb(60, 60, 255);
+  font-weight: lighter;
+  border: none;
+  border-radius: 5px;
+  margin: 0;
+  padding: 0.3rem 0.5rem;
+  transition: all 0.3s ease;
+}
+.change-btn:hover {background-color: #eef;}
+.change-btn:active {background-color: #bbf;}
+
+.acc-info {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.width-auto {width: auto;}
+.margin-top {margin-top: 1rem;}
+.align-self-center {align-self: center;}
+
+@media screen and (min-width: 450px) {
+  .setting {
+    grid-template-columns: 2fr 5fr;
   }
 }
