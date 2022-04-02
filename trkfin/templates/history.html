@@ -4,72 +4,6 @@
 
 {% block main %}
 
-<style>
-  .history-entry {
-    display: grid;
-    align-items: center;
-    row-gap: 0.5rem;
-    padding: 1rem 0.5rem;
-  }
-  .history-entry:not(:first-of-type) {
-    border-top: 1px solid #ccc;
-  }
-
-  .history-body {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    width: fit-content;
-  }
-  
-  .history-time {
-    gap: 1rem;
-  }
-  
-  .history-body div {
-    display: inline-block;
-    padding: 0 0.5rem;
-    border-radius: 3px;
-  }
-  .history-body div.nosidepad {
-    padding: 0;
-  }
-
-  .action-info     {background-color: #eef;}
-  .action-spending {background-color: #fdd;}
-  .action-income   {background-color: #dfd;}
-  .action-transfer {background-color: #eee;}
-
-  .action-spending-amount {color: red;}
-  .action-spending-amount::before {content: "-";}
-
-  .action-income-amount {color: green;}
-  .action-income-amount::before {content: "+";}
-
-  .history-wallet {border: 1px solid #eee;}
-  .history-group {
-    color: #888;
-    font-size: 0.8rem;
-    margin-right: 0.5rem;
-  }
-
-  .history-description {
-    font-style: italic;
-    color: #444;
-  }
-
-  @media screen and (min-width: 600px) {
-    .history-entry {
-      grid-template-columns: 3fr 5fr;
-      justify-content: center;
-      column-gap: 2rem;
-    }
-    .grid-center {
-      justify-self: center;
-    }
-  }
-</style>
-
 <div class="section title">History</div>
 
 <div class="section">
@@ -86,7 +20,16 @@
       <div {% if entry.action == "Spending" %} class="action-spending" {% elif entry.action == "Income" %} class="action-income" {% elif entry.action == "Transfer" %} class="action-transfer" {% else %} class="action-info" {% endif %}>{{ entry.action }}</div>
       
       {% if entry.source %}
-      <div class="history-wallet">{% if wallets[entry.source].group != "" %}<span class="history-group">{{ wallets[entry.source].group }}</span>{% endif %}{{ wallets[entry.source].name }}</div>
+      {% if wallets[entry.source] %}
+      <div class="history-wallet">
+        {% if wallets[entry.source].group != "" %}
+        <span class="history-group">{{ wallets[entry.source].group }}</span>
+        {% endif %}
+        {{ wallets[entry.source].name }}
+      </div>
+      {% else %}
+      <div class="history-wallet deleted">DELETED</div>
+      {% endif %}
       {% endif %}
       
       {% if entry.source and entry.destination %}
@@ -94,7 +37,16 @@
       {% endif %}
       
       {% if entry.destination %}
-      <div class="history-wallet">{% if wallets[entry.destination].group != "" %}<span class="history-group">{{ wallets[entry.destination].group }}</span>{% endif %}{{ wallets[entry.destination].name }}</div>
+      {% if wallets[entry.destination] %}
+      <div class="history-wallet">
+        {% if wallets[entry.destination].group != "" %}
+        <span class="history-group">{{ wallets[entry.destination].group }}</span>
+        {% endif %}
+        {{ wallets[entry.destination].name }}
+      </div>
+      {% else %}
+      <div class="history-wallet deleted">DELETED</div>
+      {% endif %}
       {% endif %}
       
       {% if entry.amount %}
