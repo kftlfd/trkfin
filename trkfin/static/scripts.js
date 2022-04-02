@@ -228,11 +228,6 @@ const toConfirm = document.querySelectorAll('[data-confirm-action]');
 toConfirm.forEach(x => {
   x.addEventListener('submit', (event) => {
     let message = x.dataset.confirmAction;
-    if (message == "delete group") {
-      message = "Are you sure you want to delete this group?\n\nDoing so will move all its wallets to Ungrouped, or if they are ungroupped, they will be deleted.";
-    } else if (message == "delete wallet") {
-      message = "If you delete wallet, it will still be visible in History as deleted in your next report, previous tranfers to/from other wallets will also remain.\n\nAre you sure?";
-    }
     if (!confirm(message)) {
       event.preventDefault();
     }
