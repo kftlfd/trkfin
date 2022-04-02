@@ -174,6 +174,7 @@ class Users(UserMixin, db.Model):
         new_rep.time_end = self.next_report
         data = self.get_wallets_status()
         data["history"] = self.get_history_json(start=new_rep.time_start, end=new_rep.time_end)
+        data["tz-offset"] = self.tz_offset
         new_rep.data = data
 
         # reset users wallets

@@ -21,6 +21,7 @@ def check_if_report_due(func):
     def wrapper(*args, **kwargs):
         if datetime.utcnow().timestamp() >= current_user.next_report:
             current_user.generate_report()
+            flash("New report is ready!")
         return func(*args, **kwargs)
     return wrapper
 
@@ -261,11 +262,15 @@ def wallets(username, **kwargs):
 @only_personal_data
 @check_if_report_due
 def reports(username):
-    # if request.args.get('newrep') == "yes":
-    #     current_user.generate_report()
-    #     return redirect(url_for('reports', username=current_user.username))
+    if request.args.get('newrep') == "yes":
+        current_user.generate_report()
+        flash("New report created!")
     reports = current_user.get_all_reports()
     return render_template('reports.html', reports=reports)
+
+@app.route('/ajax-report')
+def ajax_report():
+    return "Nothing here yet"
 
 
 
@@ -395,10 +400,3 @@ def resetdb():
     f.close()
     db.create_all()
     return redirect('/')
-
-@app.route('/test')
-def test():
-    report = current_user.get_wallets_status()
-    report['history'] = current_user.get_history_json()
-    # return render_template('rep.html', report=report)
-    return report
