@@ -222,6 +222,55 @@ if (chgReports) {
 
 
 
+// ********** REPORTS **********
+
+if (document.querySelector('[data-page="reports"]')) {
+
+  document.querySelectorAll('.report-title').forEach(x => {
+    x.addEventListener('click', () => {
+      x.classList.toggle('active')
+    })
+  })
+
+  function padZero(x) {
+    if (x < 10) {return "0" + x}
+    else {return x}
+  }
+
+  document.querySelectorAll('[data-time]').forEach(x => {
+    let time = new Date((x.dataset.time - (x.dataset.timeTz || 0)) * 1000);
+    time = time.getFullYear() + "–" + padZero(time.getMonth()) + "–" + time.getDate();
+    x.innerText = time;
+  });
+
+  // AJAX
+  let nrbtn = document.querySelector('[data-ajax-report]')
+  nrbtn.addEventListener('click', function() {
+    let httpRequest = new XMLHttpRequest();
+    if (!httpRequest) {
+      window.alert('Error: no httpRequest');
+      return false;
+    }
+    httpRequest.onreadystatechange = function() {
+      if (httpRequest.readyState === XMLHttpRequest.DONE) {
+        if (httpRequest.status === 200) {
+          // console.log(httpRequest.response);
+          // document.querySelector('#newreport').innerHTML = httpRequest.response;
+          // nrbtn.insertAdjacentHTML('afterEnd', '<div class="report">' + httpRequest.response + '</div>');
+          window.alert(httpRequest.response);
+        } else {
+          window.alert('Error: problem with request');
+        }
+      }
+    };
+    httpRequest.open('GET', '/ajax-report');
+    httpRequest.send();
+  });
+
+}
+
+
+
 // ********** CONFIRM **********
 
 const toConfirm = document.querySelectorAll('[data-confirm-action]');

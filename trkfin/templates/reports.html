@@ -3,67 +3,149 @@
 {% block title %} | Reports{% endblock %}
 
 {% block main %}
-<div>
-  {% for report in reports %}
-  <div name='rep-{{ report.id}}' style='border: 1px solid gray;'>
-    
-    <button class='btn btn-secondary' style='width: 100%;' data-bs-toggle='collapse' data-bs-target='#rep-{{ report.id }}'>
-      Show Report {{ report.id }}
-    </button>
-    
-    <div id='rep-{{ report.id }}' class='collapse'>
-      <p>{{ report.data['wallets'] }}</p>
-      <p>{{ report.data['groups'] }}</p>
-      <p>{{ report.data['sums'] }}</p>
-      <p>{{ report.data['history'] }}</p>
-    </div>
 
-  </div>
-  {% endfor %}
-</div>
+<header class="section title" data-page="reports">Reports</header>
 
-<div>
+<div class="section generate-new-bttn-link">
+
   <a href="{{ url_for('reports', username=current_user.username, newrep='yes') }}"">
-    <button class='btn btn-outline-primary'>Create new report</button>
+    <button class='w-header-bttn generate-new-bttn'>Generate new report</button>
   </a>
-</div>
-
-<div>
-  <button id='nrbtn' class='btn btn-outline-primary'>
-    New report AJAX
-  </button>
-</div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-
-    var httpRequest;
-    let nrbtn = document.querySelector('#nrbtn')
-
-    // AJAX
-    nrbtn.addEventListener('click', function() {
-      httpRequest = new XMLHttpRequest();
-      if (!httpRequest) {
-        alert('Error: no httpRequest');
-        return false;
-      }
-      httpRequest.onreadystatechange = function() {
-        if (httpRequest.readyState === XMLHttpRequest.DONE) {
-          if (httpRequest.status === 200) {
-            // console.log(httpRequest.response);
-            // document.querySelector('#newreport').innerHTML = httpRequest.response;
-            nrbtn.insertAdjacentHTML('afterEnd', '<div class="report">' + httpRequest.response + '</div>');
-          } else {
-            alert('Error: problem with request');
-          }
-        }
-      };
-      httpRequest.open('GET', '/test');
-      httpRequest.send();
-    });
-
-    // nrbtn.click()
   
-  });
-</script>
+  <button class='w-header-bttn generate-new-bttn hide-bttn' data-ajax-report>New report AJAX</button>
+
+</div>
+
+{% for report in reports %}
+<div class="section">
+  <div class="report" name='rep-{{ report.id}}'>
+    <div class="report-title" data-bs-toggle='collapse' data-bs-target='#rep-{{ report.id }}'>
+      <div>
+        <span data-time="{{ report.time_start }}" data-time-tz="{{ report.data['tz-offset'] }}"></span>
+        <span>&ensp;&mdash;&ensp;</span>
+        <span data-time="{{ report.time_end }}" data-time-tz="{{ report.data['tz-offset'] }}"></span>
+      </div>
+    </div>
+    <div class="collapse" id='rep-{{ report.id }}'>
+      <div class="report-content">
+        
+        <div class="report-title active" data-bs-toggle='collapse' data-bs-target='#wallets-{{ report.id }}' aria-expanded="true" aria-controls="wallets-{{ report.id }}">Wallets</div>
+
+        <div class="collapse show" id='wallets-{{ report.id }}'>
+          {% with wallets = report.data %}
+
+          <!-- wallets.html -->
+          {% for group in wallets['groups'] %}
+          <div class="section">            
+            <div {% if group == "" %}class="group group-unnamed"{% else %}class="group"{% endif %} data-bs-toggle="collapse" data-bs-target="#group-{{ group }}" aria-expanded="false" aria-controls="group-{{ group }}" data-wallet-title>
+              <div class="group-title">{{ group or "Ungroupped" }}</div>
+              {% if wallets['groupsize'][group] > 1 %}
+              <div class="collapse" id="group-{{ group }}">
+                <div class="wallet-info">
+                  <div>Initial</div>
+                  <div class="wallet-amount">{{ wallets['sums'][group]['initial_sum'] | num }}</div>
+                  <div>Income</div>
+                  <div class="wallet-amount income">{{ wallets['sums'][group]['income_sum'] | num }}</div>
+                  <div>Spending</div>
+                  <div class="wallet-amount spending">{{ wallets['sums'][group]['spendings_sum'] | num }}</div>
+                  <div class="wallet-total">Total</div>
+                  <div class="wallet-amount wallet-total">{{ wallets['sums'][group]['balance_sum'] | num }}</div>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+            {% for w_id in wallets['groups'][group] %}
+            <div class="wallet">
+              <div class="wallet-title" data-bs-toggle="collapse" data-bs-target="#wallet-body-{{ w_id }}" aria-expanded="false" aria-controls="wallet-body-{{ w_id }}"  data-wallet-title>
+                <div>{{ wallets['groups'][group][w_id]['name'] }}</div>
+                <div>{{ wallets['groups'][group][w_id]['balance'] | num }}</div>
+              </div>
+              <div class="collapse" id="wallet-body-{{ w_id }}">
+                <div class="wallet-info">
+                  <div>Initial</div>
+                  <div class="wallet-amount">{{ wallets['groups'][group][w_id]['initial'] | num }}</div>
+                  <div>Income</div>
+                  <div class="wallet-amount income">{{ wallets['groups'][group][w_id]['income'] | num }}</div>
+                  <div>Spending</div>
+                  <div class="wallet-amount spending">{{ wallets['groups'][group][w_id]['spendings'] | num}}</div>
+                  <div>Transfers</div>
+                  <div class="wallet-amount">{{ wallets['groups'][group][w_id]['transfers'] | num }}</div>
+                  <div class="wallet-total">Balance</div>
+                  <div class="wallet-amount wallet-total">{{ wallets['groups'][group][w_id]['balance'] | num }}</div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endfor %}
+          <!-- wallets.html -->
+
+          {% endwith %}
+        </div>
+
+        <div class="report-title" data-bs-toggle='collapse' data-bs-target='#history-{{ report.id }}' aria-expanded="false" aria-controls="history-{{ report.id }}">History</div>
+        
+        <div class="collapse" id='history-{{ report.id }}'>
+          {% with history = report.data['history'] %}
+          {% with wallets = report.data %}
+
+          <!-- history.html -->
+          <div class="section">
+            {% for entry in history %}
+            <div class="history-entry">
+              <div class="history-body grid-center">
+                <div class="nosidepad">{{ entry.local_time[:10] }}</div>
+                <div class="nosidepad">{{ entry.local_time[10:16] }}</div>
+              </div>
+              <div class="history-body">
+                <div {% if entry.action == "Spending" %} class="action-spending" {% elif entry.action == "Income" %} class="action-income" {% elif entry.action == "Transfer" %} class="action-transfer" {% else %} class="action-info" {% endif %}>{{ entry.action }}</div>
+                {% if entry.source %}
+                {% if wallets[entry.source] %}
+                <div class="history-wallet">
+                  {% if wallets[entry.source].group != "" %}
+                  <span class="history-group">{{ wallets[entry.source].group }}</span>
+                  {% endif %}
+                  {{ wallets[entry.source].name }}
+                </div>
+                {% else %}
+                <div class="history-wallet deleted">DELETED</div>
+                {% endif %}
+                {% endif %}
+                {% if entry.source and entry.destination %}
+                <div class="nosidepad">&rarr;</div>
+                {% endif %}
+                {% if entry.destination %}
+                {% if wallets[entry.destination] %}
+                <div class="history-wallet">
+                  {% if wallets[entry.destination].group != "" %}
+                  <span class="history-group">{{ wallets[entry.destination].group }}</span>
+                  {% endif %}
+                  {{ wallets[entry.destination].name }}
+                </div>
+                {% else %}
+                <div class="history-wallet deleted">DELETED</div>
+                {% endif %}
+                {% endif %}
+                {% if entry.amount %}
+                <div {% if entry.action == "Spending" %} class="nosidepad action-spending-amount" {% elif entry.action == "Income" %} class="nosidepad action-income-amount"{% else %} class="nosidepad"{% endif %}>{{ entry.amount | num }}</div>
+                {% endif %}
+                {% if entry.description %}
+                <div class="nosidepad history-description">{{ entry.description }}</div>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <!-- history.html -->
+
+          {% endwith %}
+          {% endwith %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
 {% endblock %}
