@@ -1,0 +1,12 @@
+__env/
+__flask_env/
+__pycache__/
+__test/
+logs/
+
+trkfin/exports/*
+trkfin/static/tmp.jpg
+
+.vscode
+*.db
+
