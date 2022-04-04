@@ -21,8 +21,11 @@ class Users(UserMixin, db.Model):
 
     ###   Basics   ###
 
-    def __init__(self, username):
+    def __init__(self, username, created, tz_offset, report_frequency):
         self.username = username
+        self.created = created
+        self.tz_offset = tz_offset
+        self.report_frequency = report_frequency
         self.walletcount = 0
 
     def __repr__(self):

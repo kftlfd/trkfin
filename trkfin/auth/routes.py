@@ -13,35 +13,38 @@ from trkfin.models import Users, Wallets, History, Reports
 def register():
 
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
 
     # process registration form
     form = RegistrationForm()
     if form.validate_on_submit():
 
         # record user to db
-        new_user = Users(form.username.data)
-        new_user.created = datetime.utcnow().timestamp() # float
-        new_user.tz_offset = int(form.tz_offset.data) # int
-        new_user.report_frequency = 'month'
+        new_user = Users(
+            username = form.username.data.strip(),
+            created = datetime.utcnow().timestamp(), # float
+            tz_offset = int(form.tz_offset.data), # int
+            report_frequency = 'month'
+            )
         new_user.next_report = new_user.get_next_report_ts()       
         new_user.set_password(form.password.data)
         db.session.add(new_user)
         db.session.commit()
 
         # add history entry
-        record = History()
-        record.user_id = new_user.id
-        record.ts_utc = new_user.created
-        record.local_time = datetime.fromtimestamp(new_user.created + new_user.tz_offset).__str__()[:19]
-        record.action = 'Created account'
+        record = History(
+            user_id = new_user.id,
+            ts_utc = new_user.created,
+            local_time = datetime.fromtimestamp(new_user.created + new_user.tz_offset).__str__()[:19],
+            action = 'Created account'
+            )
         db.session.add(record)
         db.session.commit()
 
-        # prevent auto-login
-        # logout_user()
-        flash('Successfully Registered')
-        return redirect(url_for('auth.login'))
+        # auto-login
+        login_user(new_user)
+        flash('Successfully Registered!')
+        return redirect(url_for('home'))
 
     return render_template("auth/register.html", form=form)
 
@@ -50,26 +53,25 @@ def register():
 def login():
 
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
 
     # process login form
     form = LoginForm()
     if form.validate_on_submit():
 
         # check if user is in db
-        user = Users.query.filter_by(username=form.username.data).first()        
+        user = Users.query.filter_by(username=form.username.data.strip()).first()        
         if user is None:
-            flash('username not found')
+            flash('Username not found')
             return redirect(url_for('auth.login'))
         
         # check password
         if not user.check_password(form.password.data):
-            flash('wrong password')
+            flash('Wrong password')
             return redirect((url_for('auth.login')))
 
         # log user in
         login_user(user, remember=form.remember_me.data)
-        flash('Logged in')
 
         # redirect to next page
         next_page = request.args.get('next')
@@ -84,4 +86,4 @@ def login():
 def logout():
     if current_user.is_authenticated:
         logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('auth.login'))

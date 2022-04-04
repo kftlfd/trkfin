@@ -12,18 +12,18 @@
 
 <div class="section">
   <h3>Sign-Up</h3>
-  <form class="form" name="registerform" action="" method="POST" novalidate>
+  <form class="form" name="registerform" action="" method="POST">
     <div>
       {{ form.username(class_="form-control") }}
-      {% for error in form.username.errors %}<div style="color: red;">[{{ error }}]</div>{% endfor %}
+      {% for error in form.username.errors %}<div class="form-error">{{ error }}</div>{% endfor %}
     </div>
     <div>
       {{ form.password(class_="form-control") }}
-      {% for error in form.password.errors %}<div style="color: red;">[{{ error }}]</div>{% endfor %}
+      {% for error in form.password.errors %}<div class="form-error">{{ error }}</div>{% endfor %}
     </div>
     <div>
       {{ form.confirm(class_="form-control") }}
-      {% for error in form.confirm.errors %}<div style="color: red;">[{{ error }}]</div>{% endfor %}
+      {% for error in form.confirm.errors %}<div class="form-error">{{ error }}</div>{% endfor %}
     </div>
     {{ form.submit(class_="btn btn-primary") }}
     {{ form.hidden_tag() }}
