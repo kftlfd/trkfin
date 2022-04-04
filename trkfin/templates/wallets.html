@@ -69,17 +69,18 @@
         </div>
         <div class="modal-body">
           <div>Name</div>
-          <form class="modal-row" action="{{ url_for('wallets', username=current_user.username) }}" method="POST">
+          <form class="modal-row" action="{{ url_for('wallet_controls', username=current_user.username) }}" method="POST">
             <input type="hidden" name="rename-group" {% if group == "" %}value="*empty" {% else %}value="{{ group }}" {% endif %}>
             <input class="form-control" type="text" name="new-group-name" {% if group == "" %}placeholder="New group name" {% else %}value="{{ group }}" {% endif %} minlength="1" required pattern="[\w\d\s()-_]{0,20}" maxlength="20" title="only letters, numbers, parentheses, spaces, -, _">
             <input class="btn btn-primary" type="submit" value="Rename">
           </form>
           <div>Delete</div>
-          <form class="modal-row" action="{{ url_for('wallets', username=current_user.username) }}" method="POST" data-confirm-action="Are you sure you want to delete this group?\n\nDoing so will move all its wallets to Ungrouped, or if they are ungroupped, they will be deleted.">
+          <form class="modal-row" action="{{ url_for('wallet_controls', username=current_user.username) }}" method="POST" data-confirm-action="Are you sure you want to delete this group?\n\nDoing so will move all its wallets to Ungrouped, or if they are ungroupped, they will be deleted.">
             <input type="hidden" name="delete-group" {% if group == "" %}value="*empty" {% else %}value="{{ group }}" {% endif %}>
             <div>
               <input class="form-check-input" type="checkbox" name="delete-wallets" {% if group == "" %} id="del-group-unnmd" checked disabled {% else %} id="del-group-{{ group }}"{% endif %}>
               <label class="form-check-label" {% if group == "" %} for="del-group-unnmd" {% else %} for="del-group-{{ group }}" {% endif %}>Also delete wallets</label>
+              {% if group == "" %}<input class="form-check-input" type="hidden" name="delete-wallets" value="true">{% endif %}
             </div>
             <input class="btn btn-danger" type="submit" value="Delete">
           </form>
@@ -104,13 +105,13 @@
         </div>
         <div class="modal-body">
           <div>Name</div>
-          <form class="modal-row" action="{{ url_for('wallets', username=current_user.username) }}" method="POST">
+          <form class="modal-row" action="{{ url_for('wallet_controls', username=current_user.username) }}" method="POST">
             <input class="form-control" type="text" name="new-name" value="{{ wallets['groups'][group][w]['name'] }}" required pattern="[\w\d\s()-_]{0,20}" maxlength="20" title="only letters, numbers, parentheses, spaces, -, _">
             <input class="btn btn-primary" type="submit" value="Rename">
             <input type="hidden" name="rename-w" value="{{ w }}">
           </form>          
           <div>Group</div>
-          <form class="modal-row" action="{{ url_for('wallets', username=current_user.username) }}" method="POST">
+          <form class="modal-row" action="{{ url_for('wallet_controls', username=current_user.username) }}" method="POST">
             <select class="form-select" name="user-group" data-group-select="{{ w }}">
               {% for g in data['groups'] %}
               <option value="{{ g[0] }}" {% if g[0]==group %} selected {% endif %}>{{ g[1] }}</option>
@@ -121,7 +122,7 @@
             <input type="hidden" name="change-w-group" value="{{ w }}">
           </form>
           <div>Delete</div>
-          <form class="modal-row" action="{{ url_for('wallets', username=current_user.username) }}" method="POST" data-confirm-action="If you delete wallet, it will still be visible in History as deleted in your next report, previous tranfers to/from other wallets will also remain.\n\nAre you sure?">
+          <form class="modal-row" action="{{ url_for('wallet_controls', username=current_user.username) }}" method="POST" data-confirm-action="If you delete wallet, it will still be visible in History as deleted in your next report, previous tranfers to/from other wallets will also remain.\n\nAre you sure?">
             <input class="btn btn-danger" type="submit" value="Delete">
             <input type="hidden" name="delete-w" value="{{ w }}">
           </form>

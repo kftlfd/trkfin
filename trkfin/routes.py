@@ -73,6 +73,10 @@ def home():
     # process MainForm
     if form.validate_on_submit():
 
+        # prevent tranfering from wallet to itself
+        if form.action.data == "Transfer" and form.source.data == form.destination.data:
+            return redirect(url_for('home'))
+
         # calculate time
         ts_utc = datetime.utcnow().timestamp() # float
         ts_user_local = ts_utc + current_user.tz_offset # float
@@ -80,13 +84,13 @@ def home():
 
         # add history entry
         record = History(
-            user_id=current_user.id,
-            ts_utc=ts_utc,
-            local_time=user_local_time,
-            action=form.action.data,
-            amount=form.amount.data,
-            description=form.description.data
-            )
+            user_id = current_user.id,
+            ts_utc = ts_utc,
+            local_time = user_local_time,
+            action = form.action.data,
+            amount = form.amount.data,
+            description = form.description.data
+        )
         if record.action == 'Spending':
             record.source = form.source.data
         elif record.action == 'Income':
@@ -128,72 +132,10 @@ def home():
 @check_if_report_due
 def wallets(username, **kwargs):
 
-    # wallet controls (kinda ugly)
-
-    if request.form.get('rename-group'):
-        group = request.form.get('rename-group')
-        if group == "*empty": group = ""
-        new_name = request.form.get('new-group-name')
-        if group != new_name:
-            wallets = Wallets.query.filter(Wallets.user_id==current_user.id, Wallets.group==group).all()
-            for w in wallets:
-                w.group = new_name
-            db.session.commit()
-            flash('group renamed')
-        return redirect(url_for('wallets', username=current_user.username))
-
-    if request.form.get('delete-group'):
-        group = request.form.get('delete-group')
-        if group == "*empty": group = ""
-        wallets = Wallets.query.filter(Wallets.user_id==current_user.id, Wallets.group==group).all()
-        for w in wallets:
-            if request.form.get('delete-wallets'):
-                db.session.delete(w)
-                current_user.walletcount -= 1
-            else:
-                w.group = ""
-        db.session.commit()
-        if request.form.get('delete-wallets'):
-            flash('group and wallets deleted')
-        else:
-            flash('group deleted, wallets moved to ungrouped')
-        return redirect(url_for('wallets', username=current_user.username))
-
-    if request.form.get('rename-w'):
-        w_id = request.form.get('rename-w')
-        new_name = request.form.get('new-name')
-        to_rnm = Wallets.query.get(w_id)
-        to_rnm.name = new_name
-        db.session.commit()
-        flash(f'renamed to "{new_name}"')
-        return redirect(url_for('wallets', username=current_user.username))
-
-    if request.form.get('change-w-group'):
-        w_id = request.form.get('change-w-group')
-        to_change = Wallets.query.get(w_id)
-        new_group = request.form.get('user-group')
-        if new_group == "*New":
-            new_group = request.form.get('new-group')
-        if to_change.group != new_group:
-            to_change.group = new_group
-            db.session.commit()
-            flash('changed group')
-        return redirect(url_for('wallets', username=current_user.username))
-
-    if request.form.get('delete-w'):
-        w_id = request.form.get('delete-w')
-        to_del = Wallets.query.get(w_id)
-        db.session.delete(to_del)
-        current_user.walletcount -= 1
-        db.session.commit()
-        flash(f'deleted wallet with id {w_id}')
-        return redirect(url_for('wallets', username=current_user.username))
-
     form = AddWalletForm()
     
-    wallets = current_user.get_wallets_status()
-
     # load wallet group names to form
+    wallets = current_user.get_wallets_status()
     groups = set()
     for g in wallets['groups']:
         groups.add(g)
@@ -226,32 +168,129 @@ def wallets(username, **kwargs):
         
         # add history entry
         record = History(
-            user_id=current_user.id,
-            ts_utc=ts_utc,
-            local_time=user_local_time,
-            action="Added wallet",
-            destination=new_wallet.id,
-            amount=form.amount.data)
+            user_id = current_user.id,
+            ts_utc = ts_utc,
+            local_time = user_local_time,
+            action = "Added wallet",
+            destination = new_wallet.id,
+            amount = form.amount.data
+        )
         db.session.add(record)
         db.session.commit()
 
         # show success message and redirect
         msg = f'Added new wallet "{new_wallet.name}"'
-        if len(new_wallet.group) > 0:
+        if new_wallet.group:
             msg += f' to group "{new_wallet.group}"'
         flash(msg)
-        if request.args:
-            next_page = url_for(request.args.get('next'))
-        else:
-            next_page = url_for('wallets', username=current_user.username)
-        return redirect(next_page)
+        return redirect(url_for('wallets', username=current_user.username))
     
     data = {
         'groups': form.group.choices,
         'walletcount': current_user.walletcount
-    }
+        }
     
     return render_template('wallets.html', form=form, wallets=wallets, data=data)
+
+@app.route("/u/<username>/wallet-controls", methods=["POST"])
+def wallet_controls(username, **kwargs):
+
+    if request.form.get('rename-group'):
+        group = request.form.get('rename-group')
+        if group == "*empty": group = ""
+        new_name = request.form.get('new-group-name')
+        if group != new_name:
+            wallets = Wallets.query.filter(Wallets.user_id==current_user.id, Wallets.group==group).all()
+            for w in wallets:
+                w.group = new_name
+            db.session.commit()
+            if group == "": flash(f'Ungrouped wallets moved to "{new_name}"')
+            else: flash(f'Group "{group}" renamed to "{new_name}"')
+
+    elif request.form.get('delete-group'):
+        group = request.form.get('delete-group')
+        if group == "*empty": group = ""
+        wallets = Wallets.query.filter(Wallets.user_id==current_user.id, Wallets.group==group).all()
+        
+        ts_utc = datetime.utcnow().timestamp() # float
+        ts_user_local = ts_utc + current_user.tz_offset # float
+        user_local_time = datetime.fromtimestamp(ts_user_local).__str__()[:19]
+        
+        for w in wallets:
+            w_name = w.name
+            w_group = w.group
+            if request.form.get('delete-wallets'):
+                db.session.add(History(
+                    user_id = current_user.id,
+                    ts_utc = ts_utc,
+                    local_time = user_local_time,
+                    action = "Deleted wallet",
+                    description = f'"{w_name} ({w_group})"' if w_group else f'"{w_name}"'
+                ))
+                db.session.delete(w)
+                current_user.walletcount -= 1
+                db.session.commit()
+            else:
+                w.group = ""
+        db.session.commit()
+        
+        if group and request.form.get('delete-wallets'):
+            flash(f'Group "{group}" and wallets deleted')
+        elif group:
+            flash(f'Group "{group}" deleted, wallets moved to ungrouped')
+        else:
+            flash("Ungrouped wallets deleted")
+
+    elif request.form.get('rename-w'):
+        w_id = request.form.get('rename-w')
+        new_name = request.form.get('new-name')
+        to_rnm = Wallets.query.get(w_id)
+        old_name = to_rnm.name
+        group = to_rnm.group
+        to_rnm.name = new_name
+        db.session.commit()
+        if group: flash(f'"{old_name} ({group})" renamed to "{new_name} ({group})"')
+        else: flash(f'"{old_name}" renamed to "{new_name}"')
+
+    elif request.form.get('change-w-group'):
+        w_id = request.form.get('change-w-group')
+        to_change = Wallets.query.get(w_id)
+        name = to_change.name
+        old_group = to_change.group
+        new_group = request.form.get('user-group')
+        if new_group == "*New":
+            new_group = request.form.get('new-group')
+        if to_change.group != new_group:
+            to_change.group = new_group
+            db.session.commit()
+            if old_group and new_group: flash(f'"{name} ({old_group})" changed group to "{name} ({new_group})"')
+            elif old_group: flash(f'"{name} ({old_group})" moved to ungrouped')
+            else: flash(f'"{name}" moved to group "{new_group}"')
+
+    elif request.form.get('delete-w'):
+        w_id = request.form.get('delete-w')
+        to_del = Wallets.query.get(w_id)
+        name = to_del.name
+        group = to_del.group
+        db.session.delete(to_del)
+        current_user.walletcount -= 1
+        
+        ts_utc = datetime.utcnow().timestamp() # float
+        ts_user_local = ts_utc + current_user.tz_offset # float
+        user_local_time = datetime.fromtimestamp(ts_user_local).__str__()[:19]
+
+        record = History(
+            user_id = current_user.id,
+            ts_utc = ts_utc,
+            local_time = user_local_time,
+            action = "Deleted wallet",
+            description = f'"{name} ({group})"' if group else f'"{name}"'
+        )
+        db.session.add(record)
+        db.session.commit()
+        flash(f'Deleted wallet "{name} (group)"')
+    
+    return redirect(url_for('wallets', username=current_user.username))
 
 
 
