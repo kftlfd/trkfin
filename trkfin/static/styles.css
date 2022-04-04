@@ -95,8 +95,10 @@ body {
   padding: 0.5rem 0 0.5rem 1.5rem;
   gap: 1rem;
 
-  background: var(--alert-bg);
-  border-radius: 5px;
+  background: #f5f5ff;
+  box-shadow: 0 0 5px var(--border-color);
+  border: 1px solid #dde;
+  border-radius: 0.25rem;
 }
 
 .alert ul {
@@ -162,6 +164,9 @@ body {
 }
 .form-hide {
   display: none;
+}
+.form-error {
+  color: red;
 }
 
 
