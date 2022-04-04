@@ -1,7 +1,7 @@
-Flask
-Flask-Login
-Flask-SQLAlchemy
-Flask-WFT
+flask
+flask_login
+flask_sqlalchemy
+flask_wtf
 python-dotenv
 gunicorn
 psycopg2-binary
