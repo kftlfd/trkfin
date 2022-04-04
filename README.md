@@ -6,8 +6,8 @@ Web-app to track your finances using Flask
 
 Download code as zip or clone git repo:
 ```
-$ git clone https://github.com/miguelgrinberg/microblog
-$ cd microblog
+$ git clone https://github.com/kftlfd/trkfin.git
+$ cd trkfin
 ```
 
 Inside project folder create python virtual environment and install dependencies:
