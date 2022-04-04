@@ -4,6 +4,7 @@
 
 {% block main %}
 
+{% if form %}
 <div class="section" name='form'>
   <form class="form" name="MainForm" action="" method="POST" data-form>
     <div class="btn-group" role="group" aria-label="Select action">
@@ -34,13 +35,14 @@
     {{ form.hidden_tag() }}
   </form>
   <div name="form-errors">
-    {% for error in form.hidden_tag.errors %}<div style="color: red;">hidden: [{{ error }}]</div>{% endfor %}
-    {% for error in form.source.errors %}<div style="color: red;">source: [{{ error }}]</div>{% endfor %}
-    {% for error in form.destination.errors %}<div style="color: red;">dest: [{{ error }}]</div>{% endfor %}
-    {% for error in form.amount.errors %}<div style="color: red;">amount: [{{ error }}]</div>{% endfor %}
-    {% for error in form.description.errors %}<div style="color: red;">descr: [{{ error }}]</div>{% endfor %}
+    {% for error in form.hidden_tag.errors %}<div class="form-error">[hidden]: {{ error }}</div>{% endfor %}
+    {% for error in form.source.errors %}<div class="form-error">[source]: {{ error }}</div>{% endfor %}
+    {% for error in form.destination.errors %}<div class="form-error">[destination]: {{ error }}</div>{% endfor %}
+    {% for error in form.amount.errors %}<div class="form-error">[amount]: {{ error }}</div>{% endfor %}
+    {% for error in form.description.errors %}<div class="form-error">[description]: {{ error }}</div>{% endfor %}
   </div>
 </div>
+{% endif %}
 
 {% if wallets %}
 {% for group in wallets['groups'] %}
@@ -48,7 +50,6 @@
   
   <div {% if group == "" %}class="group group-unnamed"{% else %}class="group"{% endif %} data-bs-toggle="collapse" data-bs-target="#group-{{ group }}" aria-expanded="false" aria-controls="group-{{ group }}" data-wallet-title>
     <div class="group-title">{{ group or "Ungroupped" }}</div>
-    {% if wallets['groupsize'][group] > 1 %}
     <div class="collapse" id="group-{{ group }}">
       <div class="wallet-info">
         <div>Initial</div>
@@ -61,7 +62,6 @@
         <div class="wallet-amount wallet-total">{{ wallets['sums'][group]['balance_sum'] | num }}</div>
       </div>
     </div>
-    {% endif %}
   </div>
     
   {% for w_id in wallets['groups'][group] %}
@@ -89,6 +89,14 @@
 
 </div>
 {% endfor %}
+
+{% else %}
+
+<div class="section centered">
+  <h3>Add some wallets to start tracking!</h3>
+  <a class="btn btn-primary btn-lg" href="{{ url_for('wallets', username=current_user.username) }}">Add wallet</a>
+</div>
+
 {% endif %}
 
 {% endblock %}

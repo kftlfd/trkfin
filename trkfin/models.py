@@ -9,19 +9,19 @@ from trkfin import app, db, login
 class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     username = db.Column(db.String(64), index=True, unique=True, nullable=False)
-    email = db.Column(db.String(120), index=True)
+    email = db.Column(db.String(120), index=True) # no email support curently
     password_hash = db.Column(db.String(128), nullable=False)
     created = db.Column(db.Float, nullable=False) # utc-posix-timestamp
     tz_offset = db.Column(db.Integer) # no. of seconds to add to utc_ts to get users local time
     report_frequency = db.Column(db.String(5), default="month") # "month" , "week", or no. of days (>=1)
-    next_report = db.Column(db.Float, index=True) # utc-timestamp, timezone adjusted
-    email_reports = db.Column(db.Boolean, default=False)
+    next_report = db.Column(db.Float, index=True) # utc-timestamp, timezone adjusted. Indexing for background jobs (TODO)
+    email_reports = db.Column(db.Boolean, default=False) # no email support curently
     walletcount = db.Column(db.Integer)
 
 
     ###   Basics   ###
 
-    def __init__(self, username, created, tz_offset, report_frequency):
+    def __init__(self, username, created, tz_offset, report_frequency="month"):
         self.username = username
         self.created = created
         self.tz_offset = tz_offset

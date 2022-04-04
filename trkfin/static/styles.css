@@ -48,6 +48,14 @@ body {
   padding: 1rem;
 }
 
+.centered {
+  flex-grow: 1;
+  display: grid;
+  place-content: center;
+  place-items: center;
+  gap: 2rem 2rem;
+}
+
 .title {
   font-size: 2rem;
   text-align: center;

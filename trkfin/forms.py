@@ -29,3 +29,10 @@ class MainForm(FlaskForm):
             raise ValidationError('No such wallet')
         if w.user_id is not current_user.id:
             raise ValidationError('Wallet owned by someone else')
+    
+    def validate_destination(self, source):
+        w = Wallets.query.get(destination.data)
+        if w is None:
+            raise ValidationError('No such wallet')
+        if w.user_id is not current_user.id:
+            raise ValidationError('Wallet owned by someone else')

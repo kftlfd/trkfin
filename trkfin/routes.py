@@ -54,15 +54,12 @@ def index():
 def home():
 
     if current_user.walletcount < 1:
-        # mb do addWalletForm here after all
-        # no need to load groups/ids
-        return redirect(url_for('wallets', username=current_user.username, next='home'))
+        return render_template("home.html")
 
     form = MainForm()
 
-    wallets = current_user.get_wallets_status()
-
     # load user's wallets to form
+    wallets = current_user.get_wallets_status()
     srcs = []
     for group in wallets['groups']:
         for w_id in wallets['groups'][group]:
@@ -88,12 +85,13 @@ def home():
             local_time=user_local_time,
             action=form.action.data,
             amount=form.amount.data,
-            description=form.description.data)
+            description=form.description.data
+            )
         if record.action == 'Spending':
             record.source = form.source.data
         elif record.action == 'Income':
             record.destination = form.destination.data
-        else:
+        else: # Transfer
             record.source = form.source.data
             record.destination = form.destination.data
         db.session.add(record)
@@ -107,7 +105,7 @@ def home():
             wi = Wallets.query.get(form.destination.data)
             wi.balance += float(form.amount.data)
             wi.income += float(form.amount.data)
-        else:
+        else: # Transfer
             ws = Wallets.query.get(form.source.data)            
             ws.balance -= float(form.amount.data)
             ws.transfers -= float(form.amount.data)
@@ -116,8 +114,8 @@ def home():
             wi.transfers += float(form.amount.data)
         db.session.commit()
 
-        flash("action recorded")
-
+        # success
+        flash(f"{record.action} recorded")
         return redirect(url_for('home'))
 
     return render_template("home.html", form=form, wallets=wallets)
