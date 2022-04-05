@@ -41,11 +41,11 @@
       {{ form.hidden_tag() }}
     </form>
     <div name="form-errors">
-      {% for error in form.hidden_tag.errors %}<div style="color: red;">hidden: [{{ error }}]</div>{% endfor %}
-      {% for error in form.group.errors %}<div style="color: red;">group: [{{ error }}]</div>{% endfor %}
-      {% for error in form.group_new.errors %}<div style="color: red;">group_input: [{{ error }}]</div>{% endfor %}
-      {% for error in form.name.errors %}<div style="color: red;">name: [{{ error }}]</div>{% endfor %}
-      {% for error in form.amount.errors %}<div style="color: red;">amount: [{{ error }}]</div>{% endfor %}
+      {% for error in form.hidden_tag.errors %}<div class="form-error">[hidden]: {{ error }}</div>{% endfor %}
+      {% for error in form.group.errors %}<div class="form-error">[group]: {{ error }}</div>{% endfor %}
+      {% for error in form.group_new.errors %}<div class="form-error">[group_new]: {{ error }}</div>{% endfor %}
+      {% for error in form.name.errors %}<div class="form-error">[name]: {{ error }}</div>{% endfor %}
+      {% for error in form.amount.errors %}<div class="form-error">[amount]: {{ error }}</div>{% endfor %}
     </div>
   </div>
 {% if hideForm %}

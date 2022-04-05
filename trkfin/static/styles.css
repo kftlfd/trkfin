@@ -470,6 +470,7 @@ body {
 .history-description {
   font-style: italic;
   color: #444;
+  overflow-wrap: anywhere;
 }
 
 @media screen and (min-width: 600px) {

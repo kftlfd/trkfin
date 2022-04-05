@@ -139,36 +139,41 @@ if (addWalletForm) {
 
   // ***** Wallet controls Modals *****
 
-  // show controls
   const editSwitch = document.querySelector('[data-edit-switch]')
   const editBtns = document.querySelectorAll('[data-edit-btn]')
-  editSwitch.addEventListener('click', function() {
-    document.querySelectorAll('[data-unnamed-group]').forEach(x => {
-      x.classList.toggle('group-unnamed')
-    });
-    editBtns.forEach(x => {
-      x.classList.toggle('show-btn');
-    });
-  });
-
-  // open and close modals
-  const modalToggles = document.querySelectorAll('[data-modal-toggle]')
-  modalToggles.forEach(x => {
-    x.addEventListener('click', function() {
-      let select = '[data-modal = "' + x.dataset.modalToggle + '"]'
-      document.querySelectorAll(select).forEach(m => {
-        m.classList.toggle('modal-show')
+  
+  if (editSwitch) {
+    
+    // show controls
+    editSwitch.addEventListener('click', function() {
+      document.querySelectorAll('[data-unnamed-group]').forEach(x => {
+        x.classList.toggle('group-unnamed')
+      });
+      editBtns.forEach(x => {
+        x.classList.toggle('show-btn');
       });
     });
-  });
-
-  // prevent closing modal by clicking on content
-  const modalContents = document.querySelectorAll('[data-modal-content]')
-  modalContents.forEach(x => {
-    x.addEventListener('click', (y) => {
-      y.cancelBubble = true;
+    
+    // open and close modals
+    const modalToggles = document.querySelectorAll('[data-modal-toggle]')
+    modalToggles.forEach(x => {
+      x.addEventListener('click', function() {
+        let select = '[data-modal = "' + x.dataset.modalToggle + '"]'
+        document.querySelectorAll(select).forEach(m => {
+          m.classList.toggle('modal-show')
+        });
+      });
     });
-  });
+    
+    // prevent closing modal by clicking on content
+    const modalContents = document.querySelectorAll('[data-modal-content]')
+    modalContents.forEach(x => {
+      x.addEventListener('click', (y) => {
+        y.cancelBubble = true;
+      });
+    });
+    
+  }
 
 }
 
