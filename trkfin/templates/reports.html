@@ -8,11 +8,17 @@
 
 <div class="section generate-new-bttn-link">
 
-  <a href="{{ url_for('reports', username=current_user.username, newrep='yes') }}"">
-    <button class='w-header-bttn generate-new-bttn'>Generate new report</button>
-  </a>
+  <div class="next-report-info">
+    <span>Next report:</span>
+    <span data-time="{{ time }}" data-time-tz="{{ time_tz }}"></span>
+    <a class="reports-settings-link" href="{{ url_for('account', username=current_user.username) }}#reports-settings"></a>
+  </div>
+
+  <form action="{{ url_for('new_report', username=current_user.username) }}" method="POST">
+    <button class="w-header-bttn generate-new-bttn" type="submit">Generate new report now</button>
+  </form>
   
-  <button class='w-header-bttn generate-new-bttn hide-bttn' data-ajax-report>New report AJAX</button>
+  <button class='w-header-bttn generate-new-bttn hide-bttn' data-ajax-report>AJAX report</button>
 
 </div>
 

@@ -243,9 +243,8 @@ if (document.querySelector('[data-page="reports"]')) {
   }
 
   document.querySelectorAll('[data-time]').forEach(x => {
-    let time = new Date((x.dataset.time - (x.dataset.timeTz || 0)) * 1000);
-    time = time.getFullYear() + "–" + padZero(time.getMonth()) + "–" + time.getDate();
-    x.innerText = time;
+    let time = new Date((Number(x.dataset.time) + Number(x.dataset.timeTz)) * 1000);
+    x.innerText = time.getFullYear() + "–" + padZero(time.getMonth()) + "–" + padZero(time.getDate());
   });
 
   // AJAX

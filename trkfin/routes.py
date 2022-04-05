@@ -299,11 +299,15 @@ def wallet_controls(username, **kwargs):
 @only_personal_data
 @check_if_report_due
 def reports(username):
-    if request.args.get('newrep') == "yes":
-        current_user.generate_report()
-        flash("New report created!")
     reports = current_user.get_all_reports()
-    return render_template('reports.html', reports=reports)
+    return render_template('reports.html', reports=reports, time=current_user.next_report, time_tz=current_user.tz_offset)
+
+@app.route('/u/<username>/new-report', methods=['POST'])
+def new_report(username):
+    # time_end = datetime.utcnow().timestamp() # + current_user.tz_offset ?
+    # current_user.generate_report(end=time_end)
+    flash("New report requested")
+    return redirect(url_for('reports', username=current_user.username))
 
 @app.route('/ajax-report')
 def ajax_report():
@@ -368,6 +372,7 @@ def account(username):
         if len(new_freq) < 1:
             return redirect(url_for('account', username=current_user.username))
         current_user.report_frequency = new_freq
+        current_user.next_report = current_user.get_next_report_ts()
         db.session.commit()
         flash('set new rep freq')
         return redirect(url_for('account', username=current_user.username))
