@@ -11,7 +11,7 @@ pattern = "\w{1,15}"
 
 class RegistrationForm(FlaskForm):
     tz_offset = HiddenField('timezone offset')
-    username = StringField('Username', validators=[DataRequired("Username required")], render_kw={'placeholder': 'Username', 'pattern': '\w{1,15}', "title": "Letters, numbers, underscores (_), – 1-15 characters"})
+    username = StringField('Username', validators=[DataRequired("Username required")], render_kw={'placeholder': 'Username', "maxlength": "15", 'pattern': '\w{1,15}', "title": "Letters, numbers, underscores (_), – 1-15 characters"})
     password = PasswordField('Password', validators=[DataRequired("Password required")], render_kw={'placeholder': 'Password'})
     confirm = PasswordField('Repeat password', validators=[DataRequired("Confirm password"), EqualTo('password', message="Passwords do not match")], render_kw={'placeholder': 'Repeat Password'})
     submit = SubmitField('Sign Up')
@@ -25,7 +25,7 @@ class RegistrationForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired("Username required")], render_kw={'placeholder': 'Username', 'pattern': '\w{1,15}', "title": "Letters, numbers, underscores (_) – 1-15 characters"})
+    username = StringField('Username', validators=[DataRequired("Username required")], render_kw={'placeholder': 'Username', "maxlength": "15", 'pattern': '\w{1,15}', "title": "Letters, numbers, underscores (_) – 1-15 characters"})
     email = StringField('E-Mail', validators=[Optional()])
     password = PasswordField('Password', validators=[DataRequired("Password required")], render_kw={'placeholder': 'Password'})
     remember_me = BooleanField('Remember Me')
