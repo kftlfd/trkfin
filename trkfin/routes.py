@@ -1,11 +1,12 @@
 from datetime import datetime
 from functools import wraps
 from json import dumps
-from os import path, remove
 from shutil import rmtree
 from zipfile import ZipFile
+import os
 
 from flask import flash, redirect, render_template, request, send_file, url_for
+from flask.ctx import after_this_request
 from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.urls import url_parse
 
@@ -15,8 +16,8 @@ from trkfin.models import History, Reports, Users, Wallets
 
 
 
-# decorator for generating reports
 def check_if_report_due(func):
+    # decorator for generating reports
     @wraps(func)
     def wrapper(*args, **kwargs):
         if datetime.utcnow().timestamp() >= current_user.next_report_ts:
@@ -25,11 +26,9 @@ def check_if_report_due(func):
         return func(*args, **kwargs)
     return wrapper
 
-
-
-# decorator to restrict user to only their own data
-# not necessary, affects only page address (adress bar)
 def only_personal_data(func):
+    # decorator to restrict user to only their own data
+    # not necessary, affects only page address (adress bar)
     @wraps(func)
     def wrapper(*args, **kwargs):
         if kwargs['username'] is not current_user.username:
@@ -326,93 +325,11 @@ def history(username):
 
 
 
-@app.route('/u/<username>', methods=['GET', 'POST'])
+@app.route('/u/<username>')
 @login_required
 @only_personal_data
 @check_if_report_due
 def account(username):
-
-    # kinda ugly
-
-    if request.form.get("new-username"):
-        check = Users.query.filter(Users.username==request.form.get("new-username")).all()
-        if len(check) != 0:
-            return redirect(url_for('account', username=current_user.username))
-        current_user.username = request.form.get("new-username")
-        db.session.commit()
-        flash('changed username')
-        return redirect(url_for('account', username=current_user.username))
-
-    if request.form.get("new-email"):
-        current_user.email = request.form.get("new-email")
-        db.session.commit()
-        flash('changed email')
-        return redirect(url_for('account', username=current_user.username))
-
-    if request.form.get("new-password"):
-        if not current_user.check_password(request.form.get("old-password")):
-            flash('wrong password')
-            return redirect(url_for('account', username=current_user.username))
-        current_user.set_password(request.form.get("new-password"))
-        db.session.commit()
-        flash('changed password')
-        return redirect(url_for('account', username=current_user.username))
-
-    if request.form.get("new-timezone"):
-        flash('tz upd')
-        current_user.tz_offset = request.form.get("new-timezone")
-        db.session.commit()
-        flash('updated timezone')
-        return redirect(url_for('account', username=current_user.username))
-
-    if request.form.get("new-report-frequency"):
-        new_freq = request.form.get("new-report-frequency")
-        if new_freq == 'other':
-            new_freq = request.form.get("ndays")
-        if len(new_freq) < 1:
-            return redirect(url_for('account', username=current_user.username))
-        current_user.report_frequency = new_freq
-        current_user.update_next_report_ts()
-        db.session.commit()
-        flash('set new rep freq')
-        return redirect(url_for('account', username=current_user.username))
-    
-    if request.form.get("email-reports-pref"):
-        if request.form.get("email-reports") and not current_user.email_reports:
-            current_user.email_reports = True
-            flash('emailing reports')
-        elif request.form.get("email-reports") and current_user.email_reports:
-            pass
-        elif current_user.email_reports:
-            current_user.email_reports = False
-            flash('emailing stoped')
-        db.session.commit()
-        return redirect(url_for('account', username=current_user.username))
-
-    if request.form.get("export-data"):
-        flash('export requested')
-        data = current_user.get_export_data()
-        with ZipFile('trkfin/exports/export.zip', 'w') as zip:
-            with open('trkfin/exports/raw.json', 'w') as file:
-                file.write(dumps(data))
-            zip.write('trkfin/exports/raw.json', arcname="raw.json")
-        return send_file('exports/export.zip')
-    
-    if request.form.get("delete-account"):
-        id = current_user.id
-        logout_user()
-        u = Users.query.get(id)
-        w = Wallets.query.filter(Wallets.user_id==id).all()
-        h = History.query.filter(History.user_id==id).all()
-        r = Reports.query.filter(Reports.user_id==id).all()
-        db.session.delete(u)
-        for i in w: db.session.delete(i)
-        for i in h: db.session.delete(i)
-        for i in r: db.session.delete(i)
-        db.session.commit()
-        flash('account deleted')
-        return redirect(url_for('index'))
-
     data = {
         'username': current_user.username,
         'email': current_user.email,
@@ -420,14 +337,104 @@ def account(username):
         'rep-freq': current_user.report_frequency,
         'email-reports': current_user.email_reports
     }
-
     return render_template('account.html', data=data)
 
-@app.after_request
-def delete_user_export(response):
-    if request.endpoint == "account" and request.form.get("export-data"):
-        rmtree("trkfin/exports/")
-    return response
+@app.route('/u/<username>/account-settings', methods=['POST'])
+@login_required
+def account_settings(username):
+
+    if request.form.get("new-username"):
+        check = Users.query.filter(Users.username==request.form.get("new-username")).all()
+        if len(check) != 0:
+            flash("New username is not available")
+        else:
+            current_user.username = request.form.get("new-username")
+            db.session.commit()
+            flash(f'Username changed to "{current_user.username}"')
+
+    elif request.form.get("new-email"):
+        current_user.email = request.form.get("new-email")
+        db.session.commit()
+        flash(f'E-mail is set to "{current_user.email}"')
+
+    elif request.form.get("new-password"):
+        if not current_user.check_password(request.form.get("old-password")):
+            flash('Wrong password')
+        elif request.form.get("new-password") != request.form.get("repeat-password"):
+            flash("Passwords don't match")
+        else:
+            current_user.set_password(request.form.get("new-password"))
+            db.session.commit()
+            flash('Password changed')
+
+    elif request.form.get("new-timezone"):
+        current_user.tz_offset = request.form.get("new-timezone")
+        db.session.commit()
+        flash('Timezone updated')
+
+    elif request.form.get("new-report-frequency"):
+
+        new_freq = request.form.get("new-report-frequency")
+        if current_user.report_frequency == new_freq or current_user.report_frequency == request.form.get("ndays"):
+            pass
+        elif new_freq == 'other' and request.form.get("ndays") >= 1 and request.form.get("ndays") <= 365:
+            current_user.report_frequency = request.form.get("ndays")
+            flash(f'Reports are set to every {request.form.get("ndays")} days')
+        else:
+            current_user.report_frequency = new_freq
+            flash(f'Reports are set to every {new_freq}')
+        
+        if request.form.get("email-reports") == "on" and not current_user.email_reports:
+            current_user.email_reports = True
+            flash('E-mailing reports')
+        elif not request.form.get("email-reports") and current_user.email_reports:
+            current_user.email_reports = False
+            flash('Stoped e-mailing reports')
+            
+        current_user.update_next_report_ts()
+        db.session.commit()
+    
+    return redirect(url_for('account', username=current_user.username))
+
+@app.route('/export-data', methods=['POST'])
+@login_required
+def export_data():
+
+    @after_this_request
+    def delete_export(response):
+        rmtree("trkfin/export/")
+        return response
+
+    data = current_user.get_export_data()
+    os.mkdir('trkfin/export/')
+    with ZipFile('trkfin/export/export.zip', 'w') as zf:
+        with open('trkfin/export/raw.json', 'w') as f:
+            f.write(dumps(data))
+        zf.write('trkfin/export/raw.json', arcname="raw.json")
+
+    return send_file('export/export.zip')
+
+@app.route('/delete-account', methods=['POST'])
+@login_required
+def delete_account():
+    
+    # remember id
+    id = current_user.id
+    logout_user()
+    
+    # gather and delete data from db
+    u = Users.query.get(id)
+    w = Wallets.query.filter(Wallets.user_id==id).all()
+    h = History.query.filter(History.user_id==id).all()
+    r = Reports.query.filter(Reports.user_id==id).all()
+    db.session.delete(u)
+    for i in w: db.session.delete(i)
+    for i in h: db.session.delete(i)
+    for i in r: db.session.delete(i)
+    db.session.commit()
+    
+    flash('Account deleted')
+    return redirect(url_for('index'))
 
 
 
@@ -436,8 +443,8 @@ def delete_user_export(response):
 # RESET DB - FOR TESTING ONLY
 @app.route('/resetdb')
 def resetdb():
-    if path.exists('trkfin.db'):
-        remove("trkfin.db")
+    if os.path.exists('trkfin.db'):
+        os.remove("trkfin.db")
     f = open('trkfin.db', 'x')
     f.close()
     db.create_all()

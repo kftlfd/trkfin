@@ -14,8 +14,8 @@
       <div class="acc-info">{{ data['username'] }}</div>
       <button class="change-btn margin-top" type="button" data-bs-toggle="collapse" data-bs-target="#changeUsername" aria-expanded="false" aria-controls="changeUsername">Change</button>
       <div class="collapse" id="changeUsername">
-        <form class="form-row margin-top" name="change-username" action="{{ url_for('account', username=current_user.username) }}" method="POST">
-          <input class="form-control width-auto" name="new-username" type="text" value="" placeholder="New username" pattern="[\w\d-_]{1,64}" title="letters, numbers, '-', '_'">
+        <form class="form-row margin-top" name="change-username" action="{{ url_for('account_settings', username=current_user.username) }}" method="POST">
+          <input class="form-control width-auto" name="new-username" type="text" value="" placeholder="New username" maxlength="15" pattern="\w" title="Letters, numbers, underscores">
           <input class="btn btn-primary" type="submit" value="Change">
         </form>
       </div>
@@ -28,8 +28,8 @@
       <div class="acc-info">{{ data['email'] or "—" }}</div>
       <button class="change-btn margin-top" type="button" data-bs-toggle="collapse" data-bs-target="#changeEmail" aria-expanded="false" aria-controls="changeEmail">Change</button>
       <div class="collapse" id="changeEmail">
-        <form class="form-row margin-top" name="change-email" action="{{ url_for('account', username=current_user.username) }}" method="POST">
-          <input class="form-control width-auto" disabled name="new-email" type="text" value="" placeholder="New email">
+        <form class="form-row margin-top" name="change-email" action="{{ url_for('account_settings', username=current_user.username) }}" method="POST">
+          <input class="form-control width-auto" name="new-email" type="text" value="" placeholder="New email" disabled>
           <input class="btn btn-primary" disabled type="submit" value="Change">
         </form>
       </div>
@@ -41,9 +41,10 @@
     <div class="setting-body">
       <button class="change-btn" type="button" data-bs-toggle="collapse" data-bs-target="#changePassword" aria-expanded="false" aria-controls="changePassword">Change</button>
       <div class="collapse" id="changePassword">
-        <form class="form-col margin-top" name="change-password" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+        <form class="form-col margin-top" name="change-password" action="{{ url_for('account_settings', username=current_user.username) }}" method="POST">
           <input class="form-control" name="old-password" type="password" value="" placeholder="Old password">
           <input class="form-control" name="new-password" type="password" value="" placeholder="New password">
+          <input class="form-control" name="repeat-password" type="password" value="" placeholder="Repeat password">
           <input class="btn btn-primary" type="submit" value="Change">
         </form>
       </div>
@@ -54,7 +55,7 @@
     <div class="setting-title">Timezone</div>
     <div class="setting-body">
       <div data-timezone="{{ data['timezone'] }}"></div>
-      <form class="margin-top" name="change-timezone" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+      <form class="margin-top" name="change-timezone" action="{{ url_for('account_settings', username=current_user.username) }}" method="POST">
         <input name="new-timezone" type="hidden" data-new-tz>
         <input class="change-btn" type="submit" value="Update">
       </form>
@@ -64,7 +65,7 @@
   <div class="setting" id="reports-settings">
     <div class="setting-title">Reports</div>
     <div class="setting-body">
-      <form name="change-reports" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+      <form name="change-reports" action="{{ url_for('account_settings', username=current_user.username) }}" method="POST">
         <div class="form-row">
           <div>Frequency:</div>
           <select class="form-select form-select-sm width-auto" name="new-report-frequency" data-rep-freq-select>
@@ -75,9 +76,9 @@
           </select>
           {% if data['rep-freq'] != "month" and data['rep-freq'] != "week" %}<span>every {{ data['rep-freq'] }} days</span>{% endif %}
           <input class="form-control form-control-sm form-hide width-auto" name="ndays" type="number" min="1" max="365" placeholder="Number of days" data-rep-freq-input>
-        </div>
+        </div>        
         <div class="form-row margin-top">
-          <input class="form-check-input" disabled id="email-rep" type="checkbox" name="email-reports" value="true" {% if data['email-reports'] %} checked {% endif %}>
+          <input class="form-check-input" id="email-rep" type="checkbox" name="email-reports" disabled {% if data['email-reports'] %} checked {% endif %}>
           <label class="form-check-label" for="email-rep">Send reports to e-mail</label>
         </div>
         <input class="change-btn margin-top" type="submit" value="Update">
@@ -88,13 +89,11 @@
   <div class="setting">
     <div class="setting-title">Privacy</div>
     <div class="setting-body">
-      <form name="export-data" action="{{ url_for('account', username=current_user.username) }}" method="POST">
+      <form name="export-data" action="{{ url_for('export_data') }}" method="POST">
         <input class="btn btn-success" type="submit" value="Export data">
-        <input name="export-data" type="hidden" value="true">
       </form>
-      <form class="margin-top" name="delete-account" action="{{ url_for('account', username=current_user.username) }}" method="POST" data-confirm-action="All your data will be deleted. Consider exporting your data first. This action cannot be undone.\n\nDelete account?">
+      <form class="margin-top" name="delete-account" action="{{ url_for('delete_account') }}" method="POST" data-confirm-action="All your data will be deleted. Consider exporting your data first. This action cannot be undone. Delete account?">
         <input class="btn btn-danger" type="submit" value="Delete account">
-        <input name="delete-account" type="hidden" value="true">
       </form>
     </div>
   </div>
