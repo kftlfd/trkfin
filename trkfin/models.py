@@ -14,7 +14,7 @@ class Users(UserMixin, db.Model):
     created = db.Column(db.Float, nullable=False) # utc-posix-timestamp
     tz_offset = db.Column(db.Integer) # no. of seconds to add to utc_ts to get users local time
     report_frequency = db.Column(db.String(5), default="month") # "month" , "week", or no. of days (>=1)
-    next_report = db.Column(db.Float, index=True) # utc-timestamp, timezone adjusted. Indexing for background jobs (TODO)
+    next_report_ts = db.Column(db.Float, index=True) # utc-timestamp, timezone adjusted. Indexing for background jobs (TODO)
     email_reports = db.Column(db.Boolean, default=False) # no email support curently
     walletcount = db.Column(db.Integer)
 
@@ -40,7 +40,7 @@ class Users(UserMixin, db.Model):
             "created": self.created,
             "tz_offset": self.tz_offset,
             "report_frequency": self.report_frequency,
-            "next_report": self.next_report,
+            "next_report_ts": self.next_report_ts,
             "email_reports": self.email_reports,
             "walletcount": self.walletcount
         }
@@ -61,21 +61,6 @@ class Users(UserMixin, db.Model):
         return Wallets.query.filter_by(user_id=self.id).order_by("group").order_by("name").all()
 
     def get_wallets_json(self):
-        wallets_raw = self.get_wallets()
-        wallets = {}
-        for w in wallets_raw:
-            wallets[w.id] = {
-                "name": w.name,
-                "group": w.group,
-                "initial": w.initial,
-                "income": w.income,
-                "spendings": w.spendings,
-                "transfers": w.transfers,
-                "balance": w.balance
-            }
-        return wallets
-
-    def get_wallets_status(self):
         wallets = self.get_wallets()
         report = {
             "wallets": {},
@@ -140,7 +125,8 @@ class Users(UserMixin, db.Model):
     
     ###   CalcTime   ###
 
-    def get_next_report_ts(self):
+    # def get_next_report_ts(self):
+    def update_next_report_ts(self):
         freq = self.report_frequency
         user_time = datetime.utcnow().timestamp() + self.tz_offset
         if freq == "month":
@@ -157,28 +143,31 @@ class Users(UserMixin, db.Model):
             nextts = d + timedelta(days=int(freq))
             nextts = nextts.replace(hour=0, minute=0, second=0, microsecond=0)
             nextts = nextts.timestamp() - self.tz_offset
+        self.next_report_ts = nextts
         return nextts
 
 
     ###   Reports   ###
 
-    def get_all_reports(self):
+    def get_reports(self):
         return Reports.query.filter(Reports.user_id==self.id).order_by(Reports.id.desc()).all()
     
-    def get_last_report(self):
-        return Reports.query.filter(Reports.user_id==self.id).order_by(Reports.id.desc()).first()
-    
-    def generate_report(self):
+    def create_new_report(self, end=None):
 
-        new_rep = Reports(self.id)
-        last = self.get_last_report()
-        if last: new_rep.time_start = last.time_end
-        else: new_rep.time_start = self.created
-        new_rep.time_end = self.next_report
-        data = self.get_wallets_status()
-        data["history"] = self.get_history_json(start=new_rep.time_start, end=new_rep.time_end)
-        data["tz-offset"] = self.tz_offset
-        new_rep.data = data
+        new_report = Reports(self.id, self.tz_offset)
+
+        # time start
+        last_report = Reports.query.filter(Reports.user_id==self.id).order_by(Reports.id.desc()).first()
+        if last_report: new_report.time_start = last_report.time_end + 0.001 # plus one milisecond = next_report_ts
+        else: new_report.time_start = self.created
+
+        # time end
+        if end: new_report.time_end = end
+        else: new_report.time_end = self.next_report_ts - 0.001 # minus one milisecond = previous day of next_report_ts
+
+        # data
+        new_report.wallets = self.get_wallets_json()
+        new_report.history = self.get_history_json(start=new_report.time_start, end=new_report.time_end)
 
         # reset users wallets
         wallets = self.get_wallets()
@@ -189,18 +178,10 @@ class Users(UserMixin, db.Model):
             w.transfers = 0
 
         # update next report time
-        self.next_report = self.get_next_report_ts()
-
-        # add history entry
-        record = History()
-        record.user_id = self.id
-        record.ts_utc = datetime.utcnow().timestamp()
-        record.local_time = datetime.fromtimestamp(record.ts_utc + self.tz_offset).__str__()[:19]
-        record.action = "Generated report"
+        if not end: self.update_next_report_ts()
 
         # write to db
-        db.session.add(new_rep)
-        db.session.add(record)
+        db.session.add(new_report)
         db.session.commit()
 
 
@@ -299,10 +280,13 @@ class Reports(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     time_start = db.Column(db.Float) # utc-posix-timestamp
     time_end = db.Column(db.Float) # utc-posix-timestamp
-    data = db.Column(db.JSON)
+    time_tz = db.Column(db.Integer)
+    wallets = db.Column(db.JSON)
+    history = db.Column(db.JSON)
 
-    def __init__(self, user_id):
+    def __init__(self, user_id, time_tz):
         self.user_id = user_id
+        self.time_tz = time_tz
         self.data = {}
 
     def __repr__(self):
@@ -314,5 +298,6 @@ class Reports(db.Model):
             "user_id": self.user_id,
             "time_start": self.time_start,
             "time_end": self.time_end,
+            "time_tz": self.time_tz,
             "data": self.data
         }

@@ -8,6 +8,7 @@
 
 <div class="section">
   {% for entry in history %}
+  {% with wallets = wallets["wallets"] %}
   <div class="history-entry">
 
     <div class="history-body grid-center">
@@ -60,6 +61,7 @@
     </div>
     
   </div>
+  {% endwith %}
   {% endfor %}
 </div>
 

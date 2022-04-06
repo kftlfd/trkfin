@@ -47,7 +47,10 @@ db.create_all()
 # jinja filters
 def num(value):
     return f'{value:,.2f}'
+def tostr(value):
+    return str(value)
 app.jinja_env.filters['num'] = num
+app.jinja_env.filters['str'] = tostr
 
 # launched successfully
 app.logger.info('trkfin launched')

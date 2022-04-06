@@ -26,8 +26,8 @@ def register():
             tz_offset = int(form.tz_offset.data), # int
             report_frequency = 'month'
             )
-        new_user.next_report = new_user.get_next_report_ts()       
         new_user.set_password(form.password.data)
+        new_user.update_next_report_ts()
         db.session.add(new_user)
         db.session.commit()
 

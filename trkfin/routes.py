@@ -19,8 +19,8 @@ from trkfin.models import History, Reports, Users, Wallets
 def check_if_report_due(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        if datetime.utcnow().timestamp() >= current_user.next_report:
-            current_user.generate_report()
+        if datetime.utcnow().timestamp() >= current_user.next_report_ts:
+            current_user.create_new_report()
             flash("New report is ready!")
         return func(*args, **kwargs)
     return wrapper
@@ -59,7 +59,7 @@ def home():
     form = MainForm()
 
     # load user's wallets to form
-    wallets = current_user.get_wallets_status()
+    wallets = current_user.get_wallets_json()
     srcs = []
     for group in wallets['groups']:
         for w_id in wallets['groups'][group]:
@@ -135,7 +135,7 @@ def wallets(username, **kwargs):
     form = AddWalletForm()
     
     # load wallet group names to form
-    wallets = current_user.get_wallets_status()
+    wallets = current_user.get_wallets_json()
     groups = set()
     for g in wallets['groups']:
         groups.add(g)
@@ -299,14 +299,14 @@ def wallet_controls(username, **kwargs):
 @only_personal_data
 @check_if_report_due
 def reports(username):
-    reports = current_user.get_all_reports()
-    return render_template('reports.html', reports=reports, time=current_user.next_report, time_tz=current_user.tz_offset)
+    reports = current_user.get_reports()
+    return render_template('reports.html', reports=reports, next_report_ts=current_user.next_report_ts, user_tz=current_user.tz_offset)
 
 @app.route('/u/<username>/new-report', methods=['POST'])
 def new_report(username):
-    # time_end = datetime.utcnow().timestamp() # + current_user.tz_offset ?
-    # current_user.generate_report(end=time_end)
-    flash("New report requested")
+    time_end = datetime.utcnow().timestamp()
+    current_user.create_new_report(end=time_end)
+    flash("New report created!")
     return redirect(url_for('reports', username=current_user.username))
 
 @app.route('/ajax-report')
@@ -372,7 +372,7 @@ def account(username):
         if len(new_freq) < 1:
             return redirect(url_for('account', username=current_user.username))
         current_user.report_frequency = new_freq
-        current_user.next_report = current_user.get_next_report_ts()
+        current_user.update_next_report_ts()
         db.session.commit()
         flash('set new rep freq')
         return redirect(url_for('account', username=current_user.username))

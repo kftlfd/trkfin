@@ -10,7 +10,7 @@
 
   <div class="next-report-info">
     <span>Next report:</span>
-    <span data-time="{{ time }}" data-time-tz="{{ time_tz }}"></span>
+    <span data-time="{{ next_report_ts }}" data-time-tz="{{ user_tz }}"></span>
     <a class="reports-settings-link" href="{{ url_for('account', username=current_user.username) }}#reports-settings"></a>
   </div>
 
@@ -27,9 +27,9 @@
   <div class="report" name='rep-{{ report.id}}'>
     <div class="report-title" data-bs-toggle='collapse' data-bs-target='#rep-{{ report.id }}'>
       <div>
-        <span data-time="{{ report.time_start }}" data-time-tz="{{ report.data['tz-offset'] }}"></span>
+        <span data-time="{{ report.time_start }}" data-time-tz="{{ report.time_tz }}"></span>
         <span>&ensp;&mdash;&ensp;</span>
-        <span data-time="{{ report.time_end }}" data-time-tz="{{ report.data['tz-offset'] }}"></span>
+        <span data-time="{{ report.time_end }}" data-time-tz="{{ report.time_tz }}"></span>
       </div>
     </div>
     <div class="collapse" id='rep-{{ report.id }}'>
@@ -38,15 +38,22 @@
         <div class="report-title active" data-bs-toggle='collapse' data-bs-target='#wallets-{{ report.id }}' aria-expanded="true" aria-controls="wallets-{{ report.id }}">Wallets</div>
 
         <div class="collapse show" id='wallets-{{ report.id }}'>
-          {% with wallets = report.data %}
+          {% with wallets = report.wallets %}
 
           <!-- wallets.html -->
           {% for group in wallets['groups'] %}
-          <div class="section">            
+          <div class="section">
+            {% if wallets['groupsize'][group] > 1 %}
+            <div {% if group == "" %}class="group group-unnamed active"{% else %}class="group active"{% endif %} data-bs-toggle="collapse" data-bs-target="#group-{{ group }}" aria-expanded="true" aria-controls="group-{{ group }}" data-wallet-title>
+            {% else %}
             <div {% if group == "" %}class="group group-unnamed"{% else %}class="group"{% endif %} data-bs-toggle="collapse" data-bs-target="#group-{{ group }}" aria-expanded="false" aria-controls="group-{{ group }}" data-wallet-title>
+            {% endif %}
               <div class="group-title">{{ group or "Ungroupped" }}</div>
               {% if wallets['groupsize'][group] > 1 %}
+              <div class="collapse show" id="group-{{ group }}">
+              {% else %}
               <div class="collapse" id="group-{{ group }}">
+              {% endif %}
                 <div class="wallet-info">
                   <div>Initial</div>
                   <div class="wallet-amount">{{ wallets['sums'][group]['initial_sum'] | num }}</div>
@@ -58,15 +65,14 @@
                   <div class="wallet-amount wallet-total">{{ wallets['sums'][group]['balance_sum'] | num }}</div>
                 </div>
               </div>
-              {% endif %}
             </div>
             {% for w_id in wallets['groups'][group] %}
             <div class="wallet">
-              <div class="wallet-title" data-bs-toggle="collapse" data-bs-target="#wallet-body-{{ w_id }}" aria-expanded="false" aria-controls="wallet-body-{{ w_id }}"  data-wallet-title>
+              <div class="wallet-title active" data-bs-toggle="collapse" data-bs-target="#wallet-body-{{ w_id }}" aria-expanded="true" aria-controls="wallet-body-{{ w_id }}"  data-wallet-title>
                 <div>{{ wallets['groups'][group][w_id]['name'] }}</div>
                 <div>{{ wallets['groups'][group][w_id]['balance'] | num }}</div>
               </div>
-              <div class="collapse" id="wallet-body-{{ w_id }}">
+              <div class="collapse show" id="wallet-body-{{ w_id }}">
                 <div class="wallet-info">
                   <div>Initial</div>
                   <div class="wallet-amount">{{ wallets['groups'][group][w_id]['initial'] | num }}</div>
@@ -89,11 +95,11 @@
           {% endwith %}
         </div>
 
-        <div class="report-title" data-bs-toggle='collapse' data-bs-target='#history-{{ report.id }}' aria-expanded="false" aria-controls="history-{{ report.id }}">History</div>
+        <div class="report-title active" data-bs-toggle='collapse' data-bs-target='#history-{{ report.id }}' aria-expanded="true" aria-controls="history-{{ report.id }}">History</div>
         
-        <div class="collapse" id='history-{{ report.id }}'>
-          {% with history = report.data['history'] %}
-          {% with wallets = report.data %}
+        <div class="collapse show" id='history-{{ report.id }}'>
+          {% with history = report.history %}
+          {% with wallets = report.wallets["wallets"] %}
 
           <!-- history.html -->
           <div class="section">
@@ -105,39 +111,49 @@
               </div>
               <div class="history-body">
                 <div {% if entry.action == "Spending" %} class="action-spending" {% elif entry.action == "Income" %} class="action-income" {% elif entry.action == "Transfer" %} class="action-transfer" {% else %} class="action-info" {% endif %}>{{ entry.action }}</div>
+                
                 {% if entry.source %}
-                {% if wallets[entry.source] %}
+                {% with src = entry.source | str %}
+                {% if wallets[src] %}
                 <div class="history-wallet">
-                  {% if wallets[entry.source].group != "" %}
-                  <span class="history-group">{{ wallets[entry.source].group }}</span>
+                  {% if wallets[src].group != "" %}
+                  <span class="history-group">{{ wallets[src].group }}</span>
                   {% endif %}
-                  {{ wallets[entry.source].name }}
+                  {{ wallets[src].name }}
                 </div>
                 {% else %}
                 <div class="history-wallet deleted">DELETED</div>
                 {% endif %}
+                {% endwith %}
                 {% endif %}
+
                 {% if entry.source and entry.destination %}
                 <div class="nosidepad">&rarr;</div>
                 {% endif %}
+
                 {% if entry.destination %}
-                {% if wallets[entry.destination] %}
+                {% with dest = entry.destination | str %}
+                {% if wallets[dest] %}
                 <div class="history-wallet">
-                  {% if wallets[entry.destination].group != "" %}
-                  <span class="history-group">{{ wallets[entry.destination].group }}</span>
+                  {% if wallets[dest].group != "" %}
+                  <span class="history-group">{{ wallets[dest].group }}</span>
                   {% endif %}
-                  {{ wallets[entry.destination].name }}
+                  {{ wallets[dest].name }}
                 </div>
                 {% else %}
                 <div class="history-wallet deleted">DELETED</div>
                 {% endif %}
+                {% endwith %}
                 {% endif %}
+
                 {% if entry.amount %}
                 <div {% if entry.action == "Spending" %} class="nosidepad action-spending-amount" {% elif entry.action == "Income" %} class="nosidepad action-income-amount"{% else %} class="nosidepad"{% endif %}>{{ entry.amount | num }}</div>
                 {% endif %}
+
                 {% if entry.description %}
                 <div class="nosidepad history-description">{{ entry.description }}</div>
                 {% endif %}
+                
               </div>
             </div>
             {% endfor %}
