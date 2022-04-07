@@ -406,11 +406,15 @@ def export_data():
         return response
 
     data = current_user.get_export_data()
-    os.mkdir('trkfin/export/')
+    if not os.path.exists('trkfin/export/'):
+        os.mkdir('trkfin/export/')
     with ZipFile('trkfin/export/export.zip', 'w') as zf:
         with open('trkfin/export/raw.json', 'w') as f:
             f.write(dumps(data))
+        with open('trkfin/export/export.html', 'w') as f2:
+            f2.write(render_template('export.html', data=data))
         zf.write('trkfin/export/raw.json', arcname="raw.json")
+        zf.write('trkfin/export/export.html', arcname="export.html")
 
     return send_file('export/export.zip')
 
@@ -449,3 +453,8 @@ def resetdb():
     f.close()
     db.create_all()
     return redirect('/')
+
+@app.route('/test-export')
+def test_export():
+    data = current_user.get_export_data()
+    return render_template('export.html', data=data)

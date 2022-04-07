@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, width=device-width">
+    <title>TrkFin Data Export</title>
+  </head>
+
+	<body>
+
+    <style>
+
+      * {
+        box-sizing: border-box;
+      }
+      
+      html {
+        font-family: sans-serif;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 10rem;
+        height: 100%;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+
+        background-color: #eee;
+        border-right: 1px solid #ddd;
+      }
+      .nav-radio {
+        display: none;
+      }
+      .nav-link {
+        display: grid;
+        place-content: center;
+        padding: 1.5rem;
+
+        cursor: pointer;
+        color: #444;
+        background-color: #eee;
+        transition: all 0.3s ease;
+      }
+      .nav-link.active {background-color: #ddd;}
+      .nav-link:hover {background-color: #ccc;}
+
+      .main {
+        margin-left: 10rem;
+        padding: 1rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .section {
+        display: none;
+        flex-direction: column;
+        gap: 3rem;
+      }
+      .open {
+        display: flex;
+      }
+      
+      .data {
+        display: grid;
+        grid-template-columns: max-content auto;
+        gap: 0.5rem 1rem;
+      }
+      .data-key {
+        color: #222;
+      }
+      .data-value {
+        color: #448;
+        overflow-wrap: anywhere;
+      }
+      
+      .page-title,
+      .page-break {
+        display: none;
+      }
+
+      @media screen and (max-width: 799px) {
+
+        .nav {
+          top: auto;
+          bottom: 0;
+          height: 5rem;
+          width: 100%;
+
+          flex-direction: row;
+          align-items: stretch;
+          box-shadow: none;
+          border-right: none;
+          border-top: 1px solid #ddd;
+        }
+
+        .nav-link {
+          flex-basis: 1rem;
+          flex-grow: 1;
+        }
+
+        .main {
+          margin-left: 0;
+          margin-bottom: 5rem;
+        }
+
+      }
+
+      @media print {
+        .nav {display: none;}
+        .main {margin: 0;}
+        .section {display: flex;}
+        .page-title {
+          display: block;
+          text-align: center;
+          font-size: 2rem;
+          margin: 4rem 1rem 1rem;
+        }
+        .page-break {
+          display: block;
+          margin-top: 2rem;
+          border-top: 5px solid #888;
+        }
+      }
+
+    </style>
+
+		<nav>
+      <form class="nav" name="navbar">
+        <input id="nav-user" class="nav-radio" name="nav" type="radio" value="user">
+        <label class="nav-link active" for="nav-user" data-nav="user">User</label>
+        
+        <input id="nav-wallets" class="nav-radio" name="nav" type="radio" value="wallets">
+        <label class="nav-link" for="nav-wallets" data-nav="wallets">Wallets</label>
+
+        <input id="nav-reports" class="nav-radio" name="nav" type="radio" value="reports">
+        <label class="nav-link" for="nav-reports" data-nav="reports">Reports</label>
+
+        <input id="nav-history" class="nav-radio" name="nav" type="radio" value="history">
+        <label class="nav-link" for="nav-history" data-nav="history">History</label>
+      </form>
+    </nav>
+
+    <main class="main">
+      
+      <div class="section open" id="user" data-section="user">
+        <div class="page-title">User</div>
+        <div class="data">
+          {% for key in data['user'] %}
+          <div class="data-key">{{ key }}</div>
+          <div class="data-value">{{ data['user'][key] }}</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="page-break"></div>
+      
+      <div class="section" id="wallets" data-section="wallets">
+        <div class="page-title">Wallets</div>
+        {% for w in data['wallets'] %}
+        <div class="data">
+          {% for key in w %}
+          <div class="data-key">{{ key }}</div>
+          <div class="data-value">{% if w[key] != "" %}{{ w[key] }}{% else %}*ungrouped{% endif %}</div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="page-break"></div>
+      
+      <div class="section" id="reports" data-section="reports">
+        <div class="page-title">Reports</div>
+        {% for r in data['reports'] %}
+        <div class="data">
+        {% for key in r %}
+
+          <div class="data-key">{{ key }}</div>
+
+          {% if key == 'wallets' %}
+          <div class="data">
+            {% for division in r[key] %}
+
+              <div class="data-key">{{ division }}</div>
+              
+              <div class="data">
+
+              {% if division == 'wallets' %}
+                {% with wallets = r[key]['wallets'] %}
+                {% for w_id in wallets %}
+                <div class="data-key">{{ w_id }}</div>
+                <div class="data">
+                  {% for k in wallets[w_id] %}
+                  <div class="data-key">{{ k }}</div>
+                  <div class="data-value">{{ wallets[w_id][k] or '*ungrouped' }}</div>
+                  {% endfor %}
+                </div>
+                {% endfor %}
+                {% endwith %}
+                
+              {% elif division == 'groups' %}
+                {% with groups = r[key]['groups'] %}
+                {% for g in groups %}
+                <div class="data-key">{{ g or "*ungrouped" }}</div>
+                <div class="data">
+                  {% for w_id in groups[g] %}
+                  <div class="data-key">{{ w_id }}</div>
+                  <div class="data">
+                    {% for k in groups[g][w_id] %}
+                    <div class="data-key">{{ k }}</div>
+                    <div class="data-value">{{ groups[g][w_id][k] }}</div>
+                    {% endfor %}
+                  </div>
+                  {% endfor %}
+                </div>
+                {% endfor %}
+                {% endwith %}
+                
+              {% elif division == 'groupsize' %}
+                {% with groupsize = r[key]['groupsize'] %}
+                {% for group in groupsize %}
+                <div class="data-key">{{ group or '*ungrouped' }}</div>
+                <div class="data-value">{{ groupsize[group] }}</div>
+                {% endfor %}
+                {% endwith %}
+
+
+              {% elif division == 'sums' %}
+                {% with sums = r[key]['sums'] %}
+                {% for group in sums %}
+                <div class="data-key">{{ group or '*ungrouped' }}</div>
+                <div class="data">
+                  {% for k in sums[group] %}
+                  <div class="data-key">{{ k }}</div>
+                  <div class="data-value">{{ sums[group][k] }}</div>
+                  {% endfor %}
+                </div>
+                {% endfor %}
+                {% endwith %}
+
+              {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+          
+          {% elif key == 'history' %}
+          <div class="data">
+            {% for entry in r[key] %}
+            <div class="data-key">{{ entry['id'] }}</div>
+            <div class="data">
+              {% for k in entry %}
+              <div class="data-key">{{ k }}</div>
+              <div class="data-value">{{ entry[k] }}</div>
+              {% endfor %}
+            </div>
+            {% endfor %}
+          </div>
+          
+          {% else %}
+          <div class="data-value">{{ r[key] }}</div>
+          {% endif %}
+          
+        {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="page-break"></div>
+      
+      <div class="section" id="history" data-section="history">
+        <div class="page-title">History</div>
+        {% for h in data['history'] %}
+        <div class="data">
+          {% for key in h %}
+          <div class="data-key">{{ key }}</div>
+          <div class="data-value">{{ h[key] }}</div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+
+    </main>
+      
+    <script>
+
+      const navbar = document.forms["navbar"];
+      navbar.addEventListener('click', () => {
+        document.querySelectorAll('[data-nav]').forEach(x => {x.classList.remove('active')});
+        document.querySelectorAll('[data-section]').forEach(x => {x.classList.remove('open')});
+        document.querySelector('[data-nav="' + navbar.nav.value + '"]').classList.add('active');
+        document.querySelector('[data-section="' + navbar.nav.value + '"]').classList.add('open');
+      });
+
+    </script>
+
+	</body>
+
+</html>

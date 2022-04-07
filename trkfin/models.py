@@ -125,7 +125,6 @@ class Users(UserMixin, db.Model):
     
     ###   CalcTime   ###
 
-    # def get_next_report_ts(self):
     def update_next_report_ts(self):
         freq = self.report_frequency
         user_time = datetime.utcnow().timestamp() + self.tz_offset
@@ -299,5 +298,6 @@ class Reports(db.Model):
             "time_start": self.time_start,
             "time_end": self.time_end,
             "time_tz": self.time_tz,
-            "data": self.data
+            "wallets": self.wallets,
+            "history": self.history
         }
