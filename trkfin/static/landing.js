@@ -5,7 +5,7 @@ if (body.getBoundingClientRect().y >= 0) {
   body.classList.add("reveal");
   function slideReveal() {
     slideSections.forEach(x => {
-      if (x.getBoundingClientRect().y < window.screen.height + 150) {
+      if (x.getBoundingClientRect().y < window.screen.height + 50) {
         x.classList.add("done")
       }
     });
