@@ -64,7 +64,14 @@ body {
 .footer {
   background: var(--footer-bg);
   color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+.footer a {color: #eee;}
+.footer a:visited {color: #ddd;}
+.footer a:hover {color: #fff;}
+.footer a:active {color: #ccc;}
 
 
 
