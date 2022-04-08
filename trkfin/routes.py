@@ -31,7 +31,7 @@ def only_personal_data(func):
     # not necessary, affects only page address (adress bar)
     @wraps(func)
     def wrapper(*args, **kwargs):
-        if kwargs['username'] is not current_user.username:
+        if kwargs['username'] != current_user.username:
             return redirect(url_for(func.__name__, username=current_user.username))
         return func(*args, **kwargs)
     return wrapper
@@ -129,7 +129,7 @@ def home():
 @login_required
 @only_personal_data
 @check_if_report_due
-def wallets(username, **kwargs):
+def wallets(username):
 
     form = AddWalletForm()
     
@@ -192,7 +192,7 @@ def wallets(username, **kwargs):
     return render_template('wallets.html', form=form, wallets=wallets, data=data)
 
 @app.route("/u/<username>/wallet-controls", methods=["POST"])
-def wallet_controls(username, **kwargs):
+def wallet_controls(username):
 
     if request.form.get('rename-group'):
         group = request.form.get('rename-group')
@@ -325,7 +325,7 @@ def history(username):
 
 
 
-@app.route('/u/<username>')
+@app.route('/u/<username>/account')
 @login_required
 @only_personal_data
 @check_if_report_due
