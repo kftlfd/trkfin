@@ -1,6 +1,12 @@
 # TrkFin
 
-Web-app to track your finances using Flask
+Flask web-app that helps you track your finances.
+
+This is a final project for Harvard's [CS50x](https://cs50.harvard.edu/x/2022/).
+
+Big thanks to Miguel Grinberg and his [Flask Mega-Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world)!
+
+#
 
 ## Installation and local hosting
 
@@ -24,3 +30,9 @@ $ source venv/bin/activate
 ```
 
 Now app is accessible at `http://localhost:5000/`
+
+#
+
+## License
+
+Software is released under the GPL-3.0, see LICENSE.txt for details.
