@@ -1,5 +1,11 @@
-{% extends "../base.html" %}
+{% extends "base.html" %}
 
 {% block main %}
-    <h1>Unexpected Server Error</h1>    
+<div class="section centered">
+  <h1>Oops!</h1>
+  <h3>Unexpected Server Error</h3>
+  {% if error %}
+  <div>{{ error }}</div>
+  {% endif %}
+</div>
 {% endblock %}
