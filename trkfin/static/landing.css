@@ -187,17 +187,40 @@ h2 {
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 10rem;
+}
+
+
+
+/* thanks to https://howchoo.com/webdev/how-to-make-youtube-videos-responsive-without-js */
+.embed-youtube {
+  margin-top: 2rem;
+  position: relative;
+  padding-bottom: 56.25%;
+  padding-top: 30px;
+  height: 0;
+  overflow: hidden;
+}
+.embed-youtube iframe,
+.embed-youtube object,
+.embed-youtube embed {
+    border: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 
 
 .footer {
+  margin-top: 10rem;
   padding: 1rem 0;
 }
 .footer h2 {
   margin-bottom: 1rem;
 }
+
 
 
 /********** Reveal **********/
