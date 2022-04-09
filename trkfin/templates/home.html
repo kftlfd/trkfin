@@ -49,7 +49,7 @@
 <div class="section">
   
   <div {% if group == "" %}class="group group-unnamed"{% else %}class="group"{% endif %} data-bs-toggle="collapse" data-bs-target="#group-{{ group }}" aria-expanded="false" aria-controls="group-{{ group }}" data-wallet-title>
-    <div class="group-title">{{ group or "Ungroupped" }}</div>
+    <div class="group-title">{{ group or "Ungrouped" }}</div>
     <div class="collapse" id="group-{{ group }}">
       <div class="wallet-info">
         <div>Initial</div>

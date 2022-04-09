@@ -48,7 +48,7 @@
             {% else %}
             <div {% if group == "" %}class="group group-unnamed"{% else %}class="group"{% endif %} data-bs-toggle="collapse" data-bs-target="#group-{{ group }}" aria-expanded="false" aria-controls="group-{{ group }}" data-wallet-title>
             {% endif %}
-              <div class="group-title">{{ group or "Ungroupped" }}</div>
+              <div class="group-title">{{ group or "Ungrouped" }}</div>
               {% if wallets['groupsize'][group] > 1 %}
               <div class="collapse show" id="group-{{ group }}">
               {% else %}
