@@ -1,1 +1,1 @@
-web: gunicorn trkfin:trkfin
+web: gunicorn trkfin:app
