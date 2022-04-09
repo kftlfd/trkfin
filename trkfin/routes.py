@@ -444,17 +444,34 @@ def delete_account():
 
 ############### TESTING ###############
 
-# RESET DB - FOR TESTING ONLY
 @app.route('/resetdb')
-def resetdb():
-    if os.path.exists('trkfin.db'):
-        os.remove("trkfin.db")
-    f = open('trkfin.db', 'x')
-    f.close()
-    db.create_all()
-    return redirect('/')
+def reset_db():
+    psw = request.args.get('psw')
+    if psw == app.config['RESET_DB_PASSWORD']:
+        if current_user.is_authenticated: logout_user()
+        db.drop_all()
+        db.create_all()
+        flash('Database is reset')
+    else:
+        flash('Denied')
+    return redirect(url_for('index'))
 
 @app.route('/test-export')
 def test_export():
-    data = current_user.get_export_data()
+    data = None
+    if current_user.is_authenticated:
+        data = current_user.get_export_data()
     return render_template('export.html', data=data)
+
+@app.route('/test-404')
+def test_404():
+    return render_template('errors/404.html'), 404
+
+@app.route('/test-500')
+def test_500():
+    return render_template('errors/500.html'), 500
+
+@app.route('/test-error')
+def test_error():
+    return unknown_variable
+    return render_template('errors/500.html'), 500

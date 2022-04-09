@@ -12,3 +12,6 @@ class Config(object):
 
     # logging on Heroku
     LOG_TO_STDOUT = os.environ.get('LOG_TO_STDOUT')
+
+    # reset database
+    RESET_DB_PASSWORD = os.environ.get('RESET_DB_PASSWORD') or 'reset'
