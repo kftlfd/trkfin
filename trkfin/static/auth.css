@@ -1,9 +1,9 @@
 .main,
-.section {
+.main .section {
   padding: 0;
 }
 
-.section {
+.main .section {
   flex-grow: 1;
   display: grid;
   place-content: center;

@@ -287,7 +287,7 @@ def wallet_controls(username):
         )
         db.session.add(record)
         db.session.commit()
-        flash(f'Deleted wallet "{name} (group)"')
+        flash(f'Deleted wallet "{name} ({group})"')
     
     return redirect(url_for('wallets', username=current_user.username))
 
