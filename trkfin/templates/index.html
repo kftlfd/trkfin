@@ -76,7 +76,7 @@
           <h4 class="hero-subtitle">Warning: not a real service</h4>
           <div class="flex-row">
             <a class="btn btn-lg btn-primary" href="#features">Features</a>
-            <a class="btn btn-lg btn-outline-primary" href="#">Sign Up</a>
+            <a class="btn btn-lg btn-outline-primary" href="{{ url_for('auth.register') }}">Sign Up</a>
           </div>
         </div>
         <div class="hero-img">
@@ -139,7 +139,7 @@
 
       <div class="section signup" name="sign-up">
         <div>Don't hesitate, sign up now!</div>
-        <a class="btn btn-primary btn-lg" href="#">Sign Up</a>
+        <a class="btn btn-primary btn-lg" href="{{ url_for('auth.register') }}">Sign Up</a>
       </div>
 
       <div class="section" name="video">
