@@ -35,4 +35,4 @@ Now app is accessible at `http://localhost:5000/`
 
 ## License
 
-Software is released under the GPL-3.0, see LICENSE.txt for details.
+Software is released under the GPL-3.0, see LICENSE.txt for full text, or TL;DR [here](https://gist.github.com/kn9ts/cbe95340d29fc1aaeaa5dd5c059d2e60).
