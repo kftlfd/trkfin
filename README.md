@@ -1,12 +1,12 @@
 # TrkFin
 
-Flask web-app that helps you track your finances.
+Flask web-app that helps you track your finances. [Video demo on YouTube](https://www.youtube.com/watch?v=SRaubLMJzj0).
 
 This is a final project for Harvard's [CS50x](https://cs50.harvard.edu/x/2022/).
 
 Big thanks to Miguel Grinberg and his [Flask Mega-Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world)!
 
-Live version on Heroku: [https://trkfin.herokuapp.com/](https://trkfin.herokuapp.com/)
+Live version on Heroku: [https://trkfin.herokuapp.com/](https://trkfin.herokuapp.com/).
 
 
 
