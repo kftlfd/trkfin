@@ -244,7 +244,7 @@ if (document.querySelector('[data-page="reports"]')) {
 
   document.querySelectorAll('[data-time]').forEach(x => {
     let time = new Date((Number(x.dataset.time) + Number(x.dataset.timeTz)) * 1000);
-    x.innerText = time.getFullYear() + "–" + padZero(time.getMonth()) + "–" + padZero(time.getDate());
+    x.innerText = time.getFullYear() + "–" + padZero(time.getMonth() + 1) + "–" + padZero(time.getDate());
   });
 
   // AJAX
