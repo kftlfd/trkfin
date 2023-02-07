@@ -6,9 +6,6 @@ This is a final project for Harvard's [CS50x](https://cs50.harvard.edu/x/2022/).
 
 Big thanks to Miguel Grinberg and his [Flask Mega-Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world)!
 
-Live version on Heroku: [https://trkfin.herokuapp.com/](https://trkfin.herokuapp.com/).
-
-
 
 ## Installation and local hosting
 
